@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require 'evva'
+Evva.run(ARGV)
