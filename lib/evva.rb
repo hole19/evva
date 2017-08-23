@@ -22,9 +22,10 @@ module Evva
       bundle       = analytics_data(config: config.dictionary)
     end
     event_generator = Evva::EventGenerator.new()
-    event_generator.build(bundle['events'], config.type, config.out_path)
+    event_generator.build(bundle[:events], config.type, config.out_path)
     enum_generator = Evva::EnumGenerator.new()
-    enum_generator.build(bundle['enums'], config.type, config.out_path)
+    enum_generator.build(bundle[:enums], config.type, config.out_path)
+    Evva::Logger.print_summary
   end
 
   def analytics_data(config:)
