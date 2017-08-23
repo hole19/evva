@@ -5,9 +5,9 @@ module Evva
     def build(data, type, path)
       if type.eql? "Android"
         if file = open_file("#{path}/mixpanel.kt", "w", false)
-          file.write(generate_kotlin_header)
+          file.write(kotlin_header)
           data.each do |event|
-            file.write(generate_kotlin_function(event))
+            file.write(kotlin_function(event))
           end
           file.write("\n}")
         end
@@ -16,52 +16,52 @@ module Evva
       if type.eql? 'iOS'
         if file = open_file("#{path}/mixpanel.swift", "w", false)
           data.each do |event|
-            file.write(generate_swift_function(event))
+            file.write(swift_function(event))
           end
         end
       end
 
-        file.flush
-        file.close
-  end
+      file.flush
+      file.close
+    end
 
-    def generate_kotlin_function(eventData)
-      if !eventData.properties.nil?
-        props = generate_json_props(eventData.properties)
-        functionBody = 
-      "\nfun #{eventData.functionName}(#{eventData.properties}) {"\
-          "#{props}"\
-      "\tmixpanelApi.trackEvent('#{eventData.eventName}', properties)\n"
+    def kotlin_function(event_data)
+      if !event_data.properties.nil?
+        props = json_props(event_data.properties)
+        function_body =
+        "\nfun #{event_data.function_name}(#{event_data.properties}) {"\
+        "#{props}"\
+        "\tmixpanelApi.trackEvent('#{event_data.event_name}', properties)\n"
       else
         props = nil
-        functionBody = 
-      "\nfun #{eventData.functionName}(#{eventData.properties}) {\n"\
-          "\tmixpanelApi.trackEvent('#{eventData.eventName}')\n"    
+        function_body =
+        "\nfun #{event_data.function_name}(#{event_data.properties}) {\n"\
+        "\tmixpanelApi.trackEvent('#{event_data.event_name}')\n"    
       end
-      functionBody += "}\n"
+      function_body += "}\n"
     end
 
-    def generate_swift_function(eventData)
-      functionBody = "case .#{eventData.functionName}(): \n" + 
-       "return EventData(name:" + "'#{eventData.eventName}'" + ", properties: [#{eventData.properties}]\n"
-      functionBody
+    def swift_function(event_data)
+      function_body = "case .#{event_data.function_name}(): \n" + 
+      "return EventData(name:" + "'#{event_data.event_name}'" + ", properties: [#{event_data.properties}]\n"
+      function_body
     end
 
-    def generate_json_props(properties)
-      splitProperties = ""
+    def json_props(properties)
+      split_properties = ""
       properties.split(',').each do |prop|
         if is_special_property(prop)
-          splitProperties += "\t\tput('" + "#{prop.split(":").first()}', " + prop.split(":").first() + ")\n"
+          split_properties += "\t\tput('" + "#{prop.split(":").first()}', " + prop.split(":").first() + ")\n"
         else
-          splitProperties += "\t\tput('" + "#{prop.split(":").first()}', " + prop.split(":").first() + ".key)\n"
+          split_properties += "\t\tput('" + "#{prop.split(":").first()}', " + prop.split(":").first() + ".key)\n"
         end
       end
-      resultingJson = "\n\tval properties = JSONObject().apply {\n" +
-        +"#{splitProperties}"
-      resultingJson += "\n\t}\n"
+      resulting_json = "\n\tval properties = JSONObject().apply {\n" +
+      +"#{split_properties}"
+      resulting_json += "\n\t}\n"
     end
 
-    def generate_kotlin_header
+    def kotlin_header
       header = 
       "package com.hole19golf.hole19.analytics\n"\
       "import com.hole19golf.hole19.analytics.Event\n\n"\

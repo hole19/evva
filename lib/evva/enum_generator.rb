@@ -5,8 +5,8 @@ module Evva
     def build(data, type, path)
       if type.eql? "Android"
         data.each do |enum|
-          file = open_file("#{path}/#{enum.enumName}.kt", "w", false)
-          file.write(generate_kotlin_enum(enum))
+          file = open_file("#{path}/#{enum.enum_name}.kt", "w", false)
+          file.write(kotlin_enum(enum))
           file.flush
           file.close
         end
@@ -14,7 +14,7 @@ module Evva
 
       if type.eql? 'iOS'
         data.each do |enum|
-          file = open_file("./#{enum.enumName}.swift", "w", false)
+          file = open_file("./#{enum.enum_name}.swift", "w", false)
           file.write(generate_swift_enum(enum))
           file.flush
           file.close
@@ -22,22 +22,22 @@ module Evva
       end
     end
 
-    def generate_kotlin_enum(enum)
-      enumValues = enum.values.split(',')
-      enumBody = "enum class #{enum.enumName}(val key: String) {\n"
-      enumValues.each do |vals|
-        enumBody += "\t#{vals.upcase}(" + "'#{vals}'" + "),\n"
+    def kotlin_enum(enum)
+      enum_values = enum.values.split(',')
+      enum_body = "enum class #{enum.enum_name}(val key: String) {\n"
+      enum_values.each do |vals|
+        enum_body += "\t#{vals.upcase}(" + "'#{vals}'" + "),\n"
       end
-      enumBody += "} \n"
+      enum_body += "} \n"
     end
 
     def generate_swift_enum(enum)
-      enumValues = enum.values.split(',')
-      enumBody = "enum #{enum.enumName}: String {\n"
-      enumValues.each do |vals|
-        enumBody += "\tcase #{vals} = "+ "'#{vals}'" + "\n"
+      enum_values = enum.values.split(',')
+      enum_body = "enum #{enum.enum_name}: String {\n"
+      enum_values.each do |vals|
+        enum_body += "\tcase #{vals} = "+ "'#{vals}'" + "\n"
       end
-      enumBody += "} \n"
+      enum_body += "} \n"
     end
 
     def open_file(file_name, method, should_exist)

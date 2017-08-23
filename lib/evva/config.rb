@@ -27,8 +27,6 @@ module Evva
       @hash[:out_path]
     end
 
-    private
-
     CONFIG_STRUCT = {
       type: Hash,
       elements: {
@@ -51,7 +49,7 @@ module Evva
 
   
     DICTIONARY_STRUCT = {
-      "google_sheet" => GOOGLE_SHEET_STRUCT,
+      "google_sheet" => GOOGLE_SHEET_STRUCT
     }
   end
 end

@@ -1,16 +1,15 @@
 module Evva
-    class MixpanelEnum
+  class MixpanelEnum
 
-        attr_reader :enumName, :values
-        def initialize(enumName, values)
-            @enumName = enumName
-            @values = values
-        end
+    attr_reader :enum_name, :values
+    def initialize(enum_name, values)
+      @enum_name = enum_name
+      @values = values
+    end
 
-        def ==(another_enum)
-            self.enumName == another_enum.enumName
-            self.values == another_enum.values
-        end
-
-    end  
+    def ==(other)
+      self.enum_name == other.enum_name
+      self.values == other.values
+    end
+  end
 end

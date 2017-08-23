@@ -5,7 +5,7 @@ module Evva
         raise ArgumentError.new("keys: expected Hash, got #{keys.class}")
       end
 
-      keys.each do |lang,v|
+      keys.each do |lang, v|
         unless v.is_a?(Hash)
           raise ArgumentError.new("keys['#{lang}']: expected Hash, got #{v.class}")
         end
@@ -17,7 +17,7 @@ module Evva
         end
       end
 
-      @keys = Hash[keys.map { |k,v| [k.downcase, v] }]
+      @keys = Hash[keys.map { |k, v| [k.downcase, v] }]
     end
   end
 end

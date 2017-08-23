@@ -6,7 +6,7 @@ require 'evva/logger'
 require 'evva/google_sheet'
 require 'evva/config'
 require 'evva/dictionary'
-require 'evva/mixpanelevent'
+require 'evva/mixpanel_event'
 require 'evva/mixpanel_enum'
 require 'evva/object_extension'
 require 'evva/version'
@@ -22,9 +22,9 @@ module Evva
       bundle       = analytics_data(config: config.dictionary)
     end
     event_generator = Evva::EventGenerator.new()
-    event_generator.build(bundle[0], config.type, config.out_path)
+    event_generator.build(bundle['events'], config.type, config.out_path)
     enum_generator = Evva::EnumGenerator.new()
-    enum_generator.build(bundle[2], config.type, config.out_path)
+    enum_generator.build(bundle['enums'], config.type, config.out_path)
   end
 
   def analytics_data(config:)
@@ -33,10 +33,11 @@ module Evva
     when "google_sheet"
       Evva::GoogleSheet.new(config[:sheet_id], config[:keys_column])
     end
-    data = source.generate_events
-    people = source.generate_people_properties
-    enums = source.generate_enum_classes
-    [data, people, enums]
+    events_bundle = {}
+    events_bundle[:events] = source.events 
+    events_bundle[:people] = source.people_properties
+    events_bundle[:enums] = source.enum_classes
+    events_bundle
   end
 
   def command_line_options(options)

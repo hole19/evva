@@ -8,43 +8,44 @@ module Evva
       @key_column = keys_column
     end
 
-    def generate_events
+    def events
       raw = raw_data(@sheet_id, 0)
       Logger.info('Downloading dictionary from Google Sheet...')
-      non_language_columns = ["id", "updated", "category", "title", "content", "link"]
-      eventList = []
-      raw["entry"].each do |entry|
-        filteredEntry = entry.select { |c| !non_language_columns.include?(c) } 
-        function = filteredEntry["functionname"].first
-        eventName = filteredEntry["eventname"].first
-        properties = filteredEntry["props"].first
-        eventList.push(Evva::MixpanelEvent.new(function, eventName, properties))
+      non_language_columns = ['id', 'updated', 'category',
+                              'title', 'content', 'link']
+      event_list = []
+      raw['entry'].each do |entry|
+        filtered_entry = entry.select { |c| !non_language_columns.include?(c) }
+        function = filtered_entry['functionname'].first
+        event_name = filtered_entry['eventname'].first
+        properties = filtered_entry['props'].first
+        event_list.push(Evva::MixpanelEvent.new(function, event_name, properties))
       end
-      eventList
+      event_list
     end
 
-    def generate_people_properties
+    def people_properties
       raw = raw_data(@sheet_id, 1)
       Logger.info('Downloading dictionary from Google Sheet...')
-      non_language_columns = ["id", "updated", "category", "title", "content", "link"]
-      raw["entry"].each do |entry|
-        filteredEntry = entry.select { |c| !non_language_columns.include?(c) } 
-        puts filteredEntry
+      non_language_columns = ['id', 'updated', 'category', 'title', 'content', 'link']
+      raw['entry'].each do |entry|
+        filtered_entry = entry.select { |c| !non_language_columns.include?(c) }
+        puts filtered_entry
       end
     end
 
-    def generate_enum_classes
+    def enum_classes
       raw = raw_data(@sheet_id, 2)
       Logger.info('Downloading dictionary from Google Sheet...')
-      non_language_columns = ["id", "updated", "category", "title", "content", "link"]
-      enumList = []
-      raw["entry"].each do |entry|
-        filteredEntry = entry.select { |c| !non_language_columns.include?(c) } 
-        enumName = filteredEntry["enum"].first
-        values = filteredEntry["values"].first
-        enumList.push(Evva::MixpanelEnum.new(enumName, values))
+      non_language_columns = ['id', 'updated', 'category', 'title', 'content', 'link']
+      enum_list = []
+      raw['entry'].each do |entry|
+        filtered_entry = entry.select { |c| !non_language_columns.include?(c) }
+        enum_name = filtered_entry['enum'].first
+        values = filtered_entry['values'].first
+        enum_list.push(Evva::MixpanelEnum.new(enum_name, values))
       end
-      enumList
+      enum_list
     end
 
     def xml_data(uri, headers = nil)
@@ -67,7 +68,7 @@ module Evva
     def raw_data(sheet_id, sheetNumber)
       Logger.info('Downloading Google Sheet...')
       sheet = xml_data("https://spreadsheets.google.com/feeds/worksheets/#{sheet_id}/public/full")
-      url   = sheet["entry"][sheetNumber]["link"][0]["href"]
+      url   = sheet['entry'][sheetNumber]['link'][0]['href']
       xml_data(url)
     end
   end
