@@ -25,11 +25,16 @@ module Evva
 
     def people_properties
       raw = raw_data(@sheet_id, 1)
+      people_list = []
       Logger.info('Downloading dictionary from Google Sheet...')
       non_language_columns = ['id', 'updated', 'category', 'title', 'content', 'link']
       raw['entry'].each do |entry|
         filtered_entry = entry.select { |c| !non_language_columns.include?(c) }
+        property = filtered_entry['properties'].first
+        value = filtered_entry['value'].first
+        people_list.push(Evva::MixpanelProperty.new(property, value))
       end
+      people_list
     end
 
     def enum_classes

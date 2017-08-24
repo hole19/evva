@@ -8,6 +8,7 @@ require 'evva/file_reader'
 require 'evva/data_source'
 require 'evva/mixpanel_event'
 require 'evva/mixpanel_enum'
+require 'evva/mixpanel_property'
 require 'evva/object_extension'
 require 'evva/version'
 require 'evva/android_generator'
@@ -29,7 +30,7 @@ module Evva
     if type.eql? "Android"
       generator = Evva::AndroidGenerator.new(config.out_path)
       if file = file_reader.open_file("#{config.out_path}/mixpanel.kt", "w", false)
-        evva_write(generator, file)
+        evva_write(bundle, generator, file)
       else
         Logger.error("Could not write to file in #{config.out_path}")
       end
@@ -38,19 +39,20 @@ module Evva
     if type.eql? "iOS"
       generator = Evva::SwiftGenerator.new(config.out_path)
       if file = file_reader.open_file("#{config.out_path}/mixpanel.swift", "w", false)
-        evva_write(generator, file)
+        evva_write(bundle, generator, file)
       end
     end
     Evva::Logger.print_summary
   end
 
-  def evva_write(generator, file)
+  def evva_write(bundle, generator, file)
    events = (generator.events(bundle[:events]))
    file.write(events)
    file.flush
    file.close
 
    generator.enums(bundle[:enums])
+   generator.people_properties(bundle[:people])
  end
 
  def analytics_data(config:)

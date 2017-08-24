@@ -24,6 +24,23 @@
       end
     end
 
+    def people_properties(people_bundle)
+      file_reader = Evva::FileReader.new()
+      file = file_reader.open_file("#{@path}/PeopleProperties.kt", "w", false)
+      properties = 
+      "package com.hole19golf.hole19.analytics\n"\
+      "import com.hole19golf.hole19.analytics.Event\n\n"\
+      "class PeopleProperties() {\n"\
+      "\tcompanion object {\n"
+      people_bundle.each do |prop|
+        properties += kotlin_const(prop)
+      end
+      properties += "\t}\n }"
+      file.write(properties)
+      file.flush
+      file.close
+    end
+
     def kotlin_header
       header = 
       "package com.hole19golf.hole19.analytics\n"\
@@ -46,6 +63,10 @@
         "\tmixpanelApi.trackEvent('#{event_data.event_name}')\n"    
       end
       function_body += "}\n"
+    end
+
+    def kotlin_const(prop)
+      people_property = "\t\tconst val #{prop.property_name} = #{prop.property_value} \n"
     end
 
     def kotlin_enum(enum)
