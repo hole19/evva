@@ -29,7 +29,6 @@ module Evva
       non_language_columns = ['id', 'updated', 'category', 'title', 'content', 'link']
       raw['entry'].each do |entry|
         filtered_entry = entry.select { |c| !non_language_columns.include?(c) }
-        puts filtered_entry
       end
     end
 

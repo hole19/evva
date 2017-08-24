@@ -3,14 +3,6 @@ require 'fileutils'
 module Evva
   class EnumGenerator
     def build(data, type, path)
-      if type.eql? "Android"
-        data.each do |enum|
-          file = open_file("#{path}/#{enum.enum_name}.kt", "w", false)
-          file.write(kotlin_enum(enum))
-          file.flush
-          file.close
-        end
-      end
 
       if type.eql? 'iOS'
         data.each do |enum|
@@ -20,15 +12,6 @@ module Evva
           file.close
         end
       end
-    end
-
-    def kotlin_enum(enum)
-      enum_values = enum.values.split(',')
-      enum_body = "enum class #{enum.enum_name}(val key: String) {\n"
-      enum_values.each do |vals|
-        enum_body += "\t#{vals.upcase}(" + "'#{vals}'" + "),\n"
-      end
-      enum_body += "} \n"
     end
 
     def generate_swift_enum(enum)

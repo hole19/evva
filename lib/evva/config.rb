@@ -27,10 +27,6 @@ module Evva
       @hash[:out_path]
     end
 
-    def enum_file_name
-      @hash[:enum_file_name]
-    end
-
     CONFIG_STRUCT = {
       type: Hash,
       elements: {
@@ -39,7 +35,6 @@ module Evva
           type: { type: String }
         } },
         out_path: { type: String },
-        enum_file_name: { type: String }
       }
     }
 

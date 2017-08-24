@@ -1,30 +1,45 @@
 require 'optparse'
 require 'yaml'
-require 'fileutils'
 
 require 'evva/logger'
 require 'evva/google_sheet'
 require 'evva/config'
+require 'evva/file_reader'
 require 'evva/data_source'
 require 'evva/mixpanel_event'
 require 'evva/mixpanel_enum'
 require 'evva/object_extension'
 require 'evva/version'
-require 'evva/event_generator'
-require 'evva/enum_generator'
+require 'evva/android_generator'
 
 module Evva
   extend self
   def run(options)
+    file_reader = Evva::FileReader.new()
     options = command_line_options(options)
-    if config_file = open_file('generic.yml', 'r', true)
+    if config_file = file_reader.open_file('generic.yml', 'r', true)
       config       = Evva::Config.new(hash: YAML::load(config_file))
       bundle       = analytics_data(config: config.data_source)
+      type         = config.type
+    else
+      Logger.error("Could not open #{file_name}!")
+      return nil
     end
-    event_generator = Evva::EventGenerator.new()
-    event_generator.build(bundle[:events], config.type, config.out_path)
-    enum_generator = Evva::EnumGenerator.new()
-    enum_generator.build(bundle[:enums], config.type, config.out_path)
+
+    if type.eql? "Android"
+      generator = Evva::AndroidGenerator.new()
+      if file = file_reader.open_file("#{config.out_path}/mixpanel.kt", "w", false)
+        events = (generator.events(bundle[:events]))
+        file.write(events)
+        file.flush
+        file.close
+
+        generator.enums(bundle[:enums], config.out_path)
+      else
+        Logger.error("Could not write to file in #{config.out_path}")
+      end
+    end
+
     Evva::Logger.print_summary
   end
 
@@ -32,7 +47,7 @@ module Evva
     source =
     case config[:type]
     when "google_sheet"
-      Evva::GoogleSheet.new(config[:sheet_id], config[:keys_column])
+      Evva::GoogleSheet.new(config[:sheet_id])
     end
     events_bundle = {}
     events_bundle[:events] = source.events 
@@ -60,18 +75,4 @@ module Evva
 
     opts_hash
   end
-
-  def open_file(file_name, method, should_exist)
-    if !File.file?(File.expand_path(file_name))
-      if should_exist
-        Logger.error("File #{file_name} not found!")
-        return nil
-      else
-        FileUtils.mkdir_p(File.dirname(file_name))
-      end
-    end
-
-    File.open(File.expand_path(file_name), method)
-  end
-
 end

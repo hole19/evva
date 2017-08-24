@@ -5,4 +5,3 @@ data_source:
   sheet_id: 1LaJd68os3g_GFlerogC64grNIlXb2iukMznOvdml7A4
   
 out_path: app/src/main/java/com/hole19golf/analytics
-enum_file_name: enums  
