@@ -1,0 +1,111 @@
+# references:
+# https://github.com/bbatsov/rubocop
+# http://joanswork.com/rubocop-rails-getting-started/
+# https://github.com/SublimeLinter/SublimeLinter-rubocop
+
+# How to disable cops in source code for rule exceptions:
+# https://github.com/bbatsov/rubocop#disabling-cops-within-source-code
+
+# run `rubocop --auto-gen-config` to find count by
+# offense, and uncomment the following line to iterate
+inherit_from: .rubocop_todo.yml
+AllCops:
+  TargetRubyVersion: 2.3
+  Include:
+    - '**/Rakefile'
+    - '**/config.ru'
+  Exclude:
+    - 'db/schema.rb'
+    - 'features/**/*'
+    - 'bin/**/*'
+    - 'vendor/**/*'
+    - 'db/migrate/old_migrations/*'
+    - 'lib/tasks/migrations/old/*'
+
+Rails:
+  Enabled: true
+
+#################
+# [i] Overrides #
+#################
+
+# should comment case by case but for now this is desired
+Rails/SkipsModelValidations:
+  Enabled: false
+
+# does not work properly
+Rails/FilePath:
+  Enabled: false
+
+# Align `end` with the matching keyword or starting expression except for
+# assignments, where it should be aligned with the LHS.
+Lint/EndAlignment:
+  EnforcedStyleAlignWith: variable
+
+CollectionMethods:
+  PreferredMethods:
+    collect: 'map'
+    collect!: 'map!'
+    reduce: 'inject'
+    find_all: 'select'
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 4711 # FIXME: redefine
+
+Metrics/MethodLength:
+  Max: 235 # FIXME: redefine
+
+Style/SingleLineMethods:
+  Enabled: true
+  Exclude:
+    - app/third-party/golf121_api*.rb
+
+Style/EmptyLineBetweenDefs:
+  Enabled: true
+  Exclude:
+    - app/third-party/golf121_api*.rb
+
+Style/Lambda:
+  Enabled: true
+  EnforcedStyle: literal
+
+Style/ModuleFunction:
+  Enabled: true
+  EnforcedStyle: extend_self
+
+#################
+# Disabled cops #
+#################
+
+Lint/AssignmentInCondition: # we like this practice too much
+  Enabled: false
+
+Style/Documentation: # No docs right now thanks
+  Enabled: false
+
+Style/SingleLineBlockParams: # We should be able to specify full variable names, even if it's only one line
+  Enabled: false
+
+Style/MultilineHashBraceLayout: # Removed temporarily for consideration
+  Enabled: false
+
+Style/MultilineMethodCallBraceLayout: # Removed temporarily for consideration
+  Enabled: false
+
+Style/MultilineArrayBraceLayout: # Removed temporarily for consideration
+  Enabled: false
+
+Style/FrozenStringLiteralComment: # Removed temporarily for consideration
+  Enabled: false
+
+Style/TernaryParentheses: # Removed due to poor implementation
+  Enabled: false
+
+Style/VariableNumber: # Don't care about this
+  Enabled: false
