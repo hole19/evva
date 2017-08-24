@@ -1,7 +1,6 @@
 describe Evva::GoogleSheet do
-  let(:sheet) { Evva::GoogleSheet.new(sheet_id, key_column) }
+  let(:sheet) { Evva::GoogleSheet.new(sheet_id) }
   let(:sheet_id) { "abc1234567890" }
-  let(:key_column) { "key_column" }
   let(:url_info)  { "https://spreadsheets.google.com/feeds/worksheets/#{sheet_id}/public/full" }
   let(:url_sheet) { "https://spreadsheets.google.com/feeds/list/#{sheet_id}/od6/public/full" }
   let(:enum_sheet) { "https://spreadsheets.google.com/feeds/list/#{sheet_id}/osju1vh/public/full" }

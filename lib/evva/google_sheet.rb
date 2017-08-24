@@ -3,9 +3,8 @@ require 'xmlsimple'
 
 module Evva
   class GoogleSheet
-    def initialize(sheet_id, keys_column)
+    def initialize(sheet_id)
       @sheet_id = sheet_id
-      @key_column = keys_column
     end
 
     def events
