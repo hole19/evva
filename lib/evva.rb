@@ -27,52 +27,62 @@ module Evva
     end
 
     if type.eql? "Android"
-      generator = Evva::AndroidGenerator.new()
+      generator = Evva::AndroidGenerator.new(config.out_path)
       if file = file_reader.open_file("#{config.out_path}/mixpanel.kt", "w", false)
-        events = (generator.events(bundle[:events]))
-        file.write(events)
-        file.flush
-        file.close
-
-        generator.enums(bundle[:enums], config.out_path)
+        evva_write(generator, file)
       else
         Logger.error("Could not write to file in #{config.out_path}")
       end
     end
 
+    if type.eql? "iOS"
+      generator = Evva::SwiftGenerator.new(config.out_path)
+      if file = file_reader.open_file("#{config.out_path}/mixpanel.swift", "w", false)
+        evva_write(generator, file)
+      end
+    end
     Evva::Logger.print_summary
   end
 
-  def analytics_data(config:)
-    source =
-    case config[:type]
-    when "google_sheet"
-      Evva::GoogleSheet.new(config[:sheet_id])
-    end
-    events_bundle = {}
-    events_bundle[:events] = source.events 
-    events_bundle[:people] = source.people_properties
-    events_bundle[:enums] = source.enum_classes
-    events_bundle
+  def evva_write(generator, file)
+   events = (generator.events(bundle[:events]))
+   file.write(events)
+   file.flush
+   file.close
+
+   generator.enums(bundle[:enums])
+ end
+
+ def analytics_data(config:)
+  source =
+  case config[:type]
+  when "google_sheet"
+    Evva::GoogleSheet.new(config[:sheet_id])
   end
+  events_bundle = {}
+  events_bundle[:events] = source.events 
+  events_bundle[:people] = source.people_properties
+  events_bundle[:enums] = source.enum_classes
+  events_bundle
+end
 
-  def command_line_options(options)
-    opts_hash = {}
+def command_line_options(options)
+  opts_hash = {}
 
-    opts_parser = OptionParser.new do |opts|
+  opts_parser = OptionParser.new do |opts|
 
-      opts.on_tail("-h", "--help", "Show this message") do
-        puts opts
-        exit
-      end
-
-      opts.on_tail("-v", "--version", "Show version") do
-        puts Evva::VERSION
-        exit
-      end
+    opts.on_tail("-h", "--help", "Show this message") do
+      puts opts
+      exit
     end
-    opts_parser.parse!(options)
 
-    opts_hash
+    opts.on_tail("-v", "--version", "Show version") do
+      puts Evva::VERSION
+      exit
+    end
   end
+  opts_parser.parse!(options)
+
+  opts_hash
+end
 end

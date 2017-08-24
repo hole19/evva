@@ -5,14 +5,14 @@ module Evva
         raise ArgumentError.new("keys: expected Hash, got #{keys.class}")
       end
 
-      keys.each do |event, v|
+      keys.each do |property, v|
         unless v.is_a?(Hash)
-          raise ArgumentError.new("keys['#{event}']: expected Hash, got #{v.class}")
+          raise ArgumentError.new("keys['#{property}']: expected Hash, got #{v.class}")
         end
 
         v.each do |key,v|
           unless v.is_a?(String) || v.nil?
-            raise ArgumentError.new("keys['#{event}']['#{key}']: expected String, got #{v.class}")
+            raise ArgumentError.new("keys['#{property}']['#{key}']: expected String, got #{v.class}")
           end
         end
       end

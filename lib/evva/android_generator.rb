@@ -1,6 +1,11 @@
  module Evva
   class AndroidGenerator
 
+    attr_reader :path
+    def initialize(path)
+      @path = path
+    end
+
     def events(bundle)
       event_file = kotlin_header
       bundle.each do |event|
@@ -9,10 +14,10 @@
       event_file += "\n}"
     end
 
-    def enums(enum_bundle, file_path)
+    def enums(enum_bundle)
       file_reader = Evva::FileReader.new()
       enum_bundle.each do |enum|
-        file = file_reader.open_file("#{file_path}/#{enum.enum_name}.kt", "w", false)
+        file = file_reader.open_file("#{@path}/#{enum.enum_name}.kt", "w", false)
         file.write(kotlin_enum(enum))
         file.flush
         file.close
