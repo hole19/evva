@@ -3,12 +3,12 @@ describe Evva::Config do
 
   let(:hash) { {
     type: "BisuOS",
-    dictionary: {
+    data_source: {
       type:         "google_sheet",
-      sheet_id:     "abc1234567890",
-      keys_column:  "key_name"
+      sheet_id:     "abc1234567890"
     },
-    out_path: "clear/path/to/event"
+    out_path: "clear/path/to/event",
+    enum_file_name: "enum/file/name"
   } }
 
   context "when hash is missing params" do
@@ -19,15 +19,16 @@ describe Evva::Config do
   its(:to_h) { should eq(hash) }
   its(:type) { should eq("BisuOS") }
   its(:out_path) { should eq("clear/path/to/event") }
+  its(:enum_file_name) { should eq("enum/file/name") }
 
-  describe "#dictionary" do
-    subject(:dictionary) { config.dictionary }
+  describe "#data_source" do
+    subject(:data_source) { config.data_source }
 
-    it { should eq({ type: "google_sheet", sheet_id: "abc1234567890", keys_column: "key_name" }) }
+    it { should eq({ type: "google_sheet", sheet_id: "abc1234567890" }) }
 
-    context "when given an unknown type dictionary" do
-      before { hash[:dictionary] = { type: "i_dunno" } }
-      it { expect { config }.to raise_error /unknown dictionary type 'i_dunno'/i }
+    context "when given an unknown type data source" do
+      before { hash[:data_source] = { type: "i_dunno" } }
+      it { expect { config }.to raise_error /unknown data source type 'i_dunno'/i }
     end
   end
 end

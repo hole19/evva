@@ -5,7 +5,7 @@ require 'fileutils'
 require 'evva/logger'
 require 'evva/google_sheet'
 require 'evva/config'
-require 'evva/dictionary'
+require 'evva/data_source'
 require 'evva/mixpanel_event'
 require 'evva/mixpanel_enum'
 require 'evva/object_extension'
@@ -19,7 +19,7 @@ module Evva
     options = command_line_options(options)
     if config_file = open_file('generic.yml', 'r', true)
       config       = Evva::Config.new(hash: YAML::load(config_file))
-      bundle       = analytics_data(config: config.dictionary)
+      bundle       = analytics_data(config: config.data_source)
     end
     event_generator = Evva::EventGenerator.new()
     event_generator.build(bundle[:events], config.type, config.out_path)
