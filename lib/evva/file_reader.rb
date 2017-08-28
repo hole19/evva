@@ -16,5 +16,11 @@ module Evva
       File.open(File.expand_path(file_name), method)
     end
 
+    def write_to_file(file, data)
+      file.write(data)
+      file.flush
+      file.close
+    end
+
   end
 end

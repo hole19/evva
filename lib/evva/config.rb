@@ -27,6 +27,14 @@ module Evva
       @hash[:out_path]
     end
 
+    def event_file_name
+      @hash[:event_file_name]
+    end
+
+    def people_file_name
+      @hash[:people_file_name]
+    end
+
     CONFIG_STRUCT = {
       type: Hash,
       elements: {
@@ -35,6 +43,8 @@ module Evva
           type: { type: String }
         } },
         out_path: { type: String },
+        event_file_name: { type: String },
+        people_file_name: { type: String },
       }
     }
 

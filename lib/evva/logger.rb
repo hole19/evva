@@ -1,5 +1,5 @@
-require "singleton"
-require "colorize"
+require 'singleton'
+require 'colorize'
 
 module Evva
   module Logger

@@ -28,16 +28,12 @@ module Evva
     end
 
     if type.eql? "Android"
-      generator = Evva::AndroidGenerator.new(config.out_path)
-      if file = file_reader.open_file("#{config.out_path}/mixpanel.kt", "w", false)
-        evva_write(bundle, generator, file)
-      else
-        Logger.error("Could not write to file in #{config.out_path}")
-      end
+      generator = Evva::AndroidGenerator.new()
+      evva_write(bundle, generator, config)
     end
 
     if type.eql? "iOS"
-      generator = Evva::SwiftGenerator.new(config.out_path)
+      generator = Evva::SwiftGenerator.new()
       if file = file_reader.open_file("#{config.out_path}/mixpanel.swift", "w", false)
         evva_write(bundle, generator, file)
       end
@@ -45,46 +41,59 @@ module Evva
     Evva::Logger.print_summary
   end
 
-  def evva_write(bundle, generator, file)
-   events = (generator.events(bundle[:events]))
-   file.write(events)
-   file.flush
-   file.close
-
-   generator.enums(bundle[:enums])
-   generator.people_properties(bundle[:people])
- end
-
- def analytics_data(config:)
-  source =
-  case config[:type]
-  when "google_sheet"
-    Evva::GoogleSheet.new(config[:sheet_id])
-  end
-  events_bundle = {}
-  events_bundle[:events] = source.events 
-  events_bundle[:people] = source.people_properties
-  events_bundle[:enums] = source.enum_classes
-  events_bundle
-end
-
-def command_line_options(options)
-  opts_hash = {}
-
-  opts_parser = OptionParser.new do |opts|
-
-    opts.on_tail("-h", "--help", "Show this message") do
-      puts opts
-      exit
+  def evva_write(bundle, generator, configuration)
+    file_reader = Evva::FileReader.new()
+    if file = file_reader.open_file(
+      "#{configuration.out_path}/#{configuration.event_file_name}", "w", false)
+      events = (generator.events(bundle[:events]))
+      file_reader.write_to_file(file, events)
+    else
+      Logger.error("Could not write to file in #{configuration.out_path}")
     end
+    
+    people = (generator.people_properties(bundle[:people]))
+    people_file = file_reader.open_file(
+      "#{configuration.out_path}/#{configuration.people_file_name}.kt", "w", false)
+    
+    file_reader.write_to_file(people_file, people)
 
-    opts.on_tail("-v", "--version", "Show version") do
-      puts Evva::VERSION
-      exit
+    bundle[:enums].each do |enum|
+      enum_file = file_reader.open_file(
+        "#{configuration.out_path}/#{enum.enum_name}.kt", "w", false)
+      file_reader.write_to_file(enum_file, generator.kotlin_enum(enum))
     end
   end
-  opts_parser.parse!(options)
 
-  opts_hash
-end
+  def analytics_data(config:)
+    source =
+    case config[:type]
+    when "google_sheet"
+      Evva::GoogleSheet.new(config[:sheet_id])
+    end
+    events_bundle = {}
+    events_bundle[:events] = source.events 
+    events_bundle[:people] = source.people_properties
+    events_bundle[:enums] = source.enum_classes
+    events_bundle
+  end
+
+  def command_line_options(options)
+    opts_hash = {}
+
+    opts_parser = OptionParser.new do |opts|
+
+      opts.on_tail("-h", "--help", "Show this message") do
+        puts opts
+        exit
+      end
+
+      opts.on_tail("-v", "--version", "Show version") do
+        puts Evva::VERSION
+        exit
+      end
+    end
+    opts_parser.parse!(options)
+
+    opts_hash
+  end
 end

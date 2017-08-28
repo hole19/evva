@@ -5,3 +5,5 @@ data_source:
   sheet_id: 1LaJd68os3g_GFlerogC64grNIlXb2iukMznOvdml7A4
   
 out_path: app/src/main/java/com/hole19golf/analytics
+event_file_name: MixpanelEvents.kt
+people_file_name: MixpanelProperties.kt 

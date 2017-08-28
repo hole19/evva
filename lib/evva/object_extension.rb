@@ -4,13 +4,13 @@ Object.class_eval do
     when Array
       self.map { |v| v.deep_symbolize }
     when Hash
-      self.inject({}) { |memo, (k,v)| memo[k.to_sym] = v.deep_symbolize; memo }
+      self.inject({}) { |memo, (k, v)| memo[k.to_sym] = v.deep_symbolize; memo }
     else
       self
     end
   end
 
-  def validate_structure!(structure, error_prefix=[])
+  def validate_structure!(structure, error_prefix = [])
     return if self == nil && structure[:optional]
 
     prepend_error = error_prefix.empty? ? "" : (["self"] + error_prefix + [": "]).join
@@ -27,7 +27,7 @@ Object.class_eval do
         e.validate_structure!(structure[:elements], error_prefix + ["[#{i}]"])
       end
     when Hash
-      mandatory_keys = structure[:elements].map { |k,s| k unless s[:optional] }.compact
+      mandatory_keys = structure[:elements].map { |k, s| k unless s[:optional] }.compact
 
       unless (missing = mandatory_keys - self.keys).empty?
         raise ArgumentError.new("#{prepend_error}Missing keys: #{missing.join(', ')}")

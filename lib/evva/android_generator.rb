@@ -1,53 +1,32 @@
- module Evva
+module Evva
   class AndroidGenerator
 
-    attr_reader :path
-    def initialize(path)
-      @path = path
-    end
+    KOTLIN_EVENT_HEADER =  
+    "package com.hole19golf.hole19.analytics\n"\
+    "import com.hole19golf.hole19.analytics.Event\n\n"\
+    "class MixpanelAnalytics(val mixpanelAPI: MixpanelAPI) {\n".freeze
+    
+    KOTLIN_PEOPLE_HEADER =  
+    "package com.hole19golf.hole19.analytics\n"\
+    "import com.hole19golf.hole19.analytics.Event\n\n"\
+    "class PeopleProperties() {\n"\
+    "\tcompanion object {\n".freeze
 
     def events(bundle)
-      event_file = kotlin_header
+      event_file = KOTLIN_EVENT_HEADER
       bundle.each do |event|
         event_file += kotlin_function(event)
       end
       event_file += "\n}"
     end
 
-    def enums(enum_bundle)
-      file_reader = Evva::FileReader.new()
-      enum_bundle.each do |enum|
-        file = file_reader.open_file("#{@path}/#{enum.enum_name}.kt", "w", false)
-        file.write(kotlin_enum(enum))
-        file.flush
-        file.close
-      end
-    end
-
     def people_properties(people_bundle)
-      file_reader = Evva::FileReader.new()
-      file = file_reader.open_file("#{@path}/PeopleProperties.kt", "w", false)
-      properties = 
-      "package com.hole19golf.hole19.analytics\n"\
-      "import com.hole19golf.hole19.analytics.Event\n\n"\
-      "class PeopleProperties() {\n"\
-      "\tcompanion object {\n"
+      properties = KOTLIN_PEOPLE_HEADER
       people_bundle.each do |prop|
         properties += kotlin_const(prop)
       end
       properties += "\t}\n }"
-      file.write(properties)
-      file.flush
-      file.close
     end
-
-    def kotlin_header
-      header = 
-      "package com.hole19golf.hole19.analytics\n"\
-      "import com.hole19golf.hole19.analytics.Event\n\n"\
-      "class MixpanelAnalytics(val mixpanelAPI: MixpanelAPI) {\n"
-    end
-
 
     def kotlin_function(event_data)
       if !event_data.properties.nil?
@@ -66,7 +45,7 @@
     end
 
     def kotlin_const(prop)
-      people_property = "\t\tconst val #{prop.property_name} = #{prop.property_value} \n"
+      people_property = "\t\tconst val #{prop.property_name} = '#{prop.property_value}'\n"
     end
 
     def kotlin_enum(enum)
