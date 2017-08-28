@@ -2,7 +2,7 @@ describe Evva::Config do
   subject(:config) { Evva::Config.new(hash: hash) }
 
   let(:hash) { {
-    type: "BisuOS",
+    type: "EvvaOS",
     data_source: {
       type:         "google_sheet",
       sheet_id:     "abc1234567890"
@@ -18,8 +18,10 @@ describe Evva::Config do
   end
 
   its(:to_h) { should eq(hash) }
-  its(:type) { should eq("BisuOS") }
+  its(:type) { should eq("EvvaOS") }
   its(:out_path) { should eq("clear/path/to/event") }
+  its(:event_file_name) { should eq("event/file/name") }
+  its(:people_file_name) { should eq("people/file/name") }
 
   describe "#data_source" do
     subject(:data_source) { config.data_source }
