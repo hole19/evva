@@ -8,6 +8,8 @@ describe Evva::Config do
       sheet_id:     "abc1234567890"
     },
     out_path: "clear/path/to/event",
+    event_file_name: "event/file/name",
+    people_file_name: "people/file/name"
   } }
 
   context "when hash is missing params" do

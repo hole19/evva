@@ -1,6 +1,6 @@
 describe Evva::AndroidGenerator do
   let(:path) { "file/path" }
-  generator = Evva::AndroidGenerator.new(:path)
+  generator = Evva::AndroidGenerator.new()
 
   describe "#kotlin_function" do
     context "event has no properties" do
