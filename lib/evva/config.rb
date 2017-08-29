@@ -35,6 +35,10 @@ module Evva
       @hash[:people_file_name]
     end
 
+    def event_enum_file_name
+      @hash[:event_enum_file_name]
+    end
+
     CONFIG_STRUCT = {
       type: Hash,
       elements: {
@@ -44,6 +48,7 @@ module Evva
         } },
         out_path: { type: String },
         event_file_name: { type: String },
+        event_enum_file_name: { type: String },
         people_file_name: { type: String },
       }
     }

@@ -6,4 +6,5 @@ data_source:
   
 out_path: app/src/main/java/com/hole19golf/analytics
 event_file_name: MixpanelEvents.kt
+event_enum_file_name: MixpanelEvent.kt
 people_file_name: MixpanelProperties.kt 

@@ -51,6 +51,12 @@ module Evva
       Logger.error("Could not write to file in #{configuration.out_path}")
     end
     
+    event_enum = generator.event_enum(bundle[:events])
+    event_enum_file = file_reader.open_file(
+      "#{configuration.out_path}/#{configuration.event_enum_file_name}.kt", "w", false)
+    
+    file_reader.write_to_file(event_enum_file, event_enum)
+
     people = (generator.people_properties(bundle[:people]))
     people_file = file_reader.open_file(
       "#{configuration.out_path}/#{configuration.people_file_name}.kt", "w", false)
