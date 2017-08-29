@@ -1,5 +1,4 @@
 describe Evva::AndroidGenerator do
-  let(:path) { "file/path" }
   generator = Evva::AndroidGenerator.new()
 
   describe "#kotlin_function" do
@@ -57,7 +56,19 @@ describe Evva::AndroidGenerator do
     end
   end
 
-  describe "#{}"
+  describe "#is_special_property" do
+    context "receives a regular property" do
+       it do
+        expect(generator.is_special_property("Long")).to eq false
+      end
+    end
+
+    context "receives a special property" do
+      it do
+        expect(generator.is_special_property("course_profile_source")).to eq false
+      end
+    end
+  end
 
   describe "#kotlin_const" do
     property = Evva::MixpanelProperty.new("RoundWithWear", "rounds_with_wear")
