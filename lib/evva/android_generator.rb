@@ -2,8 +2,9 @@ module Evva
   class AndroidGenerator
 
     KOTLIN_EVENT_HEADER =  
-    "package com.hole19golf.hole19.analytics\n"\
-    "import com.hole19golf.hole19.analytics.Event\n\n"\
+    "package com.hole19golf.hole19.analytics\n\n"\
+    "import com.hole19golf.hole19.analytics.Event\n"\
+    "import org.json.JSONObject\n\n"\
     "class MixpanelAnalytics(val mixpanelAPI: MixpanelAPI) {\n".freeze
     
     KOTLIN_PEOPLE_HEADER =  
@@ -34,12 +35,12 @@ module Evva
         function_body =
         "\nfun #{event_data.function_name}(#{event_data.properties}) {"\
         "#{props}"\
-        "\tmixpanelApi.trackEvent('#{event_data.event_name}', properties)\n"
+        "\tmixpanelAPI.trackEvent(" + %Q{"#{event_data.event_name}"} + ", properties)\n"
       else
         props = nil
         function_body =
         "\nfun #{event_data.function_name}(#{event_data.properties}) {\n"\
-        "\tmixpanelApi.trackEvent('#{event_data.event_name}')\n"    
+        "\tmixpanelAPI.trackEvent(" + %Q{"#{event_data.event_name}"} + ")\n"    
       end
       function_body += "}\n"
     end
@@ -63,9 +64,9 @@ module Evva
       split_properties = ""
       properties.split(',').each do |prop|
         if is_special_property(prop)
-          split_properties += "\t\tput('" + "#{prop.split(":").first()}', " + prop.split(":").first() + ")\n"
+          split_properties += "\t\tput(" + %Q{"#{prop.split(":").first()}"} + ", " + prop.split(":").first() + ")\n"
         else
-          split_properties += "\t\tput('" + "#{prop.split(":").first()}', " + prop.split(":").first() + ".key)\n"
+          split_properties += "\t\tput(" + %Q{"#{prop.split(":").first()}"} + ", " + prop.split(":").first() + ".key)\n"
         end
       end
       resulting_json = "\n\tval properties = JSONObject().apply {\n" +
