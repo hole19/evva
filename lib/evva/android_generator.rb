@@ -6,7 +6,7 @@ module Evva
     "import com.hole19golf.hole19.analytics.Event\n"\
     "import com.hole19golf.hole19.analytics.MixpanelAnalyticsMask\n"\
     "import org.json.JSONObject\n\n"\
-    "class MixpanelAnalytics(private val mixpanelMask: MixpanelAnalyticsMask) {\n".freeze
+    "open class MixpanelEvents(private val mixpanelMask: MixpanelAnalyticsMask) {\n".freeze
     
     KOTLIN_PEOPLE_HEADER =  
     "package com.hole19golf.hole19.analytics\n"\
@@ -47,13 +47,13 @@ module Evva
       if !event_data.properties.nil?
         props = json_props(event_data.properties)
         function_body =
-        "\nfun #{event_data.function_name}(#{event_data.properties}) {"\
+        "\nopen fun #{event_data.function_name}(#{event_data.properties}) {"\
         "#{props}"\
         "\tmixpanelMask.trackEvent(MixpanelEvent.#{event_data.event_name.upcase}, properties)\n"
       else
         props = nil
         function_body =
-        "\nfun #{event_data.function_name}(#{event_data.properties}) {\n"\
+        "\nopen fun #{event_data.function_name}(#{event_data.properties}) {\n"\
         "\tmixpanelMask.trackEvent(MixpanelEvent.#{event_data.event_name.upcase})\n"    
       end
       function_body += "}\n"
