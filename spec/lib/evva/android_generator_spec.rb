@@ -84,6 +84,12 @@ describe Evva::AndroidGenerator do
     end
   end
 
+  describe "is_optional_property" do
+    it do 
+      expect(generator.is_optional_property("course_profile_source:CourseProfileSource?")).to eq true
+    end
+  end
+
   describe "#kotlin_people_const" do
     property = Evva::MixpanelProperty.new("RoundWithWear", "rounds_with_wear")
     it "should return the correctly formed constant" do

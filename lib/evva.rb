@@ -44,7 +44,7 @@ module Evva
   def evva_write(bundle, generator, configuration)
     file_reader = Evva::FileReader.new()
     if file = file_reader.open_file(
-      "#{configuration.out_path}/#{configuration.event_file_name}", "w", false)
+      "#{configuration.out_path}/#{configuration.event_file_name}.kt", "w", false)
       events = (generator.events(bundle[:events]))
       file_reader.write_to_file(file, events)
     else
