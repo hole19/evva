@@ -60,7 +60,7 @@ module Evva
     end
 
     def kotlin_people_const(prop)
-      people_property = "\t\tconst val #{prop.property_name} = '#{prop.property_value}'\n"
+      people_property = "\t\tconst val #{prop.property_name} = "+ %Q{"#{prop.property_value}"} + "\n"
     end
 
     def kotlin_event_const(event)
@@ -84,7 +84,11 @@ module Evva
         if is_special_property(prop)
           split_properties += "\t\tput(" + %Q{"#{prop.split(":").first()}"} + ", " + prop.split(":").first() + ")\n"
         else
-          split_properties += "\t\tput(" + %Q{"#{prop.split(":").first()}"} + ", " + prop.split(":").first() + ".key)\n"
+          if is_optional_property(prop)
+            split_properties += "\t\t" + prop.split(":").first() + "?.let { put(" + %Q{"#{prop.split(":").first()}"} + ", it.key)}\n"
+          else
+            split_properties += "\t\tput(" + %Q{"#{prop.split(":").first()}"} + ", " + prop.split(":").first() + ".key)\n"
+          end
         end
       end
       resulting_json = "\n\tval properties = JSONObject().apply {\n" +
@@ -96,6 +100,11 @@ module Evva
       types_array = ['Long', 'Int','String', 'Double', 'Float', 'Boolean']
       type = prop.split(':')[1]
       types_array.include?(type) ? true : false
+    end
+
+    def is_optional_property(prop)
+      type = prop.split(':')[1]
+      type.include?("?") ? true : false
     end
   end
 end
