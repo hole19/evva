@@ -1,3 +1,6 @@
+require 'simplecov'
+SimpleCov.start
+
 require 'evva'
 require 'rspec/its'
 require 'webmock/rspec'
@@ -16,6 +19,7 @@ require 'webmock/rspec'
 # it.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+
 RSpec.configure do |config|
    config.before do
     Evva::Logger.silent_mode = true

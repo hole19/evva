@@ -4,9 +4,11 @@ describe Evva::GoogleSheet do
   let(:url_info)  { "https://spreadsheets.google.com/feeds/worksheets/#{sheet_id}/public/full" }
   let(:url_sheet) { "https://spreadsheets.google.com/feeds/list/#{sheet_id}/od6/public/full" }
   let(:enum_sheet) { "https://spreadsheets.google.com/feeds/list/#{sheet_id}/osju1vh/public/full" }
+  let(:people_sheet) { "https://spreadsheets.google.com/feeds/list/#{sheet_id}/ojyi830/public/full" }
   let(:file_info)  { File.read("spec/fixtures/sample_public_info.html") }
   let(:file_sheet) { File.read("spec/fixtures/sample_public_sheet.html") }
   let(:enum_file)  { File.read("spec/fixtures/sample_public_enums.html") }
+  let(:people_file)  { File.read("spec/fixtures/sample_public_people_properties.html") } 
 
   describe "#events" do
     subject(:events) { sheet.events }
@@ -72,6 +74,29 @@ describe Evva::GoogleSheet do
 
       it "returns an array with the corresponding events" do
         expect(enum_classes).to eq expected_enum 
+      end 
+    end   
+  end
+
+  describe "#people_properties" do
+    subject(:people_properties) { sheet.people_properties }
+    let(:expected_people_properties) { [ 
+     Evva::MixpanelProperty.new('roundsWithWear', 'rounds_with_wear'),
+     Evva::MixpanelProperty.new('totalFriends', 'total_friends')
+    ]}
+
+      context "when given a valid sheet" do
+      before do
+        stub_request(:get, url_info).to_return(:status => 200, :body => file_info, :headers => {})
+        stub_request(:get, people_sheet).to_return(:status => 200, :body => people_file, :headers => {})
+      end
+
+      it do
+        expect { people_properties }.not_to raise_error
+      end
+
+      it "returns an array with the corresponding events" do
+        expect(people_properties).to eq expected_people_properties 
       end 
     end   
   end

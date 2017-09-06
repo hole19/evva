@@ -9,7 +9,8 @@ describe Evva::Config do
     },
     out_path: "clear/path/to/event",
     event_file_name: "event/file/name",
-    people_file_name: "people/file/name"
+    people_file_name: "people/file/name",
+    event_enum_file_name: "event/enum/file"
   } }
 
   context "when hash is missing params" do
@@ -22,6 +23,7 @@ describe Evva::Config do
   its(:out_path) { should eq("clear/path/to/event") }
   its(:event_file_name) { should eq("event/file/name") }
   its(:people_file_name) { should eq("people/file/name") }
+  its(:event_enum_file_name) { should eq ("event/enum/file") }
 
   describe "#data_source" do
     subject(:data_source) { config.data_source }

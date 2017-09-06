@@ -57,7 +57,7 @@ describe Evva::AndroidGenerator do
     end
   end
 
-  describe "#kotlin_enum" do
+  describe "#special_property_enum" do
     enum = Evva::MixpanelEnum.new('CourseProfileSource', 'course_discovery,synced_courses')
 
     it "returns the expected kotlin enum" do
@@ -66,20 +66,20 @@ describe Evva::AndroidGenerator do
       "enum class CourseProfileSource(val key: String) {\n"\
       "\tCOURSE_DISCOVERY(\"course_discovery\"),\n"\
       "\tSYNCED_COURSES(\"synced_courses\"),\n} \n"
-      expect(generator.kotlin_enum(enum)).to eq expected
+      expect(generator.special_property_enum(enum)).to eq expected
     end
   end
 
   describe "#is_special_property" do
     context "receives a regular property" do
        it do
-        expect(generator.is_special_property("Long")).to eq false
+        expect(generator.is_special_property('course_id:Long')).to eq false
       end
     end
 
     context "receives a special property" do
       it do
-        expect(generator.is_special_property("course_profile_source")).to eq false
+        expect(generator.is_special_property("course_profile_source")).to eq true
       end
     end
   end
@@ -93,9 +93,17 @@ describe Evva::AndroidGenerator do
   describe "#kotlin_people_const" do
     property = Evva::MixpanelProperty.new("RoundWithWear", "rounds_with_wear")
     it "should return the correctly formed constant" do
-      expected = "\t\tconst val RoundWithWear = \"rounds_with_wear\"\n"
+      expected = "\t\tval RoundWithWear = \"rounds_with_wear\"\n"
       expect(generator.kotlin_people_const(property)).to eq expected
     end
   end
 
+  describe "#kotlin_event_const" do
+    event = Evva::MixpanelEvent.new('trackNavFeedTap', "nav_feed_tap", [])
+    it "should return the correct mixpanel event format" do
+      expected = "\t\tNAV_FEED_TAP(\"nav_feed_tap\"),\n"
+      expect(generator.kotlin_event_const(event)).to eq expected
+    end
+  end
+  
 end
