@@ -13,6 +13,9 @@ require 'evva/object_extension'
 require 'evva/version'
 require 'evva/android_generator'
 require 'evva/swift_generator'
+require 'evva/ega_calculator'
+require 'evva/usga_calculator'
+require 'evva/congu_calculator'
 
 module Evva
   extend self

@@ -25,10 +25,12 @@ module Evva
         event_file += swift_case(event)
       end
       event_file += "}\n"
+      event_file += "private var data: EventData {\n"\
+      "switch self {\n\n"
       bundle.each do |event|
         event_file += swift_event_data(event)
       end
-      event_file += "}\n"   
+      event_file += "}\n}\n"   
     end
 
     def swift_case(event_data)
@@ -47,7 +49,7 @@ module Evva
       else
         function_header = prepend_let(event_data.properties)
         function_arguments = process_arguments(event_data.properties.gsub("Boolean", "Bool"))
-        function_body = "case .#{event_data.function_name}(#{function_header}): \n" + 
+        function_body = "case .#{event_data.function_name}(#{function_header}):\n" + 
         "\treturn EventData(name:" + %Q{"#{event_data.event_name}"} + ", properties: [#{function_arguments}])\n\n"
       end
     
@@ -71,8 +73,9 @@ module Evva
     end
 
     def special_property_enum(enum)
+      enum_body = "import Foundation\n\n"
       enum_values = enum.values.split(',')
-      enum_body = "enum #{enum.enum_name}: String {\n"
+      enum_body += "enum #{enum.enum_name}: String {\n"
       enum_values.each do |vals|
         enum_body += "\tcase #{vals.tr(" ","_")} = " + %Q{"#{vals}"} + "\n"
       end
@@ -91,7 +94,11 @@ module Evva
       arguments = ""
       props.split(',').each do |property|
         if is_special_property(property)
-          arguments += %Q{"#{property.split(":").first()}"} + ":" + property.split(":").first() + ".rawValue, "
+          if is_optional_property(property)
+            
+          else
+            arguments += %Q{"#{property.split(":").first()}"} + ":" + property.split(":").first() + ".rawValue, "
+          end
         else
           arguments += %Q{"#{property.split(":").first()}"} + ":" + property.split(":").first() + ", "
         end
@@ -103,6 +110,11 @@ module Evva
       types_array = ['Long', 'Int','String', 'Double', 'Float', 'Boolean']
       type = prop.split(':')[1]
       types_array.include?(type) ? false : true
+    end
+
+    def is_optional_property(prop)
+      type = prop.split(':')[1]
+      type.include?("?") ? true : false
     end
   end
 end

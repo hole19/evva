@@ -70,6 +70,31 @@ describe Evva::AndroidGenerator do
     end
   end
 
+  describe "#event_enum" do
+    event_bundle = [Evva::MixpanelEvent.new('trackNavFeedTap', "nav_feed_tap", []),
+              Evva::MixpanelEvent.new('trackPerformanceTap', "nav_performance_tap", [])]
+    it "builds the enum with mixpanel events" do
+      expected = "package com.hole19golf.hole19.analytics\n"\
+    "import com.hole19golf.hole19.analytics.Event\n\n"\
+    "enum class MixpanelEvent(override val key: String) : Event {\n"\
+    "\t\tNAV_FEED_TAP(\"nav_feed_tap\"),\n"\
+    "\t\tNAV_PERFORMANCE_TAP(\"nav_performance_tap\"),\n\n"\
+    "}"
+      expect(generator.event_enum(event_bundle)).to eq expected
+    end
+  end
+
+  describe "#people_properties" do
+    people_bundle = [Evva::MixpanelProperty.new("RoundWithWear", "rounds_with_wear")]
+    it "build the people propeties enum" do
+      expected =  "package com.hole19golf.hole19.analytics\n"\
+    "import com.hole19golf.hole19.analytics.Event\n\n"\
+    "enum class MixpanelProperties(val key: String) {\n"\
+    "\t\tval RoundWithWear = \"rounds_with_wear\"\n"
+      expect(generator.people_properties(people_bundle)).to eq expected
+    end
+  end
+
   describe "#is_special_property" do
     context "receives a regular property" do
        it do
