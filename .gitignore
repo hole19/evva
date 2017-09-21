@@ -2,3 +2,4 @@
 .ruby-version
 running
 coverage
+.DS_Store*
