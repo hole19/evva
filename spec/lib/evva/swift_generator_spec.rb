@@ -1,5 +1,5 @@
 describe Evva::SwiftGenerator do
-	generator = Evva::SwiftGenerator.new()
+	generator = Evva::SwiftGenerator.new
 
 	describe "#is_special_property" do
 		context "receives a regular property" do
@@ -16,11 +16,11 @@ describe Evva::SwiftGenerator do
 	end
 
   describe "#events" do
-    event_bundle = 
+    event_bundle =
     [Evva::MixpanelEvent.new('trackNavFeedTap', "nav_feed_tap", []),
     Evva::MixpanelEvent.new("trackCpPageView", 'cp_page_view', "course_id:Long,course_name:String")]
     it "should process all the events and build the mixpanel events file" do
-      expected =  
+      expected =
       "import CoreLocation\n"\
       "import Foundation\n"\
       "import SharedCode\n\n"\
@@ -47,8 +47,8 @@ describe Evva::SwiftGenerator do
    end
  end
 
- describe "#swift_case" do 
-  
+ describe "#swift_case" do
+
   context "event has no properties" do
    event = Evva::MixpanelEvent.new('trackNavFeedTap', "nav_feed_tap", [])
    it "should create a case for an event to be tracked" do
@@ -58,7 +58,7 @@ describe Evva::SwiftGenerator do
 
 end
 
-context "event has properties" do 
+context "event has properties" do
  event = Evva::MixpanelEvent.new("trackCpPageView", 'cp_page_view', "course_id:Long,course_name:String")
  it "should create a case for an event to be tracked" do
   expected = "\t\tcase trackCpPageView(course_id:Long,course_name:String)\n"
@@ -97,7 +97,7 @@ end
 end
 
 describe "is_optional_property" do
-  it do 
+  it do
     expect(generator.is_optional_property("course_profile_source:CourseProfileSource?")).to eq true
   end
 end

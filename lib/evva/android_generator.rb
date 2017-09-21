@@ -1,24 +1,24 @@
 module Evva
   class AndroidGenerator
 
-    KOTLIN_EVENT_HEADER =  
+    KOTLIN_EVENT_HEADER =
     "package com.hole19golf.hole19.analytics\n\n"\
     "import com.hole19golf.hole19.analytics.Event\n"\
     "import com.hole19golf.hole19.analytics.MixpanelAnalyticsMask\n"\
     "import org.json.JSONObject\n\n"\
     "open class MixpanelEvents(private val mixpanelMask: MixpanelAnalyticsMask) {\n".freeze
-    
-    KOTLIN_PEOPLE_HEADER =  
+
+    KOTLIN_PEOPLE_HEADER =
     "package com.hole19golf.hole19.analytics\n"\
     "import com.hole19golf.hole19.analytics.Event\n\n"\
     "enum class MixpanelProperties(val key: String) {\n"
 
-    KOTLIN_BUNDLE_HEADER = 
+    KOTLIN_BUNDLE_HEADER =
     "package com.hole19golf.hole19.analytics\n"\
     "import com.hole19golf.hole19.analytics.Event\n\n"\
     "enum class MixpanelEvent(override val key: String) : Event {\n".freeze
 
-    KOTIN_PEOPLE_FUNCTIONS = 
+    KOTIN_PEOPLE_FUNCTIONS =
     "\topen fun updateProperties(property: MixpanelProperties, value: Any) {\n"\
     "\t\tmixpanelMask.setProperty(property.key value)"\
     "\t\n} \n"\
@@ -50,7 +50,7 @@ module Evva
       end
       event_file += "\n}"
     end
-    
+
     def kotlin_function(event_data)
       if !event_data.properties.nil?
         props = json_props(event_data.properties)
@@ -62,7 +62,7 @@ module Evva
         props = nil
         function_body =
         "\nopen fun #{event_data.function_name}(#{event_data.properties}) {\n"\
-        "\tmixpanelMask.trackEvent(MixpanelEvent.#{event_data.event_name.upcase})\n"    
+        "\tmixpanelMask.trackEvent(MixpanelEvent.#{event_data.event_name.upcase})\n"
       end
       function_body += "}\n"
     end
@@ -91,12 +91,12 @@ module Evva
       properties.split(',').each do |prop|
         if is_special_property(prop)
            if is_optional_property(prop)
-            split_properties += "\t\t" + prop.split(":").first() + "?.let { put(" + %Q{"#{prop.split(":").first()}"} + ", it.key)}\n"
+            split_properties += "\t\t" + prop.split(":").first + "?.let { put(" + %Q{"#{prop.split(":").first}"} + ", it.key)}\n"
           else
-            split_properties += "\t\tput(" + %Q{"#{prop.split(":").first()}"} + ", " + prop.split(":").first() + ".key)\n"
+            split_properties += "\t\tput(" + %Q{"#{prop.split(":").first}"} + ", " + prop.split(":").first + ".key)\n"
           end
         else
-          split_properties += "\t\tput(" + %Q{"#{prop.split(":").first()}"} + ", " + prop.split(":").first() + ")\n"
+          split_properties += "\t\tput(" + %Q{"#{prop.split(":").first}"} + ", " + prop.split(":").first + ")\n"
         end
       end
       resulting_json = "\n\tval properties = JSONObject().apply {\n" +

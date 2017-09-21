@@ -1,20 +1,20 @@
 module Evva
   class SwiftGenerator
 
-    SWIFT_EVENT_HEADER = 
+    SWIFT_EVENT_HEADER =
     "import CoreLocation\n"\
     "import Foundation\n"\
     "import SharedCode\n\n"\
     "class MixpanelHelper: NSObject {\n"\
     "enum Event {\n"
 
-    SWIFT_EVENT_DATA_HEADER = 
+    SWIFT_EVENT_DATA_HEADER =
     "private var data: EventData {\n"\
     "switch self {\n\n\n"
 
     SWIFT_PEOPLE_HEADER = "fileprivate enum Counter: String {\n".freeze
 
-    SWIFT_INCREMENT_FUNCTION = 
+    SWIFT_INCREMENT_FUNCTION =
             "func increment(times: Int = 1) {\n"\
             "MixpanelAPI.instance.incrementCounter(rawValue, times: times)\n"\
             "}"
@@ -30,7 +30,7 @@ module Evva
       bundle.each do |event|
         event_file += swift_event_data(event)
       end
-      event_file += "}\n}\n"   
+      event_file += "}\n}\n"
     end
 
     def swift_case(event_data)
@@ -44,15 +44,15 @@ module Evva
 
     def swift_event_data(event_data)
       if event_data.properties.nil?
-        function_body = "case .#{event_data.function_name} \n" + 
+        function_body = "case .#{event_data.function_name} \n" +
         "\treturn EventData(name:" + %Q{"#{event_data.event_name}"} + ")\n\n"
       else
         function_header = prepend_let(event_data.properties)
         function_arguments = process_arguments(event_data.properties.gsub("Boolean", "Bool"))
-        function_body = "case .#{event_data.function_name}(#{function_header}):\n" + 
+        function_body = "case .#{event_data.function_name}(#{function_header}):\n" +
         "\treturn EventData(name:" + %Q{"#{event_data.event_name}"} + ", properties: [#{function_arguments}])\n\n"
       end
-    
+
       function_body
     end
 
@@ -95,12 +95,12 @@ module Evva
       props.split(',').each do |property|
         if is_special_property(property)
           if is_optional_property(property)
-            
+
           else
-            arguments += %Q{"#{property.split(":").first()}"} + ":" + property.split(":").first() + ".rawValue, "
+            arguments += %Q{"#{property.split(":").first}"} + ":" + property.split(":").first + ".rawValue, "
           end
         else
-          arguments += %Q{"#{property.split(":").first()}"} + ":" + property.split(":").first() + ", "
+          arguments += %Q{"#{property.split(":").first}"} + ":" + property.split(":").first + ", "
         end
       end
       arguments.chomp(', ')

@@ -9,5 +9,5 @@ gem 'xml-simple', '~> 1.1'
 gem 'webmock',    '~> 1.20'
 gem 'rspec'
 gem 'rspec-its'
-gem 'simplecov', :require => false, :group => :test
+gem 'simplecov', require: false, group: :test
 gem 'simplecov-rcov',                        require: false
