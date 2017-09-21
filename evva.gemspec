@@ -1,4 +1,4 @@
-require_relative "lib/evva/version"
+require_relative 'lib/evva/version'
 
 Gem::Specification.new do |s|
   s.name        = 'evva'

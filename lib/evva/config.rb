@@ -5,7 +5,7 @@ module Evva
       @hash.validate_structure!(CONFIG_STRUCT)
 
       unless dict_struct = DICTIONARY_STRUCT[@hash[:data_source][:type]]
-        raise ArgumentError.new("unknown data source type '#{@hash[:data_source][:type]}'")
+        raise ArgumentError, "unknown data source type '#{@hash[:data_source][:type]}'"
       end
 
       @hash[:data_source].validate_structure!(dict_struct)
@@ -49,9 +49,9 @@ module Evva
         out_path: { type: String },
         event_file_name: { type: String },
         event_enum_file_name: { type: String },
-        people_file_name: { type: String },
+        people_file_name: { type: String }
       }
-    }
+    }.freeze
 
     GOOGLE_SHEET_STRUCT = {
       type: Hash,
@@ -59,11 +59,10 @@ module Evva
         type: { type: String },
         sheet_id: { type: String }
       }
-    }
+    }.freeze
 
-  
     DICTIONARY_STRUCT = {
-      "google_sheet" => GOOGLE_SHEET_STRUCT
-    }
+      'google_sheet' => GOOGLE_SHEET_STRUCT
+    }.freeze
   end
 end

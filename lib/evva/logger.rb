@@ -27,11 +27,11 @@ module Evva
 
     def print_summary
       if @levels[:warn] > 0 || @levels[:error] > 0
-        info ""
-        info "Finished with:"
+        info ''
+        info 'Finished with:'
         info "  #{@levels[:warn]} warnings" if @levels[:warn]  > 0
         info "  #{@levels[:error]} errors"  if @levels[:error] > 0
-        info ""
+        info ''
       end
     end
 

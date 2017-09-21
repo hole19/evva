@@ -20,7 +20,7 @@ module Evva
     file_reader = Evva::FileReader.new
     options = command_line_options(options)
     if config_file = file_reader.open_file('generic.yml', 'r', true)
-      config       = Evva::Config.new(hash: YAML::load(config_file))
+      config       = Evva::Config.new(hash: YAML.safe_load(config_file))
       bundle       = analytics_data(config: config.data_source)
       type         = config.type
     else
@@ -28,14 +28,14 @@ module Evva
       return
     end
 
-    if type.eql? "Android"
+    if type.eql? 'Android'
       generator = Evva::AndroidGenerator.new
-      evva_write(bundle, generator, config, "kt")
+      evva_write(bundle, generator, config, 'kt')
     end
 
-    if type.eql? "iOS"
+    if type.eql? 'iOS'
       generator = Evva::SwiftGenerator.new
-      evva_write(bundle, generator, config, "swift")
+      evva_write(bundle, generator, config, 'swift')
     end
     Evva::Logger.print_summary
   end
@@ -43,8 +43,9 @@ module Evva
   def evva_write(bundle, generator, configuration, file_extension)
     file_reader = Evva::FileReader.new
     if file = file_reader.open_file(
-      "#{configuration.out_path}/#{configuration.event_file_name}.#{file_extension}", "w", false)
-      events = (generator.events(bundle[:events]))
+      "#{configuration.out_path}/#{configuration.event_file_name}.#{file_extension}", 'w', false
+    )
+      events = generator.events(bundle[:events])
       file_reader.write_to_file(file, events)
     else
       Logger.error("Could not write to file in #{configuration.out_path}")
@@ -52,29 +53,32 @@ module Evva
 
     event_enum = generator.event_enum(bundle[:events])
     event_enum_file = file_reader.open_file(
-      "#{configuration.out_path}/#{configuration.event_enum_file_name}.#{file_extension}", "w", false)
+      "#{configuration.out_path}/#{configuration.event_enum_file_name}.#{file_extension}", 'w', false
+    )
 
     file_reader.write_to_file(event_enum_file, event_enum)
 
-    people = (generator.people_properties(bundle[:people]))
+    people = generator.people_properties(bundle[:people])
     people_file = file_reader.open_file(
-      "#{configuration.out_path}/#{configuration.people_file_name}.#{file_extension}", "w", false)
+      "#{configuration.out_path}/#{configuration.people_file_name}.#{file_extension}", 'w', false
+    )
 
     file_reader.write_to_file(people_file, people)
 
     bundle[:enums].each do |enum|
       enum_file = file_reader.open_file(
-        "#{configuration.out_path}/#{enum.enum_name}.#{file_extension}", "w", false)
+        "#{configuration.out_path}/#{enum.enum_name}.#{file_extension}", 'w', false
+      )
       file_reader.write_to_file(enum_file, generator.special_property_enum(enum))
     end
   end
 
   def analytics_data(config:)
     source =
-    case config[:type]
-    when "google_sheet"
-      Evva::GoogleSheet.new(config[:sheet_id])
-    end
+      case config[:type]
+      when 'google_sheet'
+        Evva::GoogleSheet.new(config[:sheet_id])
+      end
     events_bundle = {}
     events_bundle[:events] = source.events
     events_bundle[:people] = source.people_properties
@@ -86,13 +90,12 @@ module Evva
     opts_hash = {}
 
     opts_parser = OptionParser.new do |opts|
-
-      opts.on_tail("-h", "--help", "Show this message") do
+      opts.on_tail('-h', '--help', 'Show this message') do
         puts opts
         exit
       end
 
-      opts.on_tail("-v", "--version", "Show version") do
+      opts.on_tail('-v', '--version', 'Show version') do
         puts Evva::VERSION
         exit
       end

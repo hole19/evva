@@ -10,8 +10,8 @@ module Evva
     def events
       raw = raw_data(@sheet_id, 0)
       Logger.info('Downloading dictionary from Google Sheet...')
-      non_language_columns = ['id', 'updated', 'category',
-                              'title', 'content', 'link']
+      non_language_columns = %w[id updated category
+                                title content link]
       event_list = []
       raw['entry'].each do |entry|
         filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
@@ -27,7 +27,7 @@ module Evva
       raw = raw_data(@sheet_id, 1)
       people_list = []
       Logger.info('Downloading dictionary from Google Sheet...')
-      non_language_columns = ['id', 'updated', 'category', 'title', 'content', 'link']
+      non_language_columns = %w[id updated category title content link]
       raw['entry'].each do |entry|
         filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
         property = filtered_entry['properties'].first
@@ -40,7 +40,7 @@ module Evva
     def enum_classes
       raw = raw_data(@sheet_id, 2)
       Logger.info('Downloading dictionary from Google Sheet...')
-      non_language_columns = ['id', 'updated', 'category', 'title', 'content', 'link']
+      non_language_columns = %w[id updated category title content link]
       enum_list = []
       raw['entry'].each do |entry|
         filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
