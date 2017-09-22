@@ -22,16 +22,15 @@ module Evva
     unless config_file = file_reader.open_file('generic.yml', 'r', true)
       Logger.error("Could not open #{file_name}!")
       return
-    else
-      config       = Evva::Config.new(hash: YAML.safe_load(config_file))
-      bundle       = analytics_data(config: config.data_source)
     end
 
+    config = Evva::Config.new(hash: YAML.safe_load(config_file))
+    bundle = analytics_data(config: config.data_source)
     case config.type.downcase
-    when "android"
+    when 'android'
       generator = Evva::AndroidGenerator.new
       evva_write(bundle, generator, config, 'kt')
-    when "ios"
+    when 'ios'
       generator = Evva::SwiftGenerator.new
       evva_write(bundle, generator, config, 'swift')
     end
