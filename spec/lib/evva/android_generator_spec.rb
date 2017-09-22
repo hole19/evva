@@ -1,133 +1,123 @@
 describe Evva::AndroidGenerator do
-  generator = Evva::AndroidGenerator.new
+  let(:generator) { described_class.new }
+
+  def trim_spaces(str)
+      str.gsub(/^[ \t]+/, '')
+         .gsub(/[ \t]+$/, '')
+  end
 
   describe '#kotlin_function' do
-    context 'event has no properties' do
-      event = Evva::MixpanelEvent.new('trackNavFeedTap', 'nav_feed_tap', [])
-      it 'returns the correct kotlin function' do
-        expected = "\nopen fun trackNavFeedTap() {\n"\
-        "\tmixpanelMask.trackEvent(MixpanelEvent.NAV_FEED_TAP)\n"\
-        "}\n"
-        expect(generator.kotlin_function(event)).to eq expected
-      end
+    subject { trim_spaces(generator.kotlin_function(event)) }
+
+    context 'when the event has no properties' do
+      let(:event) { Evva::MixpanelEvent.new('trackNavFeedTap', 'nav_feed_tap', []) }
+      let(:expected) { <<-Kotlin
+        open fun trackNavFeedTap() {
+          mixpanelMask.trackEvent(MixpanelEvent.NAV_FEED_TAP)
+        }
+        Kotlin
+      }
+      it { should eq trim_spaces(expected) }
     end
 
     context 'event has properties' do
-      event = Evva::MixpanelEvent.new('trackCpPageView', 'cp_page_view', 'course_id:Long,course_name:String')
-      it 'should parse the properties and return the correct event function' do
-        expected = "\nopen fun trackCpPageView(course_id:Long,course_name:String) {\n"\
-        "\tval properties = JSONObject().apply {\n"\
-        "\t\tput(\"course_id\", course_id)\n"\
-        "\t\tput(\"course_name\", course_name)\n\n"\
-        "\t}\n"\
-        "\tmixpanelMask.trackEvent(MixpanelEvent.CP_PAGE_VIEW, properties)\n"\
-        "}\n"
-        expect(generator.kotlin_function(event)).to eq expected
-      end
+      let(:event) { Evva::MixpanelEvent.new('trackCpPageView', 'cp_page_view', 'course_id:Long,course_name:String') }
+      let(:expected) { <<-Kotlin
+        open fun trackCpPageView(course_id:Long,course_name:String) {
+          val properties = JSONObject().apply {
+            put("course_id", course_id)
+            put("course_name", course_name)
+
+          }
+          mixpanelMask.trackEvent(MixpanelEvent.CP_PAGE_VIEW, properties)
+        }
+        Kotlin
+      }
+      it { should eq trim_spaces(expected) }
     end
 
     context 'event has special properties' do
-      event = Evva::MixpanelEvent.new('trackCpPageView', 'cp_page_view', 'course_id:Long,course_name:String,from_screen: CourseProfileSource')
-      it 'should parse the special properties and return the correct event function' do
-        expected = "\nopen fun trackCpPageView(course_id:Long,course_name:String,from_screen: CourseProfileSource) {\n"\
-        "\tval properties = JSONObject().apply {\n"\
-        "\t\tput(\"course_id\", course_id)\n"\
-        "\t\tput(\"course_name\", course_name)\n"\
-        "\t\tput(\"from_screen\", from_screen.key)\n\n"\
-        "\t}\n"\
-        "\tmixpanelMask.trackEvent(MixpanelEvent.CP_PAGE_VIEW, properties)\n"\
-        "}\n"
-        expect(generator.kotlin_function(event)).to eq expected
-      end
+      let(:event) { Evva::MixpanelEvent.new('trackCpPageView', 'cp_page_view', 'course_id:Long,course_name:String,from_screen:CourseProfileSource') }
+      let(:expected) { <<-Kotlin
+        open fun trackCpPageView(course_id:Long,course_name:String,from_screen:CourseProfileSource) {
+          val properties = JSONObject().apply {
+            put("course_id", course_id)
+            put("course_name", course_name)
+            put("from_screen", from_screen.key)
+
+          }
+          mixpanelMask.trackEvent(MixpanelEvent.CP_PAGE_VIEW, properties)
+        }
+        Kotlin
+      }
+      it { should eq trim_spaces(expected) }
     end
 
     context 'event has optional properties' do
-      event = Evva::MixpanelEvent.new('trackCpPageView', 'cp_page_view', 'course_id:Long,course_name:String,from_screen: CourseProfileSource?')
-      it 'should parse the special properties and return the correct event function' do
-        expected = "\nopen fun trackCpPageView(course_id:Long,course_name:String,from_screen: CourseProfileSource?) {\n"\
-        "\tval properties = JSONObject().apply {\n"\
-        "\t\tput(\"course_id\", course_id)\n"\
-        "\t\tput(\"course_name\", course_name)\n"\
-        "\t\tfrom_screen?.let { put(\"from_screen\", it.key)}\n\n"\
-        "\t}\n"\
-        "\tmixpanelMask.trackEvent(MixpanelEvent.CP_PAGE_VIEW, properties)\n"\
-        "}\n"
-        expect(generator.kotlin_function(event)).to eq expected
-      end
+      let(:event) { Evva::MixpanelEvent.new('trackCpPageView', 'cp_page_view', 'course_id:Long,course_name:String,from_screen: CourseProfileSource?') }
+      let(:expected) { <<-Kotlin
+        open fun trackCpPageView(course_id:Long,course_name:String,from_screen: CourseProfileSource?) {
+          val properties = JSONObject().apply {
+            put("course_id", course_id)
+            put("course_name", course_name)
+            from_screen?.let { put("from_screen", it.key)}
+
+          }
+          mixpanelMask.trackEvent(MixpanelEvent.CP_PAGE_VIEW, properties)
+        }
+        Kotlin
+      }
+      it { should eq trim_spaces(expected) }
     end
   end
 
   describe '#special_property_enum' do
-    enum = Evva::MixpanelEnum.new('CourseProfileSource', 'course_discovery,synced_courses')
+    subject { trim_spaces(generator.special_property_enum(enum)) }
+    let(:enum) { Evva::MixpanelEnum.new('CourseProfileSource', 'course_discovery,synced_courses') }
+    let(:expected) { <<-Kotlin
+      package com.hole19golf.hole19.analytics
 
-    it 'returns the expected kotlin enum' do
-      expected =
-        "package com.hole19golf.hole19.analytics\n\n"\
-        "enum class CourseProfileSource(val key: String) {\n"\
-        "\tCOURSE_DISCOVERY(\"course_discovery\"),\n"\
-        "\tSYNCED_COURSES(\"synced_courses\"),\n} \n"
-      expect(generator.special_property_enum(enum)).to eq expected
-    end
+      enum class CourseProfileSource(val key: String) {
+        COURSE_DISCOVERY("course_discovery"),
+        SYNCED_COURSES("synced_courses"),
+      }
+      Kotlin
+     }
+    it { should eq trim_spaces(expected) }
   end
 
   describe '#event_enum' do
-    event_bundle = [Evva::MixpanelEvent.new('trackNavFeedTap', 'nav_feed_tap', []),
-                    Evva::MixpanelEvent.new('trackPerformanceTap', 'nav_performance_tap', [])]
-    it 'builds the enum with mixpanel events' do
-      expected = "package com.hole19golf.hole19.analytics\n"\
-    "import com.hole19golf.hole19.analytics.Event\n\n"\
-    "enum class MixpanelEvent(override val key: String) : Event {\n"\
-    "\t\tNAV_FEED_TAP(\"nav_feed_tap\"),\n"\
-    "\t\tNAV_PERFORMANCE_TAP(\"nav_performance_tap\"),\n\n"\
-    '}'
-      expect(generator.event_enum(event_bundle)).to eq expected
-    end
+    subject { trim_spaces(generator.event_enum(event_bundle)) }
+    let(:event_bundle) { [
+      Evva::MixpanelEvent.new('trackNavFeedTap', 'nav_feed_tap', []),
+      Evva::MixpanelEvent.new('trackPerformanceTap', 'nav_performance_tap', [])
+      ] }
+    let(:expected) { <<-Kotlin
+      package com.hole19golf.hole19.analytics
+      import com.hole19golf.hole19.analytics.Event
+
+      enum class MixpanelEvent(override val key: String) : Event {
+        NAV_FEED_TAP("nav_feed_tap"),
+        NAV_PERFORMANCE_TAP("nav_performance_tap"),
+
+      }
+      Kotlin
+     }
+    it { should eq trim_spaces(expected) }
   end
 
   describe '#people_properties' do
-    people_bundle = [Evva::MixpanelProperty.new('RoundWithWear', 'rounds_with_wear')]
-    it 'build the people propeties enum' do
-      expected =  "package com.hole19golf.hole19.analytics\n"\
-    "import com.hole19golf.hole19.analytics.Event\n\n"\
-    "enum class MixpanelProperties(val key: String) {\n"\
-    "\t\tval RoundWithWear = \"rounds_with_wear\"\n"
-      expect(generator.people_properties(people_bundle)).to eq expected
-    end
-  end
+    subject { trim_spaces(generator.people_properties(people_bundle)) }
+    let(:people_bundle) { [Evva::MixpanelProperty.new('RoundWithWear', 'rounds_with_wear')] }
+    let(:expected) { <<-Kotlin
+      package com.hole19golf.hole19.analytics
+      import com.hole19golf.hole19.analytics.Event
 
-  describe '#is_special_property' do
-    context 'receives a regular property' do
-      it do
-        expect(generator.is_special_property('course_id:Long')).to eq false
-      end
-    end
-
-    context 'receives a special property' do
-      it do
-        expect(generator.is_special_property('course_profile_source')).to eq true
-      end
-    end
-  end
-
-  describe 'is_optional_property' do
-    it do
-      expect(generator.is_optional_property('course_profile_source:CourseProfileSource?')).to eq true
-    end
-  end
-
-  describe '#kotlin_people_const' do
-    property = Evva::MixpanelProperty.new('RoundWithWear', 'rounds_with_wear')
-    it 'should return the correctly formed constant' do
-      expected = "\t\tval RoundWithWear = \"rounds_with_wear\"\n"
-      expect(generator.kotlin_people_const(property)).to eq expected
-    end
-  end
-
-  describe '#kotlin_event_const' do
-    event = Evva::MixpanelEvent.new('trackNavFeedTap', 'nav_feed_tap', [])
-    it 'should return the correct mixpanel event format' do
-      expected = "\t\tNAV_FEED_TAP(\"nav_feed_tap\"),\n"
-      expect(generator.kotlin_event_const(event)).to eq expected
-    end
+      enum class MixpanelProperties(val key: String) {
+        val RoundWithWear = "rounds_with_wear"
+      }
+      Kotlin
+    }
+    it { should eq trim_spaces(expected) }
   end
 end

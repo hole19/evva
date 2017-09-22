@@ -19,57 +19,38 @@ module Evva
   def run(options)
     file_reader = Evva::FileReader.new
     options = command_line_options(options)
-    if config_file = file_reader.open_file('generic.yml', 'r', true)
-      config       = Evva::Config.new(hash: YAML.safe_load(config_file))
-      bundle       = analytics_data(config: config.data_source)
-      type         = config.type
-    else
+    unless config_file = file_reader.open_file('generic.yml', 'r', true)
       Logger.error("Could not open #{file_name}!")
       return
+    else
+      config       = Evva::Config.new(hash: YAML.safe_load(config_file))
+      bundle       = analytics_data(config: config.data_source)
     end
 
-    if type.eql? 'Android'
+    case config.type.downcase
+    when "android"
       generator = Evva::AndroidGenerator.new
       evva_write(bundle, generator, config, 'kt')
-    end
-
-    if type.eql? 'iOS'
+    when "ios"
       generator = Evva::SwiftGenerator.new
       evva_write(bundle, generator, config, 'swift')
     end
     Evva::Logger.print_summary
   end
 
-  def evva_write(bundle, generator, configuration, file_extension)
-    file_reader = Evva::FileReader.new
-    if file = file_reader.open_file(
-      "#{configuration.out_path}/#{configuration.event_file_name}.#{file_extension}", 'w', false
-    )
-      events = generator.events(bundle[:events])
-      file_reader.write_to_file(file, events)
-    else
-      Logger.error("Could not write to file in #{configuration.out_path}")
-    end
+  def evva_write(bundle, generator, configuration, extension)
+    path = "#{configuration.out_path}/#{configuration.event_file_name}.#{extension}"
+    write_to_file(path, generator.events(bundle[:events]))
 
-    event_enum = generator.event_enum(bundle[:events])
-    event_enum_file = file_reader.open_file(
-      "#{configuration.out_path}/#{configuration.event_enum_file_name}.#{file_extension}", 'w', false
-    )
+    path = "#{configuration.out_path}/#{configuration.event_enum_file_name}.#{extension}"
+    write_to_file(path, generator.event_enum(bundle[:events]))
 
-    file_reader.write_to_file(event_enum_file, event_enum)
-
-    people = generator.people_properties(bundle[:people])
-    people_file = file_reader.open_file(
-      "#{configuration.out_path}/#{configuration.people_file_name}.#{file_extension}", 'w', false
-    )
-
-    file_reader.write_to_file(people_file, people)
+    path = "#{configuration.out_path}/#{configuration.people_file_name}.#{extension}"
+    write_to_file(path, generator.people_properties(bundle[:people]))
 
     bundle[:enums].each do |enum|
-      enum_file = file_reader.open_file(
-        "#{configuration.out_path}/#{enum.enum_name}.#{file_extension}", 'w', false
-      )
-      file_reader.write_to_file(enum_file, generator.special_property_enum(enum))
+      path = "#{configuration.out_path}/#{enum.enum_name}.#{extension}"
+      write_to_file(enum_file, generator.special_property_enum(enum))
     end
   end
 
@@ -103,5 +84,14 @@ module Evva
     opts_parser.parse!(options)
 
     opts_hash
+  end
+
+  def write_to_file(path, data)
+    file_reader = Evva::FileReader.new
+    if file = file_reader.open_file(path, "w", false)
+      file_reader.write_to_file(file, data)
+    else
+      Logger.error("Could not write to file in #{path}")
+    end
   end
 end

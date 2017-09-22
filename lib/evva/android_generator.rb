@@ -28,7 +28,7 @@ module Evva
     def events(bundle)
       event_file = KOTLIN_EVENT_HEADER
       bundle.each do |event|
-        event_file += kotlin_function(event)
+        event_file += "\n{kotlin_function(event)}"
       end
       event_file += KOTIN_PEOPLE_FUNCTIONS
       event_file += "\n}"
@@ -39,7 +39,7 @@ module Evva
       people_bundle.each do |prop|
         properties += kotlin_people_const(prop)
       end
-      properties
+      properties += "}\n"
     end
 
     def event_enum(bundle)
@@ -47,31 +47,23 @@ module Evva
       bundle.each do |event|
         event_file += kotlin_event_const(event)
       end
-      event_file += "\n}"
+      event_file += "\n}\n"
     end
 
     def kotlin_function(event_data)
       if !event_data.properties.nil?
         props = json_props(event_data.properties)
         function_body =
-          "\nopen fun #{event_data.function_name}(#{event_data.properties}) {"\
+          "open fun #{event_data.function_name}(#{event_data.properties}) {"\
           "#{props}"\
           "\tmixpanelMask.trackEvent(MixpanelEvent.#{event_data.event_name.upcase}, properties)\n"
       else
         props = nil
         function_body =
-          "\nopen fun #{event_data.function_name}(#{event_data.properties}) {\n"\
+          "open fun #{event_data.function_name}(#{event_data.properties}) {\n"\
           "\tmixpanelMask.trackEvent(MixpanelEvent.#{event_data.event_name.upcase})\n"
       end
       function_body += "}\n"
-    end
-
-    def kotlin_people_const(prop)
-      people_property = "\t\tval #{prop.property_name} = " + %("#{prop.property_value}") + "\n"
-    end
-
-    def kotlin_event_const(event)
-      kotlin_event = "\t\t#{event.event_name.upcase}(" + %("#{event.event_name}") + "),\n"
     end
 
     def special_property_enum(enum)
@@ -82,6 +74,16 @@ module Evva
         enum_body += "\t#{vals.tr(' ', '_').upcase}(" + %("#{vals}") + "),\n"
       end
       enum_body += "} \n"
+    end
+
+    private
+
+    def kotlin_people_const(prop)
+      people_property = "\t\tval #{prop.property_name} = " + %("#{prop.property_value}") + "\n"
+    end
+
+    def kotlin_event_const(event)
+      kotlin_event = "\t\t#{event.event_name.upcase}(" + %("#{event.event_name}") + "),\n"
     end
 
     def json_props(properties)
