@@ -1,6 +1,5 @@
 module Evva
   class MixpanelEnum
-
     attr_reader :enum_name, :values
     def initialize(enum_name, values)
       @enum_name = enum_name
@@ -8,8 +7,8 @@ module Evva
     end
 
     def ==(other)
-      self.enum_name == other.enum_name
-      self.values == other.values
+      enum_name == other.enum_name
+      values == other.values
     end
   end
 end

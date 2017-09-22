@@ -4,19 +4,19 @@ module Evva
       @hash = hash.deep_symbolize
       @hash.validate_structure!(CONFIG_STRUCT)
 
-      unless dict_struct = DICTIONARY_STRUCT[@hash[:dictionary][:type]]
-        raise ArgumentError.new("unknown dictionary type '#{@hash[:dictionary][:type]}'")
+      unless dict_struct = DICTIONARY_STRUCT[@hash[:data_source][:type]]
+        raise ArgumentError, "unknown data source type '#{@hash[:data_source][:type]}'"
       end
 
-      @hash[:dictionary].validate_structure!(dict_struct)
+      @hash[:data_source].validate_structure!(dict_struct)
     end
 
     def to_h
       @hash
     end
 
-    def dictionary
-      @hash[:dictionary]
+    def data_source
+      @hash[:data_source]
     end
 
     def type
@@ -27,29 +27,42 @@ module Evva
       @hash[:out_path]
     end
 
+    def event_file_name
+      @hash[:event_file_name]
+    end
+
+    def people_file_name
+      @hash[:people_file_name]
+    end
+
+    def event_enum_file_name
+      @hash[:event_enum_file_name]
+    end
+
     CONFIG_STRUCT = {
       type: Hash,
       elements: {
         type: { type: String },
-        dictionary: { type: Hash, elements: {
+        data_source: { type: Hash, elements: {
           type: { type: String }
         } },
-        out_path: { type: String }
+        out_path: { type: String },
+        event_file_name: { type: String },
+        event_enum_file_name: { type: String },
+        people_file_name: { type: String }
       }
-    }
+    }.freeze
 
     GOOGLE_SHEET_STRUCT = {
       type: Hash,
       elements: {
         type: { type: String },
-        sheet_id: { type: String },
-        keys_column: { type: String }
+        sheet_id: { type: String }
       }
-    }
+    }.freeze
 
-  
     DICTIONARY_STRUCT = {
-      "google_sheet" => GOOGLE_SHEET_STRUCT
-    }
+      'google_sheet' => GOOGLE_SHEET_STRUCT
+    }.freeze
   end
 end

@@ -3,19 +3,18 @@ require 'xmlsimple'
 
 module Evva
   class GoogleSheet
-    def initialize(sheet_id, keys_column)
+    def initialize(sheet_id)
       @sheet_id = sheet_id
-      @key_column = keys_column
     end
 
     def events
       raw = raw_data(@sheet_id, 0)
       Logger.info('Downloading dictionary from Google Sheet...')
-      non_language_columns = ['id', 'updated', 'category',
-                              'title', 'content', 'link']
+      non_language_columns = %w[id updated category
+                                title content link]
       event_list = []
       raw['entry'].each do |entry|
-        filtered_entry = entry.select { |c| !non_language_columns.include?(c) }
+        filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
         function = filtered_entry['functionname'].first
         event_name = filtered_entry['eventname'].first
         properties = filtered_entry['props'].first
@@ -26,21 +25,25 @@ module Evva
 
     def people_properties
       raw = raw_data(@sheet_id, 1)
+      people_list = []
       Logger.info('Downloading dictionary from Google Sheet...')
-      non_language_columns = ['id', 'updated', 'category', 'title', 'content', 'link']
+      non_language_columns = %w[id updated category title content link]
       raw['entry'].each do |entry|
-        filtered_entry = entry.select { |c| !non_language_columns.include?(c) }
-        puts filtered_entry
+        filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
+        property = filtered_entry['properties'].first
+        value = filtered_entry['value'].first
+        people_list.push(Evva::MixpanelProperty.new(property, value))
       end
+      people_list
     end
 
     def enum_classes
       raw = raw_data(@sheet_id, 2)
       Logger.info('Downloading dictionary from Google Sheet...')
-      non_language_columns = ['id', 'updated', 'category', 'title', 'content', 'link']
+      non_language_columns = %w[id updated category title content link]
       enum_list = []
       raw['entry'].each do |entry|
-        filtered_entry = entry.select { |c| !non_language_columns.include?(c) }
+        filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
         enum_name = filtered_entry['enum'].first
         values = filtered_entry['values'].first
         enum_list.push(Evva::MixpanelEnum.new(enum_name, values))
@@ -65,10 +68,10 @@ module Evva
       end
     end
 
-    def raw_data(sheet_id, sheetNumber)
+    def raw_data(sheet_id, sheet_number)
       Logger.info('Downloading Google Sheet...')
       sheet = xml_data("https://spreadsheets.google.com/feeds/worksheets/#{sheet_id}/public/full")
-      url   = sheet['entry'][sheetNumber]['link'][0]['href']
+      url   = sheet['entry'][sheet_number]['link'][0]['href']
       xml_data(url)
     end
   end
