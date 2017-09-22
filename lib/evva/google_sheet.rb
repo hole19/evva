@@ -30,9 +30,8 @@ module Evva
       non_language_columns = %w[id updated category title content link]
       raw['entry'].each do |entry|
         filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
-        property = filtered_entry['properties'].first
         value = filtered_entry['value'].first
-        people_list.push(Evva::MixpanelProperty.new(property, value))
+        people_list << value
       end
       people_list
     end

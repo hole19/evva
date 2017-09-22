@@ -79,7 +79,8 @@ module Evva
     private
 
     def kotlin_people_const(prop)
-      people_property = "\t\tval #{prop.property_name} = " + %("#{prop.property_value}") + "\n"
+      capitalized_property = prop.split('_').collect(&:capitalize).join
+      people_property = "\t\tval #{capitalized_property} = " + %("#{prop}") + "\n"
     end
 
     def kotlin_event_const(event)

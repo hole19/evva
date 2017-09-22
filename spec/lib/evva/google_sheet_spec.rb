@@ -84,8 +84,8 @@ describe Evva::GoogleSheet do
     subject(:people_properties) { sheet.people_properties }
     let(:expected_people_properties) do
       [
-        Evva::MixpanelProperty.new('roundsWithWear', 'rounds_with_wear'),
-        Evva::MixpanelProperty.new('totalFriends', 'total_friends')
+        'rounds_with_wear',
+        'total_friends'
       ]
     end
 

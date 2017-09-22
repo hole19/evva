@@ -108,13 +108,13 @@ describe Evva::AndroidGenerator do
 
   describe '#people_properties' do
     subject { trim_spaces(generator.people_properties(people_bundle)) }
-    let(:people_bundle) { [Evva::MixpanelProperty.new('RoundWithWear', 'rounds_with_wear')] }
+    let(:people_bundle) { ['rounds_with_wear'] }
     let(:expected) { <<-Kotlin
       package com.hole19golf.hole19.analytics
       import com.hole19golf.hole19.analytics.Event
 
       enum class MixpanelProperties(val key: String) {
-        val RoundWithWear = "rounds_with_wear"
+        val RoundsWithWear = "rounds_with_wear"
       }
       Kotlin
     }
