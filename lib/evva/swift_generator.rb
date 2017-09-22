@@ -67,10 +67,6 @@ module Evva
       properties += SWIFT_INCREMENT_FUNCTION + "\n}"
     end
 
-    def swift_people_const(prop)
-      case_body = "\tcase #{prop.property_name} = " + %("#{prop.property_value}") + "\n"
-    end
-
     def special_property_enum(enum)
       enum_body = "import Foundation\n\n"
       enum_values = enum.values.split(',')
@@ -79,14 +75,6 @@ module Evva
         enum_body += "\tcase #{vals.tr(' ', '_')} = " + %("#{vals}") + "\n"
       end
       enum_body += "} \n"
-    end
-
-    def prepend_let(props)
-      function_header = ''
-      props.split(',').each do |property|
-        function_header += 'let ' + property.split(':')[0] + ', '
-      end
-      function_header.chomp(', ')
     end
 
     def process_arguments(props)
@@ -105,6 +93,8 @@ module Evva
       arguments.chomp(', ')
     end
 
+    private
+
     def is_special_property(prop)
       types_array = %w[Long Int String Double Float Boolean]
       type = prop.split(':')[1]
@@ -114,6 +104,19 @@ module Evva
     def is_optional_property(prop)
       type = prop.split(':')[1]
       type.include?('?') ? true : false
+    end
+
+
+    def prepend_let(props)
+      function_header = ''
+      props.split(',').each do |property|
+        function_header += 'let ' + property.split(':')[0] + ', '
+      end
+      function_header.chomp(', ')
+    end
+
+    def swift_people_const(prop)
+      case_body = "\tcase #{prop.property_name} = " + %("#{prop.property_value}") + "\n"
     end
   end
 end

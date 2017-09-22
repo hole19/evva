@@ -1,50 +1,41 @@
 describe Evva::SwiftGenerator do
-  generator = Evva::SwiftGenerator.new
+  let(:generator) { described_class.new }
 
-  describe '#is_special_property' do
-    context 'receives a regular property' do
-      it do
-        expect(generator.is_special_property('course_id:Long')).to eq false
-      end
-    end
-
-    context 'receives a special property' do
-      it do
-        expect(generator.is_special_property('course_profile_source')).to eq true
-      end
-    end
+  def trim_spaces(str)
+      str.gsub(/^[ \t]+/, '')
+         .gsub(/[ \t]+$/, '')
   end
 
   describe '#events' do
-    event_bundle =
+    subject { trim_spaces(generator.events(event_bundle)) }
+    let(:event_bundle) {
       [Evva::MixpanelEvent.new('trackNavFeedTap', 'nav_feed_tap', []),
        Evva::MixpanelEvent.new('trackCpPageView', 'cp_page_view', 'course_id:Long,course_name:String')]
-    it 'should process all the events and build the mixpanel events file' do
-      expected =
-        "import CoreLocation\n"\
-        "import Foundation\n"\
-        "import SharedCode\n\n"\
-        "class MixpanelHelper: NSObject {\n"\
-        "enum Event {\n"\
-        + "\t\tcase trackNavFeedTap\n"\
-        + "\t\tcase trackCpPageView(course_id:Long,course_name:String)"\
-        + "\n}\n"\
-        + "private var data: EventData {\nswitch self {\n\n"\
-        + "case .trackNavFeedTap \n"\
-        + "\treturn EventData(name:\"nav_feed_tap\")\n"\
-        + "\ncase .trackCpPageView(let course_id, let course_name):\n"\
-        + "\treturn EventData(name:\"cp_page_view\", properties: [\"course_id\":course_id, \"course_name\":course_name])"\
-        + "\n\n}\n}\n"
-      expect(generator.events(event_bundle)).to eq expected
-    end
-  end
+    }
+    let(:expected) { <<-Swift
+        import CoreLocation
+        import Foundation
+        import SharedCode
 
-  describe '#prepend_let' do
-    properties = 'course_id:Long,course_name:String,from_screen: CourseProfileSource?'
-    it 'should prepend a let to every argument on the function' do
-      expected = 'let course_id, let course_name, let from_screen'
-      expect(generator.prepend_let(properties)).to eq expected
-    end
+        class MixpanelHelper: NSObject {
+          enum Event {
+            case trackNavFeedTap
+            case trackCpPageView(course_id:Long,course_name:String)
+          }
+        private var data: EventData {
+          switch self {
+
+          case .trackNavFeedTap
+        return EventData(name:"nav_feed_tap")
+
+          case .trackCpPageView(let course_id, let course_name):
+        return EventData(name:"cp_page_view", properties: ["course_id":course_id, "course_name":course_name])
+
+        }
+      }
+      Swift
+    }
+    it { should eq trim_spaces(expected) }
   end
 
   describe '#swift_case' do
@@ -74,29 +65,17 @@ describe Evva::SwiftGenerator do
   end
 
   describe '#special_property_enum' do
-    enum = Evva::MixpanelEnum.new('CourseProfileSource', 'course_discovery,synced_courses')
+    subject { trim_spaces(generator.special_property_enum(enum)) }
+    let(:enum) { Evva::MixpanelEnum.new('CourseProfileSource', 'course_discovery,synced_courses') }
+    let(:expected) { <<-Swift
+        import Foundation
 
-    it 'returns the expected kotlin enum' do
-      expected =
-        "import Foundation\n\n"\
-        "enum CourseProfileSource: String {\n"\
-        "\tcase course_discovery = \"course_discovery\"\n"\
-        "\tcase synced_courses = \"synced_courses\"\n} \n"
-      expect(generator.special_property_enum(enum)).to eq expected
-    end
-  end
-
-  describe '#swift_people_const' do
-    prop = Evva::MixpanelProperty.new('roundsWithWear', 'rounds_with_wear')
-    it 'returns the expect people constant' do
-      expected = "\tcase roundsWithWear = \"rounds_with_wear\"\n"
-      expect(generator.swift_people_const(prop)).to eq expected
-    end
-  end
-
-  describe 'is_optional_property' do
-    it do
-      expect(generator.is_optional_property('course_profile_source:CourseProfileSource?')).to eq true
-    end
+        enum CourseProfileSource: String {
+        case course_discovery = "course_discovery"
+        case synced_courses = "synced_courses"
+        }
+      Swift
+     }
+    it { should eq trim_spaces(expected) }
   end
 end
