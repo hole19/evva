@@ -38,19 +38,19 @@ module Evva
 
     def people_properties(people_bundle)
       properties = KOTLIN_PEOPLE_HEADER
-      properties += people_bundle.map do |prop| "\t\t#{prop.upcase}(" + %("#{prop}") + ")" end.join(",\n")
+      properties += people_bundle.map { |prop| "\t\t#{prop.upcase}(" + %("#{prop}") + ')' }.join(",\n")
       properties += ";\n}\n"
     end
 
     def event_enum(bundle)
       event_file = KOTLIN_BUNDLE_HEADER
-      event_file += bundle.map do |event| "\t\t#{event.event_name.upcase}(" + %("#{event.event_name}") + ")" end.join(", \n")
+      event_file += bundle.map { |event| "\t\t#{event.event_name.upcase}(" + %("#{event.event_name}") + ')' }.join(", \n")
       event_file += "\n}\n"
     end
 
     def kotlin_function(event_data)
       function_name = 'track' + titleize(event_data.event_name)
-      function_arguments = event_data.properties.map { |name, type| "#{name.to_s}: #{type}" }.join(', ')
+      function_arguments = event_data.properties.map { |name, type| "#{name}: #{type}" }.join(', ')
       if !function_arguments.empty?
         props = json_props(event_data.properties)
         function_body =
@@ -68,7 +68,7 @@ module Evva
     def special_property_enum(enum)
       enum_body = "package com.hole19golf.hole19.analytics\n\n"
       enum_body += "enum class #{enum.enum_name}(val key: String) {\n"
-      enum_body += enum.values.map do |vals| "\t#{vals.tr(' ', '_').upcase}(" + %("#{vals}") + ")" end.join(",\n")
+      enum_body += enum.values.map { |vals| "\t#{vals.tr(' ', '_').upcase}(" + %("#{vals}") + ')' }.join(",\n")
       enum_body += "\n}\n"
     end
 
@@ -83,24 +83,25 @@ module Evva
     end
 
     def json_props(properties)
-      split_properties = ''
-      split_properties += properties.map { |name, type|
-        if special_property?(type)
-          if optional_property?(type)
-             "" + name.to_s + '?.let { put(' + %("#{name}") + ", it.key) }"
+      split_properties =
+        properties
+        .map do |name, type|
+          if special_property?(type)
+            if optional_property?(type)
+              "#{name}?.let { put(" + %("#{name}") + ', it.key) }'
+            else
+              'put(' + %("#{name}") + ", #{name}.key)"
+            end
           else
-            "" + 'put(' + %("#{name}") + ", #{name.to_s}.key)"
-          end
-        else
-          if optional_property?(type)
-            "" + name.to_s + '?.let { put(' + %("#{name}") + ", it) }"
-          else
-            "put(" + %("#{name}") + ', ' + name.to_s + ")"
+            if optional_property?(type)
+              "#{name}?.let { put(" + %("#{name}") + ', it) }'
+            else
+              'put(' + %("#{name}") + ", #{name})"
+            end
           end
         end
-       }
-       .map{ |line| "\t\t" + line }
-       .join("\n")
+        .map { |line| "\t\t#{line}" }
+        .join("\n")
 
       resulting_json = "\n\tval properties = JSONObject().apply {\n" +
                        +split_properties.to_s

@@ -10,7 +10,7 @@ describe Evva::AndroidGenerator do
     subject { trim_spaces(generator.kotlin_function(event)) }
 
     context 'when the event has no properties' do
-      let(:event) { Evva::MixpanelEvent.new('nav_feed_tap', {}) }
+      let(:event) { Evva::MixpanelEvent.new('nav_feed_tap') }
       let(:expected) { <<-Kotlin
         open fun trackNavFeedTap() {
           mixpanelMask.trackEvent(MixpanelEvent.NAV_FEED_TAP)
