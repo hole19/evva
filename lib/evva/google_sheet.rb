@@ -15,10 +15,9 @@ module Evva
       event_list = []
       raw['entry'].each do |entry|
         filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
-        function = filtered_entry['functionname'].first
         event_name = filtered_entry['eventname'].first
         properties = filtered_entry['props'].first
-        event_list.push(Evva::MixpanelEvent.new(function, event_name, properties))
+        event_list.push(Evva::MixpanelEvent.new(event_name, properties))
       end
       event_list
     end

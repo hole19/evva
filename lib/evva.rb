@@ -48,7 +48,7 @@ module Evva
 
     bundle[:enums].each do |enum|
       path = "#{configuration.out_path}/#{enum.enum_name}.#{extension}"
-      write_to_file(enum_file, generator.special_property_enum(enum))
+      write_to_file(path, generator.special_property_enum(enum))
     end
   end
 

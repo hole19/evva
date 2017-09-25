@@ -10,7 +10,7 @@ describe Evva::AndroidGenerator do
     subject { trim_spaces(generator.kotlin_function(event)) }
 
     context 'when the event has no properties' do
-      let(:event) { Evva::MixpanelEvent.new('trackNavFeedTap', 'nav_feed_tap', []) }
+      let(:event) { Evva::MixpanelEvent.new('nav_feed_tap', []) }
       let(:expected) { <<-Kotlin
         open fun trackNavFeedTap() {
           mixpanelMask.trackEvent(MixpanelEvent.NAV_FEED_TAP)
@@ -21,7 +21,7 @@ describe Evva::AndroidGenerator do
     end
 
     context 'event has properties' do
-      let(:event) { Evva::MixpanelEvent.new('trackCpPageView', 'cp_page_view', 'course_id:Long,course_name:String') }
+      let(:event) { Evva::MixpanelEvent.new('cp_page_view', 'course_id:Long,course_name:String') }
       let(:expected) { <<-Kotlin
         open fun trackCpPageView(course_id:Long,course_name:String) {
           val properties = JSONObject().apply {
@@ -37,7 +37,7 @@ describe Evva::AndroidGenerator do
     end
 
     context 'event has special properties' do
-      let(:event) { Evva::MixpanelEvent.new('trackCpPageView', 'cp_page_view', 'course_id:Long,course_name:String,from_screen:CourseProfileSource') }
+      let(:event) { Evva::MixpanelEvent.new('cp_page_view', 'course_id:Long,course_name:String,from_screen:CourseProfileSource') }
       let(:expected) { <<-Kotlin
         open fun trackCpPageView(course_id:Long,course_name:String,from_screen:CourseProfileSource) {
           val properties = JSONObject().apply {
@@ -54,7 +54,7 @@ describe Evva::AndroidGenerator do
     end
 
     context 'event has optional properties' do
-      let(:event) { Evva::MixpanelEvent.new('trackCpPageView', 'cp_page_view', 'course_id:Long,course_name:String,from_screen: CourseProfileSource?') }
+      let(:event) { Evva::MixpanelEvent.new('cp_page_view', 'course_id:Long,course_name:String,from_screen: CourseProfileSource?') }
       let(:expected) { <<-Kotlin
         open fun trackCpPageView(course_id:Long,course_name:String,from_screen: CourseProfileSource?) {
           val properties = JSONObject().apply {
@@ -89,8 +89,8 @@ describe Evva::AndroidGenerator do
   describe '#event_enum' do
     subject { trim_spaces(generator.event_enum(event_bundle)) }
     let(:event_bundle) { [
-      Evva::MixpanelEvent.new('trackNavFeedTap', 'nav_feed_tap', []),
-      Evva::MixpanelEvent.new('trackPerformanceTap', 'nav_performance_tap', [])
+      Evva::MixpanelEvent.new('nav_feed_tap', []),
+      Evva::MixpanelEvent.new('nav_performance_tap', [])
       ] }
     let(:expected) { <<-Kotlin
       package com.hole19golf.hole19.analytics
