@@ -19,11 +19,13 @@ module Evva
 
     KOTIN_PEOPLE_FUNCTIONS =
       "\topen fun updateProperties(property: MixpanelProperties, value: Any) {\n"\
-      "\t\tmixpanelMask.setProperty(property.key value)"\
+      "\t\tmixpanelMask.updateProperties(property.key, value)"\
       "\t\n} \n"\
       "\topen fun incrementCounter(property: MixpanelProperties) {\n"\
-      "\t\tmixpanelMask.incrementCounter(property.key, value)"\
+      "\t\tmixpanelMask.incrementCounter(property.key)"\
       "\t\n} \n".freeze
+
+    NATIVE_TYPES = %w[Long Int String Double Float Boolean].freeze
 
     def events(bundle)
       event_file = KOTLIN_EVENT_HEADER
@@ -36,31 +38,26 @@ module Evva
 
     def people_properties(people_bundle)
       properties = KOTLIN_PEOPLE_HEADER
-      people_bundle.each do |prop|
-        properties += kotlin_people_const(prop)
-      end
-      properties += "}\n"
+      properties += people_bundle.map do |prop| "\t\t#{prop.upcase}(" + %("#{prop}") + ")" end.join(",\n")
+      properties += ";\n}\n"
     end
 
     def event_enum(bundle)
       event_file = KOTLIN_BUNDLE_HEADER
-      bundle.each do |event|
-        event_file += kotlin_event_const(event)
-      end
+      event_file += bundle.map do |event| "\t\t#{event.event_name.upcase}(" + %("#{event.event_name}") + ")" end.join(", \n")
       event_file += "\n}\n"
     end
 
     def kotlin_function(event_data)
       function_name = 'track' + titleize(event_data.event_name)
-      function_arguments = parse_function_header(event_data.properties)
-      if !event_data.properties.nil?
+      function_arguments = event_data.properties.map { |name, type| "#{name.to_s}: #{type}" }.join(', ')
+      if !function_arguments.empty?
         props = json_props(event_data.properties)
         function_body =
           "open fun #{function_name}(#{function_arguments}) {"\
           "#{props}"\
           "\tmixpanelMask.trackEvent(MixpanelEvent.#{event_data.event_name.upcase}, properties)\n"
       else
-        props = nil
         function_body =
           "open fun #{function_name}() {\n"\
           "\tmixpanelMask.trackEvent(MixpanelEvent.#{event_data.event_name.upcase})\n"
@@ -70,19 +67,15 @@ module Evva
 
     def special_property_enum(enum)
       enum_body = "package com.hole19golf.hole19.analytics\n\n"
-      enum_values = enum.values
       enum_body += "enum class #{enum.enum_name}(val key: String) {\n"
-      enum_values.each do |vals|
-        enum_body += "\t#{vals.tr(' ', '_').upcase}(" + %("#{vals}") + "),\n"
-      end
-      enum_body += "} \n"
+      enum_body += enum.values.map do |vals| "\t#{vals.tr(' ', '_').upcase}(" + %("#{vals}") + ")" end.join(",\n")
+      enum_body += "\n}\n"
     end
 
     private
 
     def kotlin_people_const(prop)
-      capitalized_property = titleize(prop)
-      people_property = "\t\tval #{capitalized_property} = " + %("#{prop}") + "\n"
+      people_property = "\t\t#{prop.upcase}(" + %("#{prop}") + ")\n"
     end
 
     def kotlin_event_const(event)
@@ -91,43 +84,39 @@ module Evva
 
     def json_props(properties)
       split_properties = ''
-      properties.each do |name, type|
-        if is_special_property?(type)
-          if is_optional_property?(type)
-            split_properties += "\t\t" + name.to_s + '?.let { put(' + %("#{name}") + ", it.key)}\n"
+      split_properties += properties.map { |name, type|
+        if special_property?(type)
+          if optional_property?(type)
+             "" + name.to_s + '?.let { put(' + %("#{name}") + ", it.key) }"
           else
-            split_properties += "\t\tput(" + %("#{name}") + ', ' + name.to_s + ".key)\n"
-         end
+            "" + 'put(' + %("#{name}") + ", #{name.to_s}.key)"
+          end
         else
-          split_properties += "\t\tput(" + %("#{name}") + ', ' + name.to_s + ")\n"
+          if optional_property?(type)
+            "" + name.to_s + '?.let { put(' + %("#{name}") + ", it) }"
+          else
+            "put(" + %("#{name}") + ', ' + name.to_s + ")"
+          end
         end
-      end
+       }
+       .map{ |line| "\t\t" + line }
+       .join("\n")
+
       resulting_json = "\n\tval properties = JSONObject().apply {\n" +
                        +split_properties.to_s
       resulting_json += "\n\t}\n"
     end
 
-    def is_special_property?(type)
-      types_array = %w[Long Int String Double Float Boolean]
-      types_array.include?(type) ? false : true
+    def special_property?(type)
+      !NATIVE_TYPES.include?(type.chomp('?'))
     end
 
-    def is_optional_property?(type)
-      type.include?('?') ? true : false
+    def optional_property?(type)
+      type.include?('?')
     end
 
     def titleize(str)
       str.split('_').collect(&:capitalize).join
-    end
-
-    def parse_function_header(arguments_hash)
-      unless arguments_hash.nil?
-        header = ''
-        arguments_hash.each do |k, v|
-          header += k.to_s + ": " + v.to_s + ", "
-        end
-        header.chomp(', ')
-      end
     end
   end
 end
