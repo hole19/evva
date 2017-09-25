@@ -23,9 +23,9 @@ describe Evva::GoogleSheet do
       end
 
       it 'returns an array with the corresponding events' do
-        expected = [Evva::MixpanelEvent.new('cp_page_view', ['course_id:Long,course_name:String']),
-                    Evva::MixpanelEvent.new('nav_feed_tap', []),
-                    Evva::MixpanelEvent.new('cp_view_scorecard', ['course_id:Long,course_name:String'])]
+        expected = [Evva::MixpanelEvent.new('cp_page_view', { course_id: 'Long', course_name: 'String' }),
+                    Evva::MixpanelEvent.new('nav_feed_tap', {}),
+                    Evva::MixpanelEvent.new('cp_view_scorecard', { course_id: 'Long', course_name: 'String' })]
         expect(events).to eq(expected)
       end
     end
@@ -59,8 +59,8 @@ describe Evva::GoogleSheet do
     subject(:enum_classes) { sheet.enum_classes }
     let(:expected_enum) do
       [
-        Evva::MixpanelEnum.new('PageViewSourceScreen', 'course_discovery,synced_courses,nearby,deal'),
-        Evva::MixpanelEnum.new('PremiumClickBuy', 'notes,hi_res_maps,whatever')
+        Evva::MixpanelEnum.new('PageViewSourceScreen', ['course_discovery','synced_courses','nearby','deal']),
+        Evva::MixpanelEnum.new('PremiumClickBuy', ['notes','hi_res_maps','whatever'])
       ]
     end
 

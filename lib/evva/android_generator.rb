@@ -52,16 +52,17 @@ module Evva
 
     def kotlin_function(event_data)
       function_name = 'track' + titleize(event_data.event_name)
+      function_arguments = parse_function_header(event_data.properties)
       if !event_data.properties.nil?
         props = json_props(event_data.properties)
         function_body =
-          "open fun #{function_name}(#{event_data.properties}) {"\
+          "open fun #{function_name}(#{function_arguments}) {"\
           "#{props}"\
           "\tmixpanelMask.trackEvent(MixpanelEvent.#{event_data.event_name.upcase}, properties)\n"
       else
         props = nil
         function_body =
-          "open fun #{function_name}(#{event_data.properties}) {\n"\
+          "open fun #{function_name}() {\n"\
           "\tmixpanelMask.trackEvent(MixpanelEvent.#{event_data.event_name.upcase})\n"
       end
       function_body += "}\n"
@@ -69,7 +70,7 @@ module Evva
 
     def special_property_enum(enum)
       enum_body = "package com.hole19golf.hole19.analytics\n\n"
-      enum_values = enum.values.split(',')
+      enum_values = enum.values
       enum_body += "enum class #{enum.enum_name}(val key: String) {\n"
       enum_values.each do |vals|
         enum_body += "\t#{vals.tr(' ', '_').upcase}(" + %("#{vals}") + "),\n"
@@ -90,15 +91,15 @@ module Evva
 
     def json_props(properties)
       split_properties = ''
-      properties.split(',').each do |prop|
-        if is_special_property(prop)
-          if is_optional_property(prop)
-            split_properties += "\t\t" + prop.split(':').first + '?.let { put(' + %("#{prop.split(':').first}") + ", it.key)}\n"
+      properties.each do |name, type|
+        if is_special_property?(type)
+          if is_optional_property?(type)
+            split_properties += "\t\t" + name.to_s + '?.let { put(' + %("#{name}") + ", it.key)}\n"
           else
-            split_properties += "\t\tput(" + %("#{prop.split(':').first}") + ', ' + prop.split(':').first + ".key)\n"
+            split_properties += "\t\tput(" + %("#{name}") + ', ' + name.to_s + ".key)\n"
          end
         else
-          split_properties += "\t\tput(" + %("#{prop.split(':').first}") + ', ' + prop.split(':').first + ")\n"
+          split_properties += "\t\tput(" + %("#{name}") + ', ' + name.to_s + ")\n"
         end
       end
       resulting_json = "\n\tval properties = JSONObject().apply {\n" +
@@ -106,19 +107,27 @@ module Evva
       resulting_json += "\n\t}\n"
     end
 
-    def is_special_property(prop)
+    def is_special_property?(type)
       types_array = %w[Long Int String Double Float Boolean]
-      type = prop.split(':')[1]
       types_array.include?(type) ? false : true
     end
 
-    def is_optional_property(prop)
-      type = prop.split(':')[1]
+    def is_optional_property?(type)
       type.include?('?') ? true : false
     end
 
     def titleize(str)
       str.split('_').collect(&:capitalize).join
+    end
+
+    def parse_function_header(arguments_hash)
+      unless arguments_hash.nil?
+        header = ''
+        arguments_hash.each do |k, v|
+          header += k.to_s + ": " + v.to_s + ", "
+        end
+        header.chomp(', ')
+      end
     end
   end
 end
