@@ -8,7 +8,6 @@ require 'evva/file_reader'
 require 'evva/data_source'
 require 'evva/mixpanel_event'
 require 'evva/mixpanel_enum'
-require 'evva/mixpanel_property'
 require 'evva/object_extension'
 require 'evva/version'
 require 'evva/android_generator'
@@ -49,7 +48,7 @@ module Evva
 
     bundle[:enums].each do |enum|
       path = "#{configuration.out_path}/#{enum.enum_name}.#{extension}"
-      write_to_file(enum_file, generator.special_property_enum(enum))
+      write_to_file(path, generator.special_property_enum(enum))
     end
   end
 

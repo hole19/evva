@@ -33,22 +33,24 @@ module Evva
     end
 
     def swift_case(event_data)
+      function_name = 'track' + titleize(event_data.event_name)
       if event_data.properties.nil?
-        case_body = "\t\tcase #{event_data.function_name}\n"
+        case_body = "\t\tcase #{function_name}\n"
       else
         trimmed_properties = event_data.properties.gsub('Boolean', 'Bool')
-        case_body = "\t\tcase #{event_data.function_name}(#{trimmed_properties})\n"
+        case_body = "\t\tcase #{function_name}(#{trimmed_properties})\n"
       end
     end
 
     def swift_event_data(event_data)
+      function_name = 'track' + titleize(event_data.event_name)
       if event_data.properties.nil?
-        function_body = "case .#{event_data.function_name} \n" \
+        function_body = "case .#{function_name} \n" \
                         "\treturn EventData(name:" + %("#{event_data.event_name}") + ")\n\n"
       else
         function_header = prepend_let(event_data.properties)
         function_arguments = process_arguments(event_data.properties.gsub('Boolean', 'Bool'))
-        function_body = "case .#{event_data.function_name}(#{function_header}):\n" \
+        function_body = "case .#{function_name}(#{function_header}):\n" \
                         "\treturn EventData(name:" + %("#{event_data.event_name}") + ", properties: [#{function_arguments}])\n\n"
       end
 
@@ -117,6 +119,10 @@ module Evva
 
     def swift_people_const(prop)
       case_body = "\tcase #{prop.property_name} = " + %("#{prop.property_value}") + "\n"
+    end
+
+    def titleize(str)
+      str.split('_').collect(&:capitalize).join
     end
   end
 end

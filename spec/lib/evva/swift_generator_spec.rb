@@ -9,8 +9,8 @@ describe Evva::SwiftGenerator do
   describe '#events' do
     subject { trim_spaces(generator.events(event_bundle)) }
     let(:event_bundle) {
-      [Evva::MixpanelEvent.new('trackNavFeedTap', 'nav_feed_tap', []),
-       Evva::MixpanelEvent.new('trackCpPageView', 'cp_page_view', 'course_id:Long,course_name:String')]
+      [Evva::MixpanelEvent.new('nav_feed_tap', []),
+       Evva::MixpanelEvent.new('cp_page_view', 'course_id:Long,course_name:String')]
     }
     let(:expected) { <<-Swift
         import CoreLocation
@@ -40,7 +40,7 @@ describe Evva::SwiftGenerator do
 
   describe '#swift_case' do
     context 'event has no properties' do
-      event = Evva::MixpanelEvent.new('trackNavFeedTap', 'nav_feed_tap', [])
+      event = Evva::MixpanelEvent.new('nav_feed_tap', [])
       it 'should create a case for an event to be tracked' do
         expected = "\t\tcase trackNavFeedTap\n"
         expect(generator.swift_case(event)).to eq expected
@@ -48,7 +48,7 @@ describe Evva::SwiftGenerator do
     end
 
     context 'event has properties' do
-      event = Evva::MixpanelEvent.new('trackCpPageView', 'cp_page_view', 'course_id:Long,course_name:String')
+      event = Evva::MixpanelEvent.new('cp_page_view', 'course_id:Long,course_name:String')
       it 'should create a case for an event to be tracked' do
         expected = "\t\tcase trackCpPageView(course_id:Long,course_name:String)\n"
         expect(generator.swift_case(event)).to eq expected

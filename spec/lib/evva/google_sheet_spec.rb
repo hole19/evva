@@ -23,9 +23,9 @@ describe Evva::GoogleSheet do
       end
 
       it 'returns an array with the corresponding events' do
-        expected = [Evva::MixpanelEvent.new('trackCpPageView', 'cp_page_view', ['course_id:Long,course_name:String']),
-                    Evva::MixpanelEvent.new('trackNavFeedTap', 'nav_feed_tap', []),
-                    Evva::MixpanelEvent.new('trackCpViewScorecard', 'cp_view_scorecard', ['course_id:Long,course_name:String'])]
+        expected = [Evva::MixpanelEvent.new('cp_page_view', ['course_id:Long,course_name:String']),
+                    Evva::MixpanelEvent.new('nav_feed_tap', []),
+                    Evva::MixpanelEvent.new('cp_view_scorecard', ['course_id:Long,course_name:String'])]
         expect(events).to eq(expected)
       end
     end
@@ -84,8 +84,8 @@ describe Evva::GoogleSheet do
     subject(:people_properties) { sheet.people_properties }
     let(:expected_people_properties) do
       [
-        Evva::MixpanelProperty.new('roundsWithWear', 'rounds_with_wear'),
-        Evva::MixpanelProperty.new('totalFriends', 'total_friends')
+        'rounds_with_wear',
+        'total_friends'
       ]
     end
 
