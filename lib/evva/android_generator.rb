@@ -38,13 +38,13 @@ module Evva
 
     def people_properties(people_bundle)
       properties = KOTLIN_PEOPLE_HEADER
-      properties += people_bundle.map { |prop| "\t\t#{prop.upcase}(" + %("#{prop}") + ')' }.join(",\n")
+      properties += people_bundle.map { |prop| "\t\t#{prop.upcase}(\"#{prop}\")" }.join(",\n")
       properties += ";\n}\n"
     end
 
     def event_enum(bundle)
       event_file = KOTLIN_BUNDLE_HEADER
-      event_file += bundle.map { |event| "\t\t#{event.event_name.upcase}(" + %("#{event.event_name}") + ')' }.join(", \n")
+      event_file += bundle.map { |event| "\t\t#{event.event_name.upcase}(\"#{event.event_name}\")"}.join(", \n")
       event_file += "\n}\n"
     end
 
@@ -68,19 +68,11 @@ module Evva
     def special_property_enum(enum)
       enum_body = "package com.hole19golf.hole19.analytics\n\n"
       enum_body += "enum class #{enum.enum_name}(val key: String) {\n"
-      enum_body += enum.values.map { |vals| "\t#{vals.tr(' ', '_').upcase}(" + %("#{vals}") + ')' }.join(",\n")
+      enum_body += enum.values.map { |vals| "\t#{vals.tr(' ', '_').upcase}(\"#{vals}\")"}.join(",\n")
       enum_body += "\n}\n"
     end
 
     private
-
-    def kotlin_people_const(prop)
-      people_property = "\t\t#{prop.upcase}(" + %("#{prop}") + ")\n"
-    end
-
-    def kotlin_event_const(event)
-      kotlin_event = "\t\t#{event.event_name.upcase}(" + %("#{event.event_name}") + "),\n"
-    end
 
     def json_props(properties)
       split_properties =
@@ -88,15 +80,15 @@ module Evva
         .map do |name, type|
           if special_property?(type)
             if optional_property?(type)
-              "#{name}?.let { put(" + %("#{name}") + ', it.key) }'
+              "#{name}?.let { put(\"#{name}\", it.key) }"
             else
-              'put(' + %("#{name}") + ", #{name}.key)"
+              "put(\"#{name}\", #{name}.key)"
             end
           else
             if optional_property?(type)
-              "#{name}?.let { put(" + %("#{name}") + ', it) }'
+              "#{name}?.let { put(\"#{name}\", it) }"
             else
-              'put(' + %("#{name}") + ", #{name})"
+              "put(\"#{name}\", #{name})"
             end
           end
         end
