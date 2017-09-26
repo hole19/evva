@@ -16,7 +16,7 @@ module Evva
       raw['entry'].each do |entry|
         filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
         event_name = filtered_entry['eventname'].first
-        properties = filtered_entry['props'].first
+        properties = hash_parser(filtered_entry['props'].first)
         event_list.push(Evva::MixpanelEvent.new(event_name, properties))
       end
       event_list
@@ -43,7 +43,7 @@ module Evva
       raw['entry'].each do |entry|
         filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
         enum_name = filtered_entry['enum'].first
-        values = filtered_entry['values'].first
+        values = filtered_entry['values'].first.split(',')
         enum_list.push(Evva::MixpanelEnum.new(enum_name, values))
       end
       enum_list
@@ -71,6 +71,21 @@ module Evva
       sheet = xml_data("https://spreadsheets.google.com/feeds/worksheets/#{sheet_id}/public/full")
       url   = sheet['entry'][sheet_number]['link'][0]['href']
       xml_data(url)
+    end
+
+    private
+
+    def hash_parser(property_array)
+      h = {}
+      unless property_array.empty?
+        property_array.split(',').each do |prop|
+          split_prop = prop.split(':')
+          prop_name = split_prop[0].to_sym
+          prop_type = split_prop[1].to_s
+          h[prop_name] = prop_type
+        end
+      end
+      h
     end
   end
 end
