@@ -29,7 +29,7 @@ describe Evva::SwiftGenerator do
         return EventData(name:"nav_feed_tap")
 
           case .trackCpPageView(let course_id, let course_name):
-        return EventData(name:"cp_page_view", properties: ["course_id":course_id, "course_name":course_name])
+        return EventData(name:"cp_page_view", properties: ["course_id": course_id, "course_name": course_name])
 
         }
       }
@@ -59,7 +59,7 @@ describe Evva::SwiftGenerator do
   describe '#process_arguments' do
     properties = 'course_id:Long,course_name:String,from_screen: CourseProfileSource'
     it 'should process the arguments looking for special properties' do
-      expected = '"course_id":course_id, "course_name":course_name, "from_screen":from_screen.rawValue'
+      expected = '"course_id": course_id, "course_name": course_name, "from_screen": from_screen.rawValue'
       expect(generator.process_arguments(properties)).to eq expected
     end
   end
@@ -76,6 +76,23 @@ describe Evva::SwiftGenerator do
         }
       Swift
      }
+    it { should eq trim_spaces(expected) }
+  end
+
+  describe "#people_properties" do
+    subject { trim_spaces(generator.people_properties(people_bundle)) }
+    let(:people_bundle) { ['rounds_with_wear', 'friends_from_facebook'] }
+    let(:expected) { <<-Swift
+      fileprivate enum Counter: String {
+        case RoundsWithWear = "rounds_with_wear"
+        case FriendsFromFacebook = "friends_from_facebook"
+
+        func increment(times: Int = 1) {
+          MixpanelAPI.instance.incrementCounter(rawValue, times: times)
+        }
+      }
+      Swift
+    }
     it { should eq trim_spaces(expected) }
   end
 end

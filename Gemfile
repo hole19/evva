@@ -5,6 +5,7 @@ gem 'colorize',   '~> 0.7'
 gem 'rubocop',    '~> 0.49.1'
 gem 'safe_yaml',  '~> 1.0'
 gem 'xml-simple', '~> 1.1'
+gem 'byebug'
 
 gem 'rspec'
 gem 'rspec-its'

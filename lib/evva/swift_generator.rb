@@ -34,7 +34,7 @@ module Evva
 
     def swift_case(event_data)
       function_name = 'track' + titleize(event_data.event_name)
-      if event_data.properties.nil?
+      if event_data.properties.empty?
         case_body = "\t\tcase #{function_name}\n"
       else
         trimmed_properties = event_data.properties.gsub('Boolean', 'Bool')
@@ -44,16 +44,15 @@ module Evva
 
     def swift_event_data(event_data)
       function_name = 'track' + titleize(event_data.event_name)
-      if event_data.properties.nil?
+      if event_data.properties.empty?
         function_body = "case .#{function_name} \n" \
-                        "\treturn EventData(name:" + %("#{event_data.event_name}") + ")\n\n"
+                        "\treturn EventData(name:\"#{event_data.event_name}\")\n\n"
       else
         function_header = prepend_let(event_data.properties)
         function_arguments = process_arguments(event_data.properties.gsub('Boolean', 'Bool'))
         function_body = "case .#{function_name}(#{function_header}):\n" \
-                        "\treturn EventData(name:" + %("#{event_data.event_name}") + ", properties: [#{function_arguments}])\n\n"
+                        "\treturn EventData(name:\"#{event_data.event_name}\", properties: [#{function_arguments}])\n\n"
       end
-
       function_body
     end
 
@@ -63,33 +62,30 @@ module Evva
 
     def people_properties(people_bundle)
       properties = SWIFT_PEOPLE_HEADER
-      people_bundle.each do |prop|
-        properties += swift_people_const(prop)
-      end
-      properties += SWIFT_INCREMENT_FUNCTION + "\n}"
+      properties += people_bundle.map { |prop| swift_people_const(prop) }.join("")
+      properties += "\n" + SWIFT_INCREMENT_FUNCTION + "\n}\n"
     end
 
     def special_property_enum(enum)
       enum_body = "import Foundation\n\n"
       enum_values = enum.values.split(',')
       enum_body += "enum #{enum.enum_name}: String {\n"
-      enum_values.each do |vals|
-        enum_body += "\tcase #{vals.tr(' ', '_')} = " + %("#{vals}") + "\n"
-      end
+      enum_body += enum_values.map { |vals| "\tcase #{vals.tr(' ', '_')} = \"#{vals}\"\n" }.join("")
       enum_body += "} \n"
     end
 
     def process_arguments(props)
       arguments = ''
       props.split(',').each do |property|
+        val = property.split(':').first
         if is_special_property(property)
           if is_optional_property(property)
-
+            # Does nothing
           else
-            arguments += %("#{property.split(':').first}") + ':' + property.split(':').first + '.rawValue, '
+            arguments += "\"#{val}\": #{val}.rawValue, "
           end
         else
-          arguments += %("#{property.split(':').first}") + ':' + property.split(':').first + ', '
+          arguments += "\"#{val}\": #{val}, "
         end
       end
       arguments.chomp(', ')
@@ -110,15 +106,11 @@ module Evva
 
 
     def prepend_let(props)
-      function_header = ''
-      props.split(',').each do |property|
-        function_header += 'let ' + property.split(':')[0] + ', '
-      end
-      function_header.chomp(', ')
+      props.split(',').map { |p| "let #{p.split(':')[0]}" }.join(", ")
     end
 
     def swift_people_const(prop)
-      case_body = "\tcase #{prop.property_name} = " + %("#{prop.property_value}") + "\n"
+      case_body = "\tcase #{titleize(prop)} = \"#{prop}\"\n"
     end
 
     def titleize(str)
