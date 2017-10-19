@@ -19,7 +19,7 @@ module Evva
     file_reader = Evva::FileReader.new
     options = command_line_options(options)
     unless config_file = file_reader.open_file('generic.yml', 'r', true)
-      Logger.error("Could not open #{file_name}!")
+      Logger.error("Could not open yml file")
       return
     end
 
