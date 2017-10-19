@@ -10,7 +10,8 @@ Evva
  3. That's it (given that someone already configured Evva)
 
 # Configuration
- Evva's configuration comes from a .yml file with the following structure
+ Evva's configuration comes from a evva_config.yml file that should be placed on your
+ app root directory. The .yml file has the following structure.
 
  ```
  type: Android|iOS
