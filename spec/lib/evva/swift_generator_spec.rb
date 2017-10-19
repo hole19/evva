@@ -10,7 +10,7 @@ describe Evva::SwiftGenerator do
     subject { trim_spaces(generator.events(event_bundle)) }
     let(:event_bundle) {
       [Evva::MixpanelEvent.new('nav_feed_tap', []),
-       Evva::MixpanelEvent.new('cp_page_view', 'course_id:Long,course_name:String')]
+       Evva::MixpanelEvent.new('cp_page_view', 'course_id:Long,course_name:String?')]
     }
     let(:expected) { <<-Swift
         import CoreLocation
@@ -20,7 +20,7 @@ describe Evva::SwiftGenerator do
         class MixpanelHelper: NSObject {
           enum Event {
             case trackNavFeedTap
-            case trackCpPageView(course_id:Long,course_name:String)
+            case trackCpPageView(course_id:Long,course_name:String?)
           }
         private var data: EventData {
           switch self {
@@ -57,10 +57,20 @@ describe Evva::SwiftGenerator do
   end
 
   describe '#process_arguments' do
-    properties = 'course_id:Long,course_name:String,from_screen: CourseProfileSource'
-    it 'should process the arguments looking for special properties' do
-      expected = '"course_id": course_id, "course_name": course_name, "from_screen": from_screen.rawValue'
-      expect(generator.process_arguments(properties)).to eq expected
+    context "with optional arguments" do
+      properties = 'course_id:Long,course_name:String,from_screen: CourseProfileSource?'
+      it 'processes the arguments looking for special properties' do
+        expected = '"course_id": course_id, "course_name": course_name, "from_screen": from_screen.rawValue'
+        expect(generator.process_arguments(properties)).to eq expected
+      end
+    end
+
+    context "without optional arguments" do
+      properties = 'course_id:Long,course_name:String,from_screen: CourseProfileSource'
+      it 'processes the arguments looking for special properties' do
+        expected = '"course_id": course_id, "course_name": course_name, "from_screen": from_screen.rawValue'
+        expect(generator.process_arguments(properties)).to eq expected
+      end
     end
   end
 

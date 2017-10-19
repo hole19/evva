@@ -18,6 +18,8 @@ module Evva
       "MixpanelAPI.instance.incrementCounter(rawValue, times: times)\n"\
       '}'.freeze
 
+    NATIVE_TYPES = %w[Long Int String Double Float Bool].freeze
+
     def events(bundle)
       event_file = SWIFT_EVENT_HEADER
       bundle.each do |event|
@@ -35,10 +37,10 @@ module Evva
     def swift_case(event_data)
       function_name = 'track' + titleize(event_data.event_name)
       if event_data.properties.empty?
-        case_body = "\t\tcase #{function_name}\n"
+        "\t\tcase #{function_name}\n"
       else
         trimmed_properties = event_data.properties.gsub('Boolean', 'Bool')
-        case_body = "\t\tcase #{function_name}(#{trimmed_properties})\n"
+        "\t\tcase #{function_name}(#{trimmed_properties})\n"
       end
     end
 
@@ -62,30 +64,36 @@ module Evva
 
     def people_properties(people_bundle)
       properties = SWIFT_PEOPLE_HEADER
-      properties += people_bundle.map { |prop| swift_people_const(prop) }.join("")
-      properties += "\n" + SWIFT_INCREMENT_FUNCTION + "\n}\n"
+      properties += people_bundle.map { |prop| swift_people_const(prop) }.join('')
+      properties + "\n" + SWIFT_INCREMENT_FUNCTION + "\n}\n"
     end
 
     def special_property_enum(enum)
       enum_body = "import Foundation\n\n"
       enum_values = enum.values.split(',')
       enum_body += "enum #{enum.enum_name}: String {\n"
-      enum_body += enum_values.map { |vals| "\tcase #{vals.tr(' ', '_')} = \"#{vals}\"\n" }.join("")
-      enum_body += "} \n"
+      enum_body += enum_values.map { |vals| "\tcase #{vals.tr(' ', '_')} = \"#{vals}\"\n" }.join('')
+      enum_body + "} \n"
     end
 
     def process_arguments(props)
       arguments = ''
       props.split(',').each do |property|
         val = property.split(':').first
-        if is_special_property(property)
-          if is_optional_property(property)
-            # Does nothing
+        if is_special_property?(property)
+          if is_optional_property?(property)
+            val = val.chomp('?')
+            arguments += "\"#{val}\": #{val}.rawValue, "
           else
             arguments += "\"#{val}\": #{val}.rawValue, "
           end
         else
-          arguments += "\"#{val}\": #{val}, "
+          if is_optional_property?(property)
+            val = val.chomp('?')
+            arguments += "\"#{val}\": #{val}, "
+          else
+            arguments += "\"#{val}\": #{val}, "
+          end
         end
       end
       arguments.chomp(', ')
@@ -93,24 +101,22 @@ module Evva
 
     private
 
-    def is_special_property(prop)
-      types_array = %w[Long Int String Double Float Boolean]
+    def is_special_property?(prop)
       type = prop.split(':')[1]
-      types_array.include?(type) ? false : true
+      !NATIVE_TYPES.include?(type.chomp('?'))
     end
 
-    def is_optional_property(prop)
+    def is_optional_property?(prop)
       type = prop.split(':')[1]
       type.include?('?') ? true : false
     end
 
-
     def prepend_let(props)
-      props.split(',').map { |p| "let #{p.split(':')[0]}" }.join(", ")
+      props.split(',').map { |p| "let #{p.split(':')[0]}" }.join(', ')
     end
 
     def swift_people_const(prop)
-      case_body = "\tcase #{titleize(prop)} = \"#{prop}\"\n"
+      "\tcase #{titleize(prop)} = \"#{prop}\"\n"
     end
 
     def titleize(str)
