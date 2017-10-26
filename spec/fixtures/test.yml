@@ -1,10 +1,10 @@
-type: iOS
+type: Android
 
 data_source:
   type: google_sheet
   sheet_id: 1LaJd68os3g_GFlerogC64grNIlXb2iukMznOvdml7A4
-  
-out_path: app/src/main/java/com/hole19golf/analytics
-event_file_name: MixpanelEvents
+
+out_path: analytics
+event_file_name: MixpanelAnalytics
 event_enum_file_name: MixpanelEvent
 people_file_name: MixpanelProperties
