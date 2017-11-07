@@ -99,7 +99,7 @@ describe Evva::AndroidGenerator do
   end
 
   describe '#event_enum' do
-    subject { trim_spaces(generator.event_enum(event_bundle)) }
+    subject { trim_spaces(generator.event_enum(event_bundle, 'MixpanelEvent')) }
     let(:event_bundle) { [
       Evva::MixpanelEvent.new('nav_feed_tap', {}),
       Evva::MixpanelEvent.new('nav_performance_tap', {})
@@ -118,7 +118,7 @@ describe Evva::AndroidGenerator do
   end
 
   describe '#people_properties' do
-    subject { trim_spaces(generator.people_properties(people_bundle)) }
+    subject { trim_spaces(generator.people_properties(people_bundle, 'MixpanelProperties')) }
     let(:people_bundle) { ['rounds_with_wear', 'friends_from_facebook'] }
     let(:expected) { <<-Kotlin
       package com.hole19golf.hole19.analytics

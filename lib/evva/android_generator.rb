@@ -4,18 +4,15 @@ module Evva
       "package com.hole19golf.hole19.analytics\n\n"\
       "import com.hole19golf.hole19.analytics.Event\n"\
       "import com.hole19golf.hole19.analytics.MixpanelAnalyticsMask\n"\
-      "import org.json.JSONObject\n\n"\
-      "open class MixpanelEvents(private val mixpanelMask: MixpanelAnalyticsMask) {\n".freeze
+      "import org.json.JSONObject\n\n".freeze
 
     KOTLIN_PEOPLE_HEADER =
       "package com.hole19golf.hole19.analytics\n"\
-      "import com.hole19golf.hole19.analytics.Event\n\n"\
-      "enum class MixpanelProperties(val key: String) {\n".freeze
+      "import com.hole19golf.hole19.analytics.Event\n\n".freeze
 
     KOTLIN_BUNDLE_HEADER =
       "package com.hole19golf.hole19.analytics\n"\
-      "import com.hole19golf.hole19.analytics.Event\n\n"\
-      "enum class MixpanelEvent(override val key: String) : Event {\n".freeze
+      "import com.hole19golf.hole19.analytics.Event\n\n".freeze
 
     KOTIN_PEOPLE_FUNCTIONS =
       "\topen fun updateProperties(property: MixpanelProperties, value: Any) {\n"\
@@ -27,8 +24,8 @@ module Evva
 
     NATIVE_TYPES = %w[Long Int String Double Float Boolean].freeze
 
-    def events(bundle)
-      event_file = KOTLIN_EVENT_HEADER
+    def events(bundle, file_name)
+      event_file = KOTLIN_EVENT_HEADER + "open class #{file_name}(private val mixpanelMask: MixpanelAnalyticsMask) {\n".freeze
       bundle.each do |event|
         event_file += "\n#{kotlin_function(event)}"
       end
@@ -36,14 +33,14 @@ module Evva
       event_file += "\n}"
     end
 
-    def people_properties(people_bundle)
-      properties = KOTLIN_PEOPLE_HEADER
+    def people_properties(people_bundle, file_name)
+      properties = KOTLIN_PEOPLE_HEADER + "enum class #{file_name}(val key: String) {\n"
       properties += people_bundle.map { |prop| "\t\t#{prop.upcase}(\"#{prop}\")" }.join(",\n")
       properties += ";\n}\n"
     end
 
-    def event_enum(bundle)
-      event_file = KOTLIN_BUNDLE_HEADER
+    def event_enum(bundle, file_name)
+      event_file = KOTLIN_BUNDLE_HEADER + "enum class #{file_name}(override val key: String) : Event {\n"
       event_file += bundle.map { |event| "\t\t#{event.event_name.upcase}(\"#{event.event_name}\")"}.join(", \n")
       event_file += "\n}\n"
     end

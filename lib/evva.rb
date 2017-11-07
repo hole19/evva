@@ -38,13 +38,13 @@ module Evva
 
   def evva_write(bundle, generator, configuration, extension)
     path = "#{configuration.out_path}/#{configuration.event_file_name}.#{extension}"
-    write_to_file(path, generator.events(bundle[:events]))
+    write_to_file(path, generator.events(bundle[:events], configuration.event_file_name))
 
     path = "#{configuration.out_path}/#{configuration.event_enum_file_name}.#{extension}"
-    write_to_file(path, generator.event_enum(bundle[:events]))
+    write_to_file(path, generator.event_enum(bundle[:events], configuration.event_enum_file_name))
 
     path = "#{configuration.out_path}/#{configuration.people_file_name}.#{extension}"
-    write_to_file(path, generator.people_properties(bundle[:people]))
+    write_to_file(path, generator.people_properties(bundle[:people], configuration.people_file_name))
 
     bundle[:enums].each do |enum|
       path = "#{configuration.out_path}/#{enum.enum_name}.#{extension}"
