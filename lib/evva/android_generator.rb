@@ -15,10 +15,10 @@ module Evva
       "import com.hole19golf.hole19.analytics.Event\n\n".freeze
 
     KOTIN_PEOPLE_FUNCTIONS =
-      "\topen fun updateProperties(property: MixpanelProperties, value: Any) {\n"\
+      "\nopen fun updateProperties(property: MixpanelProperties, value: Any) {\n"\
       "\t\tmixpanelMask.updateProperties(property.key, value)"\
       "\t\n} \n"\
-      "\topen fun incrementCounter(property: MixpanelProperties) {\n"\
+      "\nopen fun incrementCounter(property: MixpanelProperties) {\n"\
       "\t\tmixpanelMask.incrementCounter(property.key)"\
       "\t\n} \n".freeze
 
