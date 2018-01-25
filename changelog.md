@@ -1,5 +1,8 @@
 # Change Log
 
+##[0.1.2] - 2018-01-25
+Improves swift code generation
+
 ## [0.1.1] - 2017-11-07
 Fixes mismatch between file name and class name generated.
 
