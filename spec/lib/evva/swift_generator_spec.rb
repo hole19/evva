@@ -7,10 +7,10 @@ describe Evva::SwiftGenerator do
   end
 
   describe '#events' do
-    subject { trim_spaces(generator.events(event_bundle)) }
+    subject { trim_spaces(generator.events(event_bundle, "")) }
     let(:event_bundle) {
       [Evva::MixpanelEvent.new('nav_feed_tap', []),
-       Evva::MixpanelEvent.new('cp_page_view', 'course_id:Long,course_name:String?')]
+       Evva::MixpanelEvent.new('cp_page_view', ['course_id:Long'],['course_name:String?'])]
     }
     let(:expected) { <<-Swift
         import CoreLocation
