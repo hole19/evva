@@ -5,11 +5,11 @@ module Evva
       "import Foundation\n"\
       "import SharedCode\n\n"\
       "class MixpanelHelper: NSObject {\n"\
-      "enum Event {\n".freeze
+      "\tenum Event {\n".freeze
 
     SWIFT_EVENT_DATA_HEADER =
-      "private var data: EventData {\n"\
-      "switch self {\n\n\n".freeze
+      "\t\tprivate var data: EventData {\n"\
+      "\t\t\tswitch self {\n".freeze
 
     SWIFT_PEOPLE_HEADER = "fileprivate enum Counter: String {\n".freeze
 
@@ -26,8 +26,7 @@ module Evva
         event_file += swift_case(event)
       end
       event_file += "}\n"
-      event_file += "private var data: EventData {\n"\
-      "switch self {\n\n"
+      event_file += SWIFT_EVENT_DATA_HEADER
       bundle.each do |event|
         event_file += swift_event_data(event)
       end
@@ -47,13 +46,13 @@ module Evva
     def swift_event_data(event_data)
       function_name = 'track' + titleize(event_data.event_name)
       if event_data.properties.empty?
-        function_body = "case .#{function_name} \n" \
-                        "\treturn EventData(name:\"#{event_data.event_name}\")\n\n"
+        function_body = "\t\t\tcase .#{function_name} \n" \
+                        "\t\t\t\treturn EventData(name:\"#{event_data.event_name}\")\n\n"
       else
         function_header = prepend_let(event_data.properties)
         function_arguments = process_arguments(event_data.properties.map { |k, v| "#{k}: #{v.gsub('Boolean', 'Bool')}" })
-        function_body = "case .#{function_name}(#{function_header}):\n" \
-                        "\treturn EventData(name:\"#{event_data.event_name}\", properties: [#{function_arguments}])\n\n"
+        function_body = "\t\t\tcase .#{function_name}(#{function_header}):\n" \
+                        "\t\t\t\treturn EventData(name:\"#{event_data.event_name}\", properties: [#{function_arguments}])\n\n"
       end
       function_body
     end
