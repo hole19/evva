@@ -39,8 +39,8 @@ module Evva
       if event_data.properties.empty?
         "\t\tcase #{function_name}\n"
       else
-        trimmed_properties = event_data.properties.map { |k, v| "#{k}: #{v.gsub('Boolean', 'Bool')}" }
-        "\t\tcase #{function_name}(#{trimmed_properties})\n"
+        trimmed_properties = event_data.properties.map { |k, v| k.to_s + '": ' + v.gsub('Boolean', 'Bool') }.join(",\"")
+        "\t\tcase #{function_name}(\"#{trimmed_properties})\n"
       end
     end
 
