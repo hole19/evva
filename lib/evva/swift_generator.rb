@@ -50,7 +50,7 @@ module Evva
       if event_data.properties.empty?
         "\t\tcase #{function_name}\n"
       else
-        trimmed_properties = event_data.properties.map { |k, v| k.to_s + ': ' + v.gsub('Boolean','Bool').gsub('Long', 'Int') }.join(", ")
+        trimmed_properties = event_data.properties.map { |k, v| k.to_s + ': ' + native_type(v) }.join(", ")
         "\t\tcase #{function_name}(#{trimmed_properties})\n"
       end
     end
@@ -101,11 +101,15 @@ module Evva
     private
 
     def is_raw_representable_property?(type)
-      !NATIVE_TYPES.include?(type.chomp('?'))
+      !NATIVE_TYPES.include?(native_type(type).chomp('?'))
     end
 
     def is_optional_property?(type)
       type.end_with?('?')
+    end
+
+    def native_type(type)
+      type.gsub('Boolean','Bool').gsub('Long', 'Int')
     end
 
     def prepend_let(props)
