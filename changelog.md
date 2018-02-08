@@ -1,4 +1,7 @@
 # Change Log
+## [0.1.4.1] - 2018-02-08
+- DRYs methods in swift event generation
+
 ## [0.1.4] - 2018-02-08
 - Removes not needed enum file on Swift generator
 - Removes Long type on Swift generator
