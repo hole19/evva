@@ -18,7 +18,7 @@ module Evva
       "\t\tMixpanelAPI.instance.incrementCounter(rawValue, times: times)\n"\
       '\t}'.freeze
 
-    NATIVE_TYPES = %w[Long Int String Double Float Bool].freeze
+    NATIVE_TYPES = %w[Int String Double Float Bool].freeze
 
     def events(bundle, file_name)
       event_file = SWIFT_EVENT_HEADER
@@ -38,7 +38,7 @@ module Evva
       if event_data.properties.empty?
         "\t\tcase #{function_name}\n"
       else
-        trimmed_properties = event_data.properties.map { |k, v| k.to_s + ': ' + v.gsub('Boolean', 'Bool') }.join(", ")
+        trimmed_properties = event_data.properties.map { |k, v| k.to_s + ': ' + v.gsub('Boolean','Bool').gsub('Long', 'Int') }.join(", ")
         "\t\tcase #{function_name}(#{trimmed_properties})\n"
       end
     end
@@ -50,7 +50,7 @@ module Evva
                         "\t\t\t\treturn EventData(name: \"#{event_data.event_name}\")\n\n"
       else
         function_header = prepend_let(event_data.properties)
-        function_arguments = process_arguments(event_data.properties.map { |k, v| "#{k}: #{v.gsub('Boolean', 'Bool')}" })
+        function_arguments = process_arguments(event_data.properties.map { |k, v| "#{k}: #{v}" })
         function_body = "\t\t\tcase .#{function_name}(#{function_header}):\n" \
                         "\t\t\t\treturn EventData(name: \"#{event_data.event_name}\", properties: [#{function_arguments}])\n\n"
       end
