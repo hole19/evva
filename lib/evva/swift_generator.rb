@@ -4,7 +4,17 @@ module Evva
       "import CoreLocation\n"\
       "import Foundation\n"\
       "import SharedCode\n\n"\
-      "@objc class MixpanelHelper: NSObject {\n"\
+      "@objc class MixpanelHelper: NSObject {\n\n"\
+      "\tprivate struct EventData {\n"\
+      "\t\tlet name: String\n"\
+      "\t\tlet properties: [String: Any]?\n"\
+      "\t\tlet timeEvent: Bool\n\n"\
+      "\t\tinit(name: String, properties: [String: Any]? = nil, timeEvent: Bool = false) {\n"\
+      "\t\t\tself.name = name\n"\
+      "\t\t\tself.properties = properties\n"\
+      "\t\t\tself.timeEvent = timeEvent\n"\
+      "\t\t}\n"\
+      "\t}\n\n"\
       "\tenum Event {\n".freeze
 
     SWIFT_EVENT_DATA_HEADER =
@@ -16,7 +26,7 @@ module Evva
     SWIFT_INCREMENT_FUNCTION =
       "\tfunc increment(times: Int = 1) {\n"\
       "\t\tMixpanelAPI.instance.incrementCounter(rawValue, times: times)\n"\
-      '\t}'.freeze
+      "\t}".freeze
 
     NATIVE_TYPES = %w[Int String Double Float Bool].freeze
 
@@ -25,12 +35,14 @@ module Evva
       bundle.each do |event|
         event_file += swift_case(event)
       end
-      event_file += "\t}\n\n"
       event_file += SWIFT_EVENT_DATA_HEADER
       bundle.each do |event|
         event_file += swift_event_data(event)
       end
-      event_file += "\t}\n}\n"
+      event_file += "\t\t\t}\n"
+      event_file += "\t\t}\n"
+      event_file += "\t}\n"
+      event_file += "}\n"
     end
 
     def swift_case(event_data)
@@ -50,9 +62,11 @@ module Evva
                         "\t\t\t\treturn EventData(name: \"#{event_data.event_name}\")\n\n"
       else
         function_header = prepend_let(event_data.properties)
-        function_arguments = process_arguments(event_data.properties.map { |k, v| "#{k}: #{v}" })
-        function_body = "\t\t\tcase .#{function_name}(#{function_header}):\n" \
-                        "\t\t\t\treturn EventData(name: \"#{event_data.event_name}\", properties: [#{function_arguments}])\n\n"
+        function_arguments = dictionary_pairs(event_data.properties)
+        function_body = "\t\t\tcase .#{function_name}(#{function_header}):\n"\
+                        "\t\t\t\treturn EventData(name: \"#{event_data.event_name}\", properties: [\n"\
+                        "\t\t\t\t\t#{function_arguments.join(",\n\t\t\t\t\t")} ]\n"\
+                        "\t\t\t\t)\n\n"
       end
       function_body
     end
@@ -74,39 +88,24 @@ module Evva
       enum_body + "} \n"
     end
 
-    def process_arguments(props)
-      arguments = ''
-      props.each do |property|
-        val = property.split(':').first
-        if is_special_property?(property)
-          if is_optional_property?(property)
-            val = val.chomp('?')
-            arguments += "\"#{val}\": #{val}.rawValue, "
-          else
-            arguments += "\"#{val}\": #{val}.rawValue, "
-          end
-        else
-          if is_optional_property?(property)
-            val = val.chomp('?')
-            arguments += "\"#{val}\": #{val}, "
-          else
-            arguments += "\"#{val}\": #{val}, "
-          end
+    def dictionary_pairs(props)
+      props.map do |name, type|
+        pair = "\"#{name}\": #{name}"
+        if is_raw_representable_property?(type)
+          pair += ".rawValue"
         end
+        pair
       end
-      arguments.chomp(', ')
     end
 
     private
 
-    def is_special_property?(prop)
-      type = prop.split(':')[1]
+    def is_raw_representable_property?(type)
       !NATIVE_TYPES.include?(type.chomp('?'))
     end
 
-    def is_optional_property?(prop)
-      type = prop.split(':')[1]
-      type.include?('?') ? true : false
+    def is_optional_property?(type)
+      type.end_with?('?')
     end
 
     def prepend_let(props)
