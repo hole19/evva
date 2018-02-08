@@ -40,9 +40,10 @@ module Evva
     path = "#{configuration.out_path}/#{configuration.event_file_name}.#{extension}"
     write_to_file(path, generator.events(bundle[:events], configuration.event_file_name))
 
-    path = "#{configuration.out_path}/#{configuration.event_enum_file_name}.#{extension}"
-    write_to_file(path, generator.event_enum(bundle[:events], configuration.event_enum_file_name))
-
+    unless configuration.type.downcase == 'ios'
+      path = "#{configuration.out_path}/#{configuration.event_enum_file_name}.#{extension}"
+      write_to_file(path, generator.event_enum(bundle[:events], configuration.event_enum_file_name))
+    end
     path = "#{configuration.out_path}/#{configuration.people_file_name}.#{extension}"
     write_to_file(path, generator.people_properties(bundle[:people], configuration.people_file_name))
 

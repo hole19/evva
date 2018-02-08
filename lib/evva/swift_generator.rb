@@ -4,7 +4,7 @@ module Evva
       "import CoreLocation\n"\
       "import Foundation\n"\
       "import SharedCode\n\n"\
-      "class MixpanelHelper: NSObject {\n"\
+      "@objc class MixpanelHelper: NSObject {\n"\
       "\tenum Event {\n".freeze
 
     SWIFT_EVENT_DATA_HEADER =
@@ -14,23 +14,23 @@ module Evva
     SWIFT_PEOPLE_HEADER = "fileprivate enum Counter: String {\n".freeze
 
     SWIFT_INCREMENT_FUNCTION =
-      "func increment(times: Int = 1) {\n"\
-      "MixpanelAPI.instance.incrementCounter(rawValue, times: times)\n"\
-      '}'.freeze
+      "\tfunc increment(times: Int = 1) {\n"\
+      "\t\tMixpanelAPI.instance.incrementCounter(rawValue, times: times)\n"\
+      '\t}'.freeze
 
-    NATIVE_TYPES = %w[Long Int String Double Float Bool].freeze
+    NATIVE_TYPES = %w[Int String Double Float Bool].freeze
 
     def events(bundle, file_name)
       event_file = SWIFT_EVENT_HEADER
       bundle.each do |event|
         event_file += swift_case(event)
       end
-      event_file += "}\n"
+      event_file += "\t}\n\n"
       event_file += SWIFT_EVENT_DATA_HEADER
       bundle.each do |event|
         event_file += swift_event_data(event)
       end
-      event_file += "}\n}\n"
+      event_file += "\t}\n}\n"
     end
 
     def swift_case(event_data)
@@ -38,21 +38,21 @@ module Evva
       if event_data.properties.empty?
         "\t\tcase #{function_name}\n"
       else
-        trimmed_properties = event_data.properties.map { |k, v| k.to_s + '": ' + v.gsub('Boolean', 'Bool') }.join(",\"")
-        "\t\tcase #{function_name}(\"#{trimmed_properties})\n"
+        trimmed_properties = event_data.properties.map { |k, v| k.to_s + ': ' + v.gsub('Boolean','Bool').gsub('Long', 'Int') }.join(", ")
+        "\t\tcase #{function_name}(#{trimmed_properties})\n"
       end
     end
 
     def swift_event_data(event_data)
       function_name = 'track' + titleize(event_data.event_name)
       if event_data.properties.empty?
-        function_body = "\t\t\tcase .#{function_name} \n" \
-                        "\t\t\t\treturn EventData(name:\"#{event_data.event_name}\")\n\n"
+        function_body = "\t\t\tcase .#{function_name}:\n" \
+                        "\t\t\t\treturn EventData(name: \"#{event_data.event_name}\")\n\n"
       else
         function_header = prepend_let(event_data.properties)
-        function_arguments = process_arguments(event_data.properties.map { |k, v| "#{k}: #{v.gsub('Boolean', 'Bool')}" })
+        function_arguments = process_arguments(event_data.properties.map { |k, v| "#{k}: #{v}" })
         function_body = "\t\t\tcase .#{function_name}(#{function_header}):\n" \
-                        "\t\t\t\treturn EventData(name:\"#{event_data.event_name}\", properties: [#{function_arguments}])\n\n"
+                        "\t\t\t\treturn EventData(name: \"#{event_data.event_name}\", properties: [#{function_arguments}])\n\n"
       end
       function_body
     end
