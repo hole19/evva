@@ -1,4 +1,6 @@
 # Change Log
+##[0.1.3] - 2018-02-08
+Fixes quotations and spacing on Swift code generation
 
 ##[0.1.2] - 2018-01-25
 Improves swift code generation
