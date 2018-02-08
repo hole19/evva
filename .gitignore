@@ -3,3 +3,4 @@
 running
 coverage
 .DS_Store*
+.byebug_history
