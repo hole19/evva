@@ -4,7 +4,6 @@ GEM
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
     ast (2.3.0)
-    byebug (9.1.0)
     colorize (0.8.1)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
@@ -63,7 +62,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  byebug
   colorize
   rspec
   rspec-its
