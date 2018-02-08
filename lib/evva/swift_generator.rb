@@ -92,9 +92,12 @@ module Evva
       props.map do |name, type|
         pair = "\"#{name}\": #{name}"
         if is_raw_representable_property?(type)
+          if is_optional_property?(type)
+            pair += "?"
+          end
           pair += ".rawValue"
         end
-        pair
+        pair += " as Any"
       end
     end
 
