@@ -1,52 +1,33 @@
 module Evva
   class SwiftGenerator
-    SWIFT_EVENT_HEADER =
-      "import CoreLocation\n"\
-      "import Foundation\n"\
-      "import SharedCode\n\n"\
-      "@objc class MixpanelHelper: NSObject {\n\n"\
-      "\tprivate struct EventData {\n"\
-      "\t\tlet name: String\n"\
-      "\t\tlet properties: [String: Any]?\n"\
-      "\t\tlet timeEvent: Bool\n\n"\
-      "\t\tinit(name: String, properties: [String: Any]? = nil, timeEvent: Bool = false) {\n"\
-      "\t\t\tself.name = name\n"\
-      "\t\t\tself.properties = properties\n"\
-      "\t\t\tself.timeEvent = timeEvent\n"\
-      "\t\t}\n"\
-      "\t}\n\n"\
-      "\tenum Event {\n".freeze
+    EXTENSION_HEADER =
+      "\nimport Foundation\n\n"\
+      "extension Analytics {\n\n".freeze
 
-    SWIFT_EVENT_DATA_HEADER =
-      "\t\tprivate var data: EventData {\n"\
-      "\t\t\tswitch self {\n".freeze
-
-    SWIFT_PEOPLE_HEADER = "fileprivate enum Counter: String {\n".freeze
-
-    SWIFT_INCREMENT_FUNCTION =
-      "\tfunc increment(times: Int = 1) {\n"\
-      "\t\tMixpanelAPI.instance.incrementCounter(rawValue, times: times)\n"\
-      "\t}".freeze
+    EXTENSION_FOOTER =
+      "\n\n}\n"
 
     NATIVE_TYPES = %w[Int String Double Float Bool].freeze
 
     def events(bundle, file_name)
-      event_file = SWIFT_EVENT_HEADER
+      event_file = EXTENSION_HEADER
+      event_file += "\tenum Event {\n\n"
       bundle.each do |event|
-        event_file += swift_case(event)
+        event_file += event_case(event)
       end
-      event_file += SWIFT_EVENT_DATA_HEADER
+      event_file += "\n\t\tvar data: EventData {\n"
+      event_file += "\t\t\tswitch self {\n"
       bundle.each do |event|
-        event_file += swift_event_data(event)
+        event_file += event_data(event)
       end
       event_file += "\t\t\t}\n"
-      event_file += "\t\t}\n"
-      event_file += "\t}\n"
-      event_file += "}\n"
+      event_file += "\t\t}\n\n"
+      event_file += "\t}"
+      event_file += EXTENSION_FOOTER
     end
 
-    def swift_case(event_data)
-      function_name = 'track' + titleize(event_data.event_name)
+    def event_case(event_data)
+      function_name = camelize(event_data.event_name)
       if event_data.properties.empty?
         "\t\tcase #{function_name}\n"
       else
@@ -55,8 +36,8 @@ module Evva
       end
     end
 
-    def swift_event_data(event_data)
-      function_name = 'track' + titleize(event_data.event_name)
+    def event_data(event_data)
+      function_name = camelize(event_data.event_name)
       if event_data.properties.empty?
         function_body = "\t\t\tcase .#{function_name}:\n" \
                         "\t\t\t\treturn EventData(name: \"#{event_data.event_name}\")\n\n"
@@ -76,16 +57,23 @@ module Evva
     end
 
     def people_properties(people_bundle, file_name)
-      properties = SWIFT_PEOPLE_HEADER
-      properties += people_bundle.map { |prop| swift_people_const(prop) }.join('')
-      properties + "\n" + SWIFT_INCREMENT_FUNCTION + "\n}\n"
+      properties = EXTENSION_HEADER
+      properties += "\tenum Property: String {\n"
+      people_bundle.each do |prop|
+        properties += "\t\tcase #{camelize(prop)} = \"#{prop}\"\n"
+      end
+      properties += "\t}"
+      properties += EXTENSION_FOOTER
     end
 
     def special_property_enum(enum)
-      enum_body = "import Foundation\n\n"
-      enum_body += "enum #{enum.enum_name}: String {\n"
-      enum_body += enum.values.map { |vals| "\tcase #{vals.tr(' ', '_')} = \"#{vals}\"\n" }.join('')
-      enum_body + "} \n"
+      enum_body = EXTENSION_HEADER
+      enum_body += "\tenum #{enum.enum_name}: String {\n"
+      enum.values.map do |val|
+        enum_body += "\t\tcase #{val.tr(' ', '_')} = \"#{val}\"\n"
+      end
+      enum_body += "\t}"
+      enum_body += EXTENSION_FOOTER
     end
 
     def dictionary_pairs(props)
@@ -119,12 +107,13 @@ module Evva
       props.map { |k, v| "let #{k}" }.join(', ')
     end
 
-    def swift_people_const(prop)
-      "\tcase #{titleize(prop)} = \"#{prop}\"\n"
+    def camelize(term)
+      string = term.to_s
+      string = string.sub(/^(?:#{@acronym_regex}(?=\b|[A-Z_])|\w)/) { |match| match.downcase }
+      string.gsub!(/(?:_|(\/))([a-z\d]*)/i) { "#{$1}#{$2.capitalize}" }
+      string.gsub!("/".freeze, "::".freeze)
+      string
     end
 
-    def titleize(str)
-      str.split('_').collect(&:capitalize).join
-    end
   end
 end
