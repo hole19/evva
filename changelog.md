@@ -1,4 +1,7 @@
 # Change Log
+## [0.1.4.2] - 2018-02-14
+ - Replaces Swift headers
+
 ## [0.1.4.1] - 2018-02-08
 - DRYs methods in swift event generation
 
