@@ -43,12 +43,19 @@ module Evva
       path = "#{configuration.out_path}/#{configuration.event_enum_file_name}.#{extension}"
       write_to_file(path, generator.event_enum(bundle[:events], configuration.event_enum_file_name))
     end
+
     path = "#{configuration.out_path}/#{configuration.people_file_name}.#{extension}"
     write_to_file(path, generator.people_properties(bundle[:people], configuration.people_file_name))
 
-    bundle[:enums].each do |enum|
-      path = "#{configuration.out_path}/#{enum.enum_name}.#{extension}"
-      write_to_file(path, generator.special_property_enum(enum))
+    if configuration.type.downcase == 'ios'
+      path = "#{configuration.out_path}/#{configuration.special_enum_file_name}.#{extension}"
+      write_to_file(path, generator.special_property_enums(bundle[:enums]))
+
+    else
+      bundle[:enums].each do |enum|
+        path = "#{configuration.out_path}/#{enum.enum_name}.#{extension}"
+        write_to_file(path, generator.special_property_enums([enum]))
+      end
     end
   end
 

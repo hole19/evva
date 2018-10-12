@@ -24,4 +24,5 @@ Evva
  event_file_name: /file/with/tracking/functions
  event_enum_file_name: /file/with/event/names
  people_file_name: /file/with/people/properties
+ special_enum_file_name: //file/with/special/enum/properties/
  ```

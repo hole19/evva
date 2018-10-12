@@ -39,6 +39,10 @@ module Evva
       @hash[:event_enum_file_name]
     end
 
+    def special_enum_file_name
+      @hash[:special_enum_file_name]
+    end
+
     CONFIG_STRUCT = {
       type: Hash,
       elements: {
