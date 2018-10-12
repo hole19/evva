@@ -56,13 +56,13 @@ module Evva
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       data = http.get(uri.path, headers)
       unless data.code.to_i == 200
-        raise 'Cannot access sheet at #{uri} - HTTP #{data.code}'
+        raise "Cannot access sheet at #{uri} - HTTP #{data.code}"
       end
 
       begin
         XmlSimple.xml_in(data.body, 'KeyAttr' => 'name')
       rescue
-        raise 'Cannot parse. Expected XML at #{uri}'
+        raise "Cannot parse. Expected XML at #{uri}"
       end
     end
 
