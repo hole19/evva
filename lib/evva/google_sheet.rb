@@ -8,45 +8,43 @@ module Evva
     end
 
     def events
-      raw = raw_data(@sheet_id, 0)
-      Logger.info('Downloading dictionary from Google Sheet...')
-      non_language_columns = %w[id updated category
-                                title content link]
       event_list = []
-      raw['entry'].each do |entry|
-        filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
-        event_name = filtered_entry['eventname'].first
-        properties = hash_parser(filtered_entry['props'].first)
-        event_list.push(Evva::MixpanelEvent.new(event_name, properties))
+      iterate_entries(raw_data(@sheet_id, 0)) do |entry|
+        event_name = entry['eventname'].first
+        properties = hash_parser(entry['eventproperties'].first)
+        event_list << Evva::MixpanelEvent.new(event_name, properties)
       end
       event_list
     end
 
     def people_properties
-      raw = raw_data(@sheet_id, 1)
       people_list = []
-      Logger.info('Downloading dictionary from Google Sheet...')
-      non_language_columns = %w[id updated category title content link]
-      raw['entry'].each do |entry|
-        filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
-        value = filtered_entry['value'].first
+      iterate_entries(raw_data(@sheet_id, 1)) do |entry|
+        value = entry['propertyname'].first
         people_list << value
       end
       people_list
     end
 
     def enum_classes
-      raw = raw_data(@sheet_id, 2)
-      Logger.info('Downloading dictionary from Google Sheet...')
-      non_language_columns = %w[id updated category title content link]
       enum_list = []
-      raw['entry'].each do |entry|
-        filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
-        enum_name = filtered_entry['enum'].first
-        values = filtered_entry['values'].first.split(',')
-        enum_list.push(Evva::MixpanelEnum.new(enum_name, values))
+      iterate_entries(raw_data(@sheet_id, 2)) do |entry|
+        enum_name = entry['enumname'].first
+        values = entry['possiblevalues'].first.split(',')
+        enum_list << Evva::MixpanelEnum.new(enum_name, values)
       end
       enum_list
+    end
+
+    private
+
+    def iterate_entries(data)
+      Logger.info('Downloading dictionary from Google Sheet...')
+      non_language_columns = %w[id updated category title content link]
+      data['entry'].each do |entry|
+        filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
+        yield(filtered_entry)
+      end
     end
 
     def xml_data(uri, headers = nil)
@@ -56,13 +54,13 @@ module Evva
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       data = http.get(uri.path, headers)
       unless data.code.to_i == 200
-        raise 'Cannot access sheet at #{uri} - HTTP #{data.code}'
+        raise "Cannot access sheet at #{uri} - HTTP #{data.code}"
       end
 
       begin
         XmlSimple.xml_in(data.body, 'KeyAttr' => 'name')
       rescue
-        raise 'Cannot parse. Expected XML at #{uri}'
+        raise "Cannot parse. Expected XML at #{uri}"
       end
     end
 
@@ -72,8 +70,6 @@ module Evva
       url   = sheet['entry'][sheet_number]['link'][0]['href']
       xml_data(url)
     end
-
-    private
 
     def hash_parser(property_array)
       h = {}
