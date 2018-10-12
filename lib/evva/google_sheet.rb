@@ -11,7 +11,7 @@ module Evva
       event_list = []
       iterate_entries(raw_data(@sheet_id, 0)) do |entry|
         event_name = entry['eventname'].first
-        properties = hash_parser(entry['props'].first)
+        properties = hash_parser(entry['eventproperties'].first)
         event_list << Evva::MixpanelEvent.new(event_name, properties)
       end
       event_list
@@ -20,7 +20,7 @@ module Evva
     def people_properties
       people_list = []
       iterate_entries(raw_data(@sheet_id, 1)) do |entry|
-        value = entry['value'].first
+        value = entry['propertyname'].first
         people_list << value
       end
       people_list
@@ -29,8 +29,8 @@ module Evva
     def enum_classes
       enum_list = []
       iterate_entries(raw_data(@sheet_id, 2)) do |entry|
-        enum_name = entry['enum'].first
-        values = entry['values'].first.split(',')
+        enum_name = entry['enumname'].first
+        values = entry['possiblevalues'].first.split(',')
         enum_list << Evva::MixpanelEnum.new(enum_name, values)
       end
       enum_list
