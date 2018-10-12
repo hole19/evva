@@ -1,4 +1,8 @@
 # Change Log
+## [0.1.4.3] - 2018-10-12
+ - Fixes swift and kotlin tabs, indentation and property names
+ - Merges all special enums in a single file
+
 ## [0.1.4.2] - 2018-02-14
  - Replaces Swift headers
 
