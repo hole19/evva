@@ -43,6 +43,10 @@ module Evva
       @hash[:special_enum_file_name]
     end
 
+    def package_name
+      @hash[:package_name]
+    end
+
     CONFIG_STRUCT = {
       type: Hash,
       elements: {
@@ -53,7 +57,8 @@ module Evva
         out_path: { type: String },
         event_file_name: { type: String },
         event_enum_file_name: { type: String },
-        people_file_name: { type: String }
+        people_file_name: { type: String },
+        package_name: { type: String }
       }
     }.freeze
 

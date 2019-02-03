@@ -8,3 +8,4 @@ out_path: analytics
 event_file_name: MixpanelAnalytics
 event_enum_file_name: MixpanelEvent
 people_file_name: MixpanelProperties
+package_name: com.hole19golf.hole19.analytics
