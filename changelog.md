@@ -1,4 +1,7 @@
 # Change Log
+## [0.1.4.4] - 2019-02-04
+ - Adds support for dynamic android package name
+
 ## [0.1.4.3] - 2018-10-12
  - Fixes swift and kotlin tabs, indentation and property names
  - Merges all special enums in a single file
@@ -25,3 +28,4 @@
 
 ## [0.1.0] - 2017/10/26
 - Initial Release.
+
