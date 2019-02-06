@@ -13,7 +13,6 @@ module Evva
     NATIVE_TYPES = %w[Long Int String Double Float Boolean].freeze
 
     def events(bundle, file_name)
-      puts "#{@package_name} pkg"
       header_footer_wrapper([IMPORT_EVENT, IMPORT_MASK, IMPORT_JSON]) do
 """open class #{file_name}(private val mask: MixpanelAnalyticsMask) {
 
