@@ -6,9 +6,9 @@ module Evva
       @package_name = package_name
     end
 
-    IMPORT_EVENT = "import packagename.Event"
-    IMPORT_MASK = "import packagename.MixpanelAnalyticsMask"
-    IMPORT_JSON = "import org.json.JSONObject"
+    IMPORT_EVENT = "import packagename.Event".freeze
+    IMPORT_MASK = "import packagename.MixpanelAnalyticsMask".freeze
+    IMPORT_JSON = "import org.json.JSONObject".freeze
 
     NATIVE_TYPES = %w[Long Int String Double Float Boolean].freeze
 
@@ -59,8 +59,8 @@ module Evva
 
     def imports_header(imports = [])
       return unless imports.length > 0
-      imports.each{ |ev| ev. gsub!("packagename", @package_name) }
-      imports.join("\n") + "\n\n"
+      imports.map { |ev| ev. gsub("packagename", @package_name) }
+             .join("\n") + "\n\n"
     end
 
     def header_footer_wrapper(imports = [])
