@@ -26,7 +26,7 @@ module Evva
     bundle = analytics_data(config: config.data_source)
     case config.type.downcase
     when 'android'
-      generator = Evva::AndroidGenerator.new
+      generator = Evva::AndroidGenerator.new(config.package_name)
       evva_write(bundle, generator, config, 'kt')
     when 'ios'
       generator = Evva::SwiftGenerator.new
