@@ -6,8 +6,11 @@ gem 'rubocop'
 gem 'safe_yaml'
 gem 'xml-simple'
 
-gem 'rspec'
-gem 'rspec-its'
-gem 'simplecov', require: false, group: :test
-gem 'simplecov-rcov', require: false
-gem 'webmock', '~> 1.20'
+group :test do
+  gem 'rake'
+  gem 'rspec'
+  gem 'rspec-its'
+  gem 'simplecov', require: false, group: :test
+  gem 'simplecov-rcov', require: false
+  gem 'webmock', '~> 1.20'
+end
