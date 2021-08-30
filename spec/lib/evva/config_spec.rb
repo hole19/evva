@@ -5,8 +5,10 @@ describe Evva::Config do
     {
       type: 'EvvaOS',
       data_source: {
-        type:         'google_sheet',
-        sheet_id:     'abc1234567890'
+        type: 'google_sheet',
+        events_url: 'https://events.csv',
+        people_properties_url: 'https://people_properties.csv',
+        enum_classes_url: 'https://enum_classes.csv',
       },
       out_path: 'clear/path/to/event',
       event_file_name: 'event/file/name',
@@ -32,7 +34,7 @@ describe Evva::Config do
   describe '#data_source' do
     subject(:data_source) { config.data_source }
 
-    it { should eq(type: 'google_sheet', sheet_id: 'abc1234567890') }
+    it { should eq(type: 'google_sheet', events_url: 'https://events.csv', people_properties_url: 'https://people_properties.csv', enum_classes_url: 'https://enum_classes.csv') }
 
     context 'when given an unknown type data source' do
       before { hash[:data_source] = { type: 'i_dunno' } }

@@ -55,7 +55,7 @@ module Evva
     source =
       case config[:type]
       when 'google_sheet'
-        Evva::GoogleSheet.new(config[:sheet_id])
+        Evva::GoogleSheet.new(config[:events_url], config[:people_properties_url], config[:enum_classes_url])
       end
     events_bundle = {}
     events_bundle[:events] = source.events

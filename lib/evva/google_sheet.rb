@@ -1,36 +1,47 @@
 require 'net/https'
-require 'xmlsimple'
+require 'csv'
 
 module Evva
   class GoogleSheet
-    def initialize(sheet_id)
-      @sheet_id = sheet_id
+    def initialize(events_url, people_properties_url, enum_classes_url)
+      @events_url = events_url
+      @people_properties_url = people_properties_url
+      @enum_classes_url = enum_classes_url
     end
 
     def events
+      Logger.info("Downloading data from Google Sheet at #{@events_url}")
+      csv = get_csv(@events_url)
+
       event_list = []
-      iterate_entries(raw_data(@sheet_id, 0)) do |entry|
-        event_name = entry['eventname'].first
-        properties = hash_parser(entry['eventproperties'].first)
+      csv.each do |row|
+        event_name = row['Event Name']
+        properties = hash_parser(row['Event Properties'])
         event_list << Evva::MixpanelEvent.new(event_name, properties)
       end
       event_list
     end
 
     def people_properties
+      Logger.info("Downloading data from Google Sheet at #{@people_properties_url}")
+      csv = get_csv(@people_properties_url)
+
       people_list = []
-      iterate_entries(raw_data(@sheet_id, 1)) do |entry|
-        value = entry['propertyname'].first
+      csv.each do |row|
+        value = row['Property Name']
         people_list << value
       end
       people_list
     end
 
     def enum_classes
+      Logger.info("Downloading data from Google Sheet at #{@enum_classes_url}")
+      csv = get_csv(@enum_classes_url)
+
       enum_list = []
-      iterate_entries(raw_data(@sheet_id, 2)) do |entry|
-        enum_name = entry['enumname'].first
-        values = entry['possiblevalues'].first.split(',')
+      csv.each do |row|
+        enum_name = row['Enum Name']
+        values = row['Possible Values'].split(',')
         enum_list << Evva::MixpanelEnum.new(enum_name, values)
       end
       enum_list
@@ -38,42 +49,38 @@ module Evva
 
     private
 
-    def iterate_entries(data)
-      Logger.info('Downloading dictionary from Google Sheet...')
-      non_language_columns = %w[id updated category title content link]
-      data['entry'].each do |entry|
-        filtered_entry = entry.reject { |c| non_language_columns.include?(c) }
-        yield(filtered_entry)
+    def get_csv(url)
+      data = get(url)
+
+      begin
+        CSV.parse(data, headers: true)
+      rescue StandardError => e
+        raise "Cannot parse. Expected CSV at #{url}: #{e}"
       end
     end
 
-    def xml_data(uri, headers = nil)
-      uri = URI.parse(uri)
+    def get(url, max_redirects = 1)
+      raise "Too may redirects" if max_redirects == -1
+
+      uri = URI(url)
+
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      data = http.get(uri.path, headers)
-      unless data.code.to_i == 200
-        raise "Cannot access sheet at #{uri} - HTTP #{data.code}"
-      end
 
-      begin
-        XmlSimple.xml_in(data.body, 'KeyAttr' => 'name')
-      rescue
-        raise "Cannot parse. Expected XML at #{uri}"
-      end
-    end
+      request = Net::HTTP::Get.new(uri.request_uri)
+      response = http.request(request)
 
-    def raw_data(sheet_id, sheet_number)
-      Logger.info('Downloading Google Sheet...')
-      sheet = xml_data("https://spreadsheets.google.com/feeds/worksheets/#{sheet_id}/public/full")
-      url   = sheet['entry'][sheet_number]['link'][0]['href']
-      xml_data(url)
+      return get(response['location'], max_redirects - 1) if response.is_a? Net::HTTPRedirection
+
+      raise "Http Error #{response.body}" if response.code.to_i >= 400
+
+      response.body
     end
 
     def hash_parser(property_array)
       h = {}
-      unless property_array.empty?
+      unless property_array.nil? || property_array.empty?
         property_array.split(',').each do |prop|
           split_prop = prop.split(':')
           prop_name = split_prop[0].to_sym

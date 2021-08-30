@@ -66,7 +66,9 @@ module Evva
       type: Hash,
       elements: {
         type: { type: String },
-        sheet_id: { type: String }
+        events_url: { type: String },
+        people_properties_url: { type: String },
+        enum_classes_url: { type: String },
       }
     }.freeze
 

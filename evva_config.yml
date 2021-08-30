@@ -3,6 +3,9 @@ type: iOS
 data_source:
   type: google_sheet
   sheet_id: 1LaJd68os3g_GFlerogC64grNIlXb2iukMznOvdml7A4
+  events_url: https://path-to-csv
+  people_properties_url: https://path-to-csv
+  enum_classes_url: https://path-to-csv
 
 out_path: analytics
 event_file_name: MixpanelAnalytics

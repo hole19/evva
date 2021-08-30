@@ -56,7 +56,6 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff
-    xml-simple (1.1.5)
 
 PLATFORMS
   ruby
@@ -71,10 +70,9 @@ DEPENDENCIES
   simplecov
   simplecov-rcov
   webmock (~> 1.20)
-  xml-simple
 
 RUBY VERSION
-   ruby 2.3.3p222
+   ruby 2.7.3p183
 
 BUNDLED WITH
-   1.16.1
+   2.2.26

@@ -1,10 +1,8 @@
 source 'https://rubygems.org'
-ruby '2.3.3'
+ruby '2.7.3'
 
 gem 'colorize'
-gem 'rubocop'
 gem 'safe_yaml'
-gem 'xml-simple'
 
 group :test do
   gem 'rake'
@@ -13,4 +11,5 @@ group :test do
   gem 'simplecov', require: false, group: :test
   gem 'simplecov-rcov', require: false
   gem 'webmock', '~> 1.20'
+  gem 'rubocop'
 end
