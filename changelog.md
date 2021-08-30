@@ -1,4 +1,10 @@
 # Change Log
+
+## [0.2.0] - 2021/08/30
+- Google Spreadsheet option stopped working due to a change in the API. This version fixes that.
+
+Note: You'll need a new setup. View README.
+
 ## [0.1.4.4] - 2019-02-04
  - Adds support for dynamic android package name
 
