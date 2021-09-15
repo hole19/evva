@@ -2,14 +2,14 @@ describe Evva::AndroidGenerator do
   let(:generator) { described_class.new("com.hole19golf.hole19.analytics") }
 
   describe '#events' do
-    subject { generator.events(events, "MixpanelAnalytics") }
+    subject { generator.events(events, "AnalyticsEvent") }
 
     let(:events) { [
-      Evva::MixpanelEvent.new('cp_page_view'),
-      Evva::MixpanelEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }),
-      Evva::MixpanelEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }),
-      Evva::MixpanelEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }),
-      Evva::MixpanelEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' })
+      Evva::AnalyticsEvent.new('cp_page_view'),
+      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }),
+      Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }),
+      Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }),
+      Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' })
     ] }
 
     let(:expected) {

@@ -5,11 +5,11 @@ describe Evva::SwiftGenerator do
     subject { generator.events(event_bundle, "") }
 
     let(:event_bundle) { [
-      Evva::MixpanelEvent.new('cp_page_view'),
-      Evva::MixpanelEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }),
-      Evva::MixpanelEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }),
-      Evva::MixpanelEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }),
-      Evva::MixpanelEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' })
+      Evva::AnalyticsEvent.new('cp_page_view'),
+      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }),
+      Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }),
+      Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }),
+      Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' })
     ] }
 
     let(:expected) {
@@ -71,8 +71,8 @@ Swift
     subject { generator.special_property_enums(enums) }
 
     let(:enums) { [
-      Evva::MixpanelEnum.new('CourseProfileSource', ['course_discovery', 'synced_courses']),
-      Evva::MixpanelEnum.new('PremiumFrom', ['Course Profile', 'Round Setup'])
+      Evva::AnalyticsEnum.new('CourseProfileSource', ['course_discovery', 'synced_courses']),
+      Evva::AnalyticsEnum.new('PremiumFrom', ['Course Profile', 'Round Setup'])
     ] }
 
     let(:expected) {
