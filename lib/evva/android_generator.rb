@@ -30,7 +30,7 @@ module Evva
 
     def event_enum(bundle, file_name)
       header_footer_wrapper do
-        body = "enum class #{file_name}(override val key: String) {\n"
+        body = "enum class #{file_name}(val key: String) {\n"
         body << bundle.map(&:event_name).map { |prop| "\t#{prop.upcase}(\"#{prop}\")" }.join(",\n")
         body << ";\n}"
       end
