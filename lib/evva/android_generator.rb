@@ -67,19 +67,19 @@ Kotlin
     end
 
     def event_class(event_data, superclass_name)
-      class_name = titleize(event_data.event_name)
-      class_arguments = event_data.properties.map { |name, type| "val #{name}: #{type}" }.join(', ')
+      class_name = camelize(event_data.event_name)
+      class_arguments = event_data.properties.map { |name, type| "val #{camelize(name, false)}: #{type}" }.join(', ')
       if !class_arguments.empty?
         props = props_map(event_data.properties)
 
-"""\tclass #{class_name}(
+"""\tdata class #{class_name}(
 \t\t#{class_arguments}
 \t) : #{superclass_name}(AnalyticsEvents.#{event_data.event_name.upcase}) {
 #{props}
 \t}"""
 
       else
-"""\tclass #{class_name} : #{superclass_name}(AnalyticsEvents.#{event_data.event_name.upcase})"""
+"""\tdata class #{class_name} : #{superclass_name}(AnalyticsEvents.#{event_data.event_name.upcase})"""
       end
     end
 
@@ -88,7 +88,7 @@ Kotlin
         properties
         .map.with_index do |data, index|
           name, type = data
-          prop = "\t\t\t\"#{name}\" to #{name}"
+          prop = "\t\t\t\"#{name}\" to #{camelize(name, false)}"
 
           if special_property?(type)
             if optional_property?(type)
@@ -117,8 +117,15 @@ Kotlin
       type.include?('?')
     end
 
-    def titleize(str)
-      str.split('_').collect(&:capitalize).join
+    # extracted from Rails' ActiveSupport
+    def camelize(string, uppercase_first_letter = true)
+      string = string.to_s
+      if uppercase_first_letter
+        string = string.sub(/^[a-z\d]*/) { |match| match.capitalize }
+      else
+        string = string.sub(/^(?:(?=\b|[A-Z_])|\w)/) { |match| match.downcase }
+      end
+      string.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub("/", "::")
     end
   end
 end

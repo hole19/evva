@@ -25,43 +25,43 @@ sealed class AnalyticsEvent(event: AnalyticsEvents) {
 
     open val properties: Map<String, Any?>? = null
 
-    class CpPageView : AnalyticsEvent(AnalyticsEvents.CP_PAGE_VIEW)
+    data class CpPageView : AnalyticsEvent(AnalyticsEvents.CP_PAGE_VIEW)
 
-    class CpPageViewA(
-        val course_id: Long, val course_name: String
+    data class CpPageViewA(
+        val courseId: Long, val courseName: String
     ) : AnalyticsEvent(AnalyticsEvents.CP_PAGE_VIEW_A) {
         override val properties = mapOf(
-            "course_id" to course_id,
-            "course_name" to course_name
+            "course_id" to courseId,
+            "course_name" to courseName
         )
     }
 
-    class CpPageViewB(
-        val course_id: Long, val course_name: String, val from_screen: CourseProfileSource
+    data class CpPageViewB(
+        val courseId: Long, val courseName: String, val fromScreen: CourseProfileSource
     ) : AnalyticsEvent(AnalyticsEvents.CP_PAGE_VIEW_B) {
         override val properties = mapOf(
-            "course_id" to course_id,
-            "course_name" to course_name,
-            "from_screen" to from_screen.key
+            "course_id" to courseId,
+            "course_name" to courseName,
+            "from_screen" to fromScreen.key
         )
     }
 
-    class CpPageViewC(
-        val course_id: Long, val course_name: String, val from_screen: CourseProfileSource?
+    data class CpPageViewC(
+        val courseId: Long, val courseName: String, val fromScreen: CourseProfileSource?
     ) : AnalyticsEvent(AnalyticsEvents.CP_PAGE_VIEW_C) {
         override val properties = mapOf(
-            "course_id" to course_id,
-            "course_name" to course_name,
-            "from_screen" to from_screen?.key
+            "course_id" to courseId,
+            "course_name" to courseName,
+            "from_screen" to fromScreen?.key
         )
     }
 
-    class CpPageViewD(
-        val course_id: Long?, val course_name: String
+    data class CpPageViewD(
+        val courseId: Long?, val courseName: String
     ) : AnalyticsEvent(AnalyticsEvents.CP_PAGE_VIEW_D) {
         override val properties = mapOf(
-            "course_id" to course_id,
-            "course_name" to course_name
+            "course_id" to courseId,
+            "course_name" to courseName
         )
     }
 }
