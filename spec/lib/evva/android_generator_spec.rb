@@ -25,7 +25,7 @@ sealed class AnalyticsEvent(event: AnalyticsEvents) {
 
     open val properties: Map<String, Any?>? = null
 
-    data class CpPageView() : AnalyticsEvent(AnalyticsEvents.CP_PAGE_VIEW)
+    class CpPageView : AnalyticsEvent(AnalyticsEvents.CP_PAGE_VIEW)
 
     data class CpPageViewA(
         val courseId: Long, val courseName: String
