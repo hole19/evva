@@ -79,7 +79,7 @@ Kotlin
 \t}"""
 
       else
-"""\tclass #{class_name} : #{superclass_name}(AnalyticsEvents.#{event_data.event_name.upcase})"""
+"""\tobject #{class_name} : #{superclass_name}(AnalyticsEvents.#{event_data.event_name.upcase})"""
       end
     end
 
