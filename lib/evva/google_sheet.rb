@@ -17,7 +17,7 @@ module Evva
       csv.each do |row|
         event_name = row['Event Name']
         properties = hash_parser(row['Event Properties'])
-        event_list << Evva::MixpanelEvent.new(event_name, properties)
+        event_list << Evva::AnalyticsEvent.new(event_name, properties)
       end
       event_list
     end
@@ -42,7 +42,7 @@ module Evva
       csv.each do |row|
         enum_name = row['Enum Name']
         values = row['Possible Values'].split(',')
-        enum_list << Evva::MixpanelEnum.new(enum_name, values)
+        enum_list << Evva::AnalyticsEnum.new(enum_name, values)
       end
       enum_list
     end

@@ -57,8 +57,8 @@ Layout/EmptyLinesAroundBlockBody:
 Layout/EmptyLinesAroundClassBody:
   Exclude:
     - 'lib/evva/android_generator.rb'
-    - 'lib/evva/mixpanel_enum.rb'
-    - 'lib/evva/mixpanel_event.rb'
+    - 'lib/evva/analytics_enum.rb'
+    - 'lib/evva/analytics_event.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -163,8 +163,8 @@ Layout/TrailingBlankLines:
     - 'lib/evva/enum_generator.rb'
     - 'lib/evva/event_generator.rb'
     - 'lib/evva/google_sheet.rb'
-    - 'lib/evva/mixpanel_enum.rb'
-    - 'lib/evva/mixpanel_event.rb'
+    - 'lib/evva/analytics_enum.rb'
+    - 'lib/evva/analytics_event.rb'
     - 'spec/lib/evva/enum_generator_spec.rb'
     - 'spec/lib/evva/event_generator_spec.rb'
     - 'spec/lib/evva/google_sheet_spec.rb'
@@ -226,8 +226,8 @@ Lint/UselessAssignment:
 # Offense count: 2
 Lint/Void:
   Exclude:
-    - 'lib/evva/mixpanel_enum.rb'
-    - 'lib/evva/mixpanel_event.rb'
+    - 'lib/evva/analytics_enum.rb'
+    - 'lib/evva/analytics_event.rb'
 
 # Offense count: 8
 Metrics/AbcSize:
@@ -309,8 +309,8 @@ Style/Documentation:
     - 'lib/evva/event_generator.rb'
     - 'lib/evva/google_sheet.rb'
     - 'lib/evva/logger.rb'
-    - 'lib/evva/mixpanel_enum.rb'
-    - 'lib/evva/mixpanel_event.rb'
+    - 'lib/evva/analytics_enum.rb'
+    - 'lib/evva/analytics_event.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -407,8 +407,8 @@ Style/RaiseArgs:
 # Cop supports --auto-correct.
 Style/RedundantSelf:
   Exclude:
-    - 'lib/evva/mixpanel_enum.rb'
-    - 'lib/evva/mixpanel_event.rb'
+    - 'lib/evva/analytics_enum.rb'
+    - 'lib/evva/analytics_event.rb'
     - 'lib/evva/object_extension.rb'
 
 # Offense count: 1

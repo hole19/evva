@@ -8,7 +8,7 @@ data_source:
   enum_classes_url: https://path-to-csv
 
 out_path: analytics
-event_file_name: MixpanelAnalytics
-event_enum_file_name: MixpanelEvent
-people_file_name: MixpanelProperties
+event_file_name: AnalyticsEvent
+event_enum_file_name: AnalyticsEvents
+people_file_name: AnalyticsProperties
 package_name: com.hole19golf.hole19.analytics

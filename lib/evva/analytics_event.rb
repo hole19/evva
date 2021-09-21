@@ -1,5 +1,5 @@
 module Evva
-  class MixpanelEvent
+  class AnalyticsEvent
     attr_reader :event_name, :properties
     def initialize(event_name, properties = {})
       @event_name = event_name

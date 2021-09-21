@@ -6,40 +6,31 @@ module Evva
       @package_name = package_name
     end
 
-    IMPORT_EVENT = "import packagename.Event".freeze
-    IMPORT_MASK = "import packagename.MixpanelAnalyticsMask".freeze
-    IMPORT_JSON = "import org.json.JSONObject".freeze
-
     NATIVE_TYPES = %w[Long Int String Double Float Boolean].freeze
 
     def events(bundle, file_name)
-      header_footer_wrapper([IMPORT_EVENT, IMPORT_MASK, IMPORT_JSON]) do
-"""open class #{file_name}(private val mask: MixpanelAnalyticsMask) {
+      header_footer_wrapper do
+"""sealed class #{file_name}(event: AnalyticsEvents) {
+\tval name = event.key
 
-#{bundle.map { |e| kotlin_function(e) }.join("\n\n")}
+\topen val properties: Map<String, Any?>? = null
 
-\topen fun updateProperties(property: MixpanelProperties, value: Any) {
-\t\tmask.updateProperties(property.key, value)
-\t}
-
-\topen fun incrementCounter(property: MixpanelProperties) {
-\t\tmask.incrementCounter(property.key)
-\t}
+#{bundle.map { |e| event_class(e, file_name) }.join("\n\n")}
 }"""
       end
     end
 
     def people_properties(people_bundle, file_name)
       header_footer_wrapper do
-        body = "enum class MixpanelProperties(val key: String) {\n"
+        body = "enum class #{file_name}(val key: String) {\n"
         body << people_bundle.map { |prop| "\t#{prop.upcase}(\"#{prop}\")" }.join(",\n")
         body << ";\n}"
       end
     end
 
     def event_enum(bundle, file_name)
-      header_footer_wrapper([IMPORT_EVENT]) do
-        body = "enum class #{file_name}(override val key: String) : Event {\n"
+      header_footer_wrapper do
+        body = "enum class #{file_name}(val key: String) {\n"
         body << bundle.map(&:event_name).map { |prop| "\t#{prop.upcase}(\"#{prop}\")" }.join(",\n")
         body << ";\n}"
       end
@@ -75,45 +66,47 @@ package #{@package_name}
 Kotlin
     end
 
-    def kotlin_function(event_data)
-      function_name = 'track' + titleize(event_data.event_name)
-      function_arguments = event_data.properties.map { |name, type| "#{name}: #{type}" }.join(', ')
-      if !function_arguments.empty?
-        props = json_props(event_data.properties)
-"""\topen fun #{function_name}(#{function_arguments}) {
+    def event_class(event_data, superclass_name)
+      class_name = camelize(event_data.event_name)
+      class_arguments = event_data.properties.map { |name, type| "val #{camelize(name, false)}: #{type}" }.join(', ')
+      if !class_arguments.empty?
+        props = props_map(event_data.properties)
+
+"""\tdata class #{class_name}(
+\t\t#{class_arguments}
+\t) : #{superclass_name}(AnalyticsEvents.#{event_data.event_name.upcase}) {
 #{props}
-\t\tmask.trackEvent(MixpanelEvent.#{event_data.event_name.upcase}, properties)
 \t}"""
 
       else
-"""\topen fun #{function_name}() {
-\t\tmask.trackEvent(MixpanelEvent.#{event_data.event_name.upcase})
-\t}"""
+"""\tobject #{class_name} : #{superclass_name}(AnalyticsEvents.#{event_data.event_name.upcase})"""
       end
     end
 
-    def json_props(properties)
+    def props_map(properties)
       split_properties =
         properties
-        .map do |name, type|
+        .map.with_index do |data, index|
+          name, type = data
+          prop = "\t\t\t\"#{name}\" to #{camelize(name, false)}"
+
           if special_property?(type)
             if optional_property?(type)
-              "#{name}?.let { put(\"#{name}\", it.key) }"
-            else
-              "put(\"#{name}\", #{name}.key)"
+              prop = "#{prop}?"
             end
-          else
-            if optional_property?(type)
-              "#{name}?.let { put(\"#{name}\", it) }"
-            else
-              "put(\"#{name}\", #{name})"
-            end
+            prop = "#{prop}.key"
           end
+
+          if index < properties.size - 1
+            # add list comma to every property except the last one
+            prop = "#{prop},"
+          end
+
+          prop
         end
-        .map { |line| "\t\t\t#{line}" }
         .join("\n")
 
-      "\t\tval properties = JSONObject().apply {\n#{split_properties}\n\t\t}"
+      "\t\toverride val properties = mapOf(\n#{split_properties}\n\t\t)"
     end
 
     def special_property?(type)
@@ -124,8 +117,15 @@ Kotlin
       type.include?('?')
     end
 
-    def titleize(str)
-      str.split('_').collect(&:capitalize).join
+    # extracted from Rails' ActiveSupport
+    def camelize(string, uppercase_first_letter = true)
+      string = string.to_s
+      if uppercase_first_letter
+        string = string.sub(/^[a-z\d]*/) { |match| match.capitalize }
+      else
+        string = string.sub(/^(?:(?=\b|[A-Z_])|\w)/) { |match| match.downcase }
+      end
+      string.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub("/", "::")
     end
   end
 end
