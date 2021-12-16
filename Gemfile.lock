@@ -71,8 +71,5 @@ DEPENDENCIES
   simplecov-rcov
   webmock (~> 1.20)
 
-RUBY VERSION
-   ruby 2.7.3p183
-
 BUNDLED WITH
    2.2.26
