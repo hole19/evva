@@ -1,6 +1,9 @@
 # Change Log
 
-## [0.2.0] - 2021/08/30
+## [0.3.0] - 2021-12-16
+- Revamp Android generator to generate events as classes instead of methods.
+
+## [0.2.0] - 2021-08-30
 - Google Spreadsheet option stopped working due to a change in the API. This version fixes that.
 
 Note: You'll need a new setup. View README.
@@ -32,6 +35,6 @@ Note: You'll need a new setup. View README.
 ## [0.1.1] - 2017-11-07
 - Fixes mismatch between file name and class name generated.
 
-## [0.1.0] - 2017/10/26
+## [0.1.0] - 2017-10-26
 - Initial Release.
 
