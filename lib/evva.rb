@@ -38,7 +38,7 @@ module Evva
 
   def evva_write(bundle, generator, configuration, extension)
     path = "#{configuration.out_path}/#{configuration.event_file_name}.#{extension}"
-    write_to_file(path, generator.events(bundle[:events], configuration.event_file_name, configuration.event_enum_file_name))
+    write_to_file(path, generator.events(bundle[:events], configuration.event_file_name, configuration.event_enum_file_name, configuration.platforms_file_name))
 
     unless configuration.type.downcase == 'ios'
       path = "#{configuration.out_path}/#{configuration.event_enum_file_name}.#{extension}"
@@ -51,10 +51,8 @@ module Evva
     path = "#{configuration.out_path}/#{configuration.special_enum_file_name}.#{extension}"
     write_to_file(path, generator.special_property_enums(bundle[:enums]))
 
-    if configuration.type.downcase == 'ios'
-      path = "#{configuration.out_path}/#{configuration.platforms_file_name}.#{extension}"
-      write_to_file(path, generator.platforms(bundle[:platforms], configuration.platforms_file_name))
-    end
+    path = "#{configuration.out_path}/#{configuration.platforms_file_name}.#{extension}"
+    write_to_file(path, generator.platforms(bundle[:platforms], configuration.platforms_file_name))
   end
 
   def analytics_data(config:)

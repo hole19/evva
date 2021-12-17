@@ -11,15 +11,17 @@ module Evva
     EVENTS_TEMPLATE = File.expand_path("./templates/kotlin/events.kt", __dir__)
     PEOPLE_PROPERTIES_TEMPLATE = File.expand_path("./templates/kotlin/people_properties.kt", __dir__)
     SPECIAL_PROPERTY_ENUMS_TEMPLATE = File.expand_path("./templates/kotlin/special_property_enums.kt", __dir__)
+    PLATFORMS_TEMPLATE = File.expand_path("./templates/kotlin/platforms.kt", __dir__)
 
     TAB_SIZE = "    " # \t -> 4 spaces
 
     NATIVE_TYPES = %w[Long Int String Double Float Boolean].freeze
 
-    def events(bundle, file_name, enums_file_name)
+    def events(bundle, file_name, enums_file_name, platforms_file_name)
       header_footer_wrapper do
         class_name = file_name
         enums_class_name = enums_file_name
+        platforms_class_name = platforms_file_name
 
         events = bundle.map do |event|
           properties = event.properties.map do |name, type|
@@ -43,10 +45,14 @@ module Evva
             }
           end
 
+          platforms = event.platforms.map { |p| constantize(p) }
+
           {
             class_name: camelize(event.event_name),
-            event_name: event.event_name.upcase,
+            event_name: constantize(event.event_name),
             properties: properties,
+            platforms: platforms,
+            is_object: properties.count == 0 && platforms.count == 0,
           }
         end
 
@@ -60,7 +66,7 @@ module Evva
 
         properties = people_bundle.map(&:property_name).map do |property_name|
           {
-            name: property_name.upcase,
+            name: constantize(property_name),
             value: property_name,
           }
         end
@@ -75,7 +81,7 @@ module Evva
 
         events = bundle.map(&:event_name).map do |event_name|
           {
-            name: event_name.upcase,
+            name: constantize(event_name),
             value: event_name,
           }
         end
@@ -89,7 +95,7 @@ module Evva
         enums = enums_bundle.map do |enum|
           values = enum.values.map do |value|
             {
-              name: value.tr(' ', '_').upcase,
+              name: constantize(value),
               value: value,
             }
           end
@@ -101,6 +107,16 @@ module Evva
         end
 
         template_from(SPECIAL_PROPERTY_ENUMS_TEMPLATE).result(binding)
+      end
+    end
+
+    def platforms(bundle, file_name)
+      header_footer_wrapper do
+        class_name = file_name
+
+        platforms = bundle.map { |platform| constantize(platform) }
+
+        template_from(PLATFORMS_TEMPLATE).result(binding)
       end
     end
 
@@ -133,6 +149,10 @@ module Evva
         string = string.sub(/^(?:(?=\b|[A-Z_])|\w)/) { |match| match.downcase }
       end
       string.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub("/", "::")
+    end
+
+    def constantize(string)
+      string.tr(' ', '_').upcase
     end
   end
 end
