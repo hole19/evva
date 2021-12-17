@@ -12,7 +12,7 @@ module Evva
 
     NATIVE_TYPES = %w[Int String Double Float Bool].freeze
 
-    def events(bundle, _file_name)
+    def events(bundle, _file_name, _enums_file_name)
       header_footer_wrapper do
         events = bundle.map do |event|
           properties = event.properties.map { |k, v|
@@ -21,7 +21,7 @@ module Evva
             value_fetcher = k.to_s
 
             if !NATIVE_TYPES.include?(type.chomp('?'))
-              # not a native type, we'll use rawValue
+              # special property, we'll use rawValue
               if type.end_with?('?')
                 # optional value, we need ? to access a parameter
                 value_fetcher += "?"

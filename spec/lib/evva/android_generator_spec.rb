@@ -2,7 +2,7 @@ describe Evva::AndroidGenerator do
   let(:generator) { described_class.new("com.hole19golf.hole19.analytics") }
 
   describe '#events' do
-    subject { generator.events(events, "AnalyticsEvent") }
+    subject { generator.events(events, "AnalyticsEvent", "AnalyticsEvents") }
 
     let(:events) { [
       Evva::AnalyticsEvent.new('cp_page_view', {}, []),

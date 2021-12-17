@@ -2,7 +2,7 @@ describe Evva::SwiftGenerator do
   let(:generator) { described_class.new }
 
   describe '#events' do
-    subject { generator.events(event_bundle, "") }
+    subject { generator.events(event_bundle, nil, nil) }
 
     let(:event_bundle) { [
       Evva::AnalyticsEvent.new('cp_page_view', {}, ['firebase']),

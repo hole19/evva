@@ -38,7 +38,7 @@ module Evva
 
   def evva_write(bundle, generator, configuration, extension)
     path = "#{configuration.out_path}/#{configuration.event_file_name}.#{extension}"
-    write_to_file(path, generator.events(bundle[:events], configuration.event_file_name))
+    write_to_file(path, generator.events(bundle[:events], configuration.event_file_name, configuration.event_enum_file_name))
 
     unless configuration.type.downcase == 'ios'
       path = "#{configuration.out_path}/#{configuration.event_enum_file_name}.#{extension}"
