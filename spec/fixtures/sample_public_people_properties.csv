@@ -1,3 +1,4 @@
-Property Name,Comments
-rounds_with_wear,asldkaslkdlaksd
-total_friends,
+Property Name,Property Type
+rounds_with_wear,String,"firebase"
+total_friends,Int
+wearable_platform,WearableAppPlatform

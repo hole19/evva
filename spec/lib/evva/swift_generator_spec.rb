@@ -5,7 +5,7 @@ describe Evva::SwiftGenerator do
     subject { generator.events(event_bundle, "") }
 
     let(:event_bundle) { [
-      Evva::AnalyticsEvent.new('cp_page_view'),
+      Evva::AnalyticsEvent.new('cp_page_view', {}),
       Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }),
       Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }),
       Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }),
@@ -122,7 +122,10 @@ Swift
   describe "#people_properties" do
     subject { generator.people_properties(people_bundle, "") }
 
-    let(:people_bundle) { ['rounds_with_wear', 'friends_from_facebook'] }
+    let(:people_bundle) { [
+      Evva::AnalyticsProperty.new('rounds_with_wear', 'String'),
+      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform'),
+    ] }
 
     let(:expected) {
 <<-Swift
@@ -133,7 +136,7 @@ import Foundation
 extension Analytics {
     enum Property: String {
         case roundsWithWear = "rounds_with_wear"
-        case friendsFromFacebook = "friends_from_facebook"
+        case wearPlatform = "wear_platform"
     }
 }
 Swift

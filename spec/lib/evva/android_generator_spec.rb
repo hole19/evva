@@ -5,7 +5,7 @@ describe Evva::AndroidGenerator do
     subject { generator.events(events, "AnalyticsEvent") }
 
     let(:events) { [
-      Evva::AnalyticsEvent.new('cp_page_view'),
+      Evva::AnalyticsEvent.new('cp_page_view', {}),
       Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }),
       Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }),
       Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }),
@@ -124,7 +124,10 @@ Kotlin
 
   describe '#people_properties' do
     subject { generator.people_properties(people_bundle, 'AnalyticsProperties') }
-    let(:people_bundle) { ['rounds_with_wear', 'friends_from_facebook'] }
+    let(:people_bundle) { [
+      Evva::AnalyticsProperty.new('rounds_with_wear', 'String'),
+      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform'),
+    ] }
     let(:expected) {
 <<-Kotlin
 package com.hole19golf.hole19.analytics
@@ -135,7 +138,7 @@ package com.hole19golf.hole19.analytics
 
 enum class AnalyticsProperties(val key: String) {
     ROUNDS_WITH_WEAR("rounds_with_wear"),
-    FRIENDS_FROM_FACEBOOK("friends_from_facebook");
+    WEAR_PLATFORM("wear_platform");
 }
 Kotlin
     }

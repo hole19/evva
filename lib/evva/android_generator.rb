@@ -23,7 +23,7 @@ module Evva
     def people_properties(people_bundle, file_name)
       header_footer_wrapper do
         body = "enum class #{file_name}(val key: String) {\n"
-        body << people_bundle.map { |prop| "\t#{prop.upcase}(\"#{prop}\")" }.join(",\n")
+        body << people_bundle.map(&:property_name).map { |prop| "\t#{prop.upcase}(\"#{prop}\")" }.join(",\n")
         body << ";\n}"
       end
     end

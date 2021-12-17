@@ -79,7 +79,7 @@ module Evva
     def people_properties(people_bundle, file_name)
       header_footer_wrapper do
         props = "\tenum Property: String {\n"
-        people_bundle.each do |prop|
+        people_bundle.map(&:property_name).each do |prop|
           props << "\t\tcase #{camelize(prop)} = \"#{prop}\"\n"
         end
         props << "\t}"
