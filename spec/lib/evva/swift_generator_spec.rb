@@ -19,6 +19,27 @@ describe Evva::SwiftGenerator do
 import Foundation
 
 extension Analytics {
+    struct EventData {
+        let name: String
+        let properties: [String: Any]?
+
+        init(name: String, properties: [String: Any]? = nil) {
+            self.name = name
+            self.properties = properties
+        }
+
+        init(name: EventName, properties: [String: Any]? = nil) {
+            self.init(name: name.rawValue, properties: properties)
+        }
+    }
+
+    enum EventName: String {
+        case cpPageView = "cp_page_view"
+        case cpPageViewA = "cp_page_view_a"
+        case cpPageViewB = "cp_page_view_b"
+        case cpPageViewC = "cp_page_view_c"
+        case cpPageViewD = "cp_page_view_d"
+    }
 
     enum Event {
         case cpPageView
@@ -30,30 +51,30 @@ extension Analytics {
         var data: EventData {
             switch self {
             case .cpPageView:
-                return EventData(name: "cp_page_view")
+                return EventData(name: .cpPageView)
 
             case .cpPageViewA(let course_id, let course_name):
-                return EventData(name: "cp_page_view_a", properties: [
+                return EventData(name: .cpPageViewA, properties: [
                     "course_id": course_id as Any,
                     "course_name": course_name as Any ]
                 )
 
             case .cpPageViewB(let course_id, let course_name, let from_screen):
-                return EventData(name: "cp_page_view_b", properties: [
+                return EventData(name: .cpPageViewB, properties: [
                     "course_id": course_id as Any,
                     "course_name": course_name as Any,
                     "from_screen": from_screen.rawValue as Any ]
                 )
 
             case .cpPageViewC(let course_id, let course_name, let from_screen):
-                return EventData(name: "cp_page_view_c", properties: [
+                return EventData(name: .cpPageViewC, properties: [
                     "course_id": course_id as Any,
                     "course_name": course_name as Any,
                     "from_screen": from_screen?.rawValue as Any ]
                 )
 
             case .cpPageViewD(let course_id, let course_name):
-                return EventData(name: "cp_page_view_d", properties: [
+                return EventData(name: .cpPageViewD, properties: [
                     "course_id": course_id as Any,
                     "course_name": course_name as Any ]
                 )
@@ -82,7 +103,6 @@ Swift
 import Foundation
 
 extension Analytics {
-
     enum CourseProfileSource: String {
         case courseDiscovery = "course_discovery"
         case syncedCourses = "synced_courses"
@@ -111,7 +131,6 @@ Swift
 import Foundation
 
 extension Analytics {
-
     enum Property: String {
         case roundsWithWear = "rounds_with_wear"
         case friendsFromFacebook = "friends_from_facebook"

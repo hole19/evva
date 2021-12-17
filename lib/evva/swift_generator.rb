@@ -11,7 +11,25 @@ module Evva
 
     def events(bundle, file_name)
       header_footer_wrapper do
-"""\tenum Event {
+"""\tstruct EventData {
+\t\tlet name: String
+\t\tlet properties: [String: Any]?
+
+\t\tinit(name: String, properties: [String: Any]? = nil) {
+\t\t\tself.name = name
+\t\t\tself.properties = properties
+\t\t}
+
+\t\tinit(name: EventName, properties: [String: Any]? = nil) {
+\t\t\tself.init(name: name.rawValue, properties: properties)
+\t\t}
+\t}
+
+\tenum EventName: String {
+#{bundle.map { |e| event_name_case(e) }.join("\n")}
+\t}
+
+\tenum Event {
 #{bundle.map { |e| event_case(e) }.join("\n")}
 
 \t\tvar data: EventData {
@@ -21,6 +39,11 @@ module Evva
 \t\t}
 \t}"""
       end
+    end
+
+    def event_name_case(event_data)
+      function_name = camelize(event_data.event_name)
+      "\t\tcase #{function_name} = \"#{event_data.event_name}\""
     end
 
     def event_case(event_data)
@@ -37,12 +60,12 @@ module Evva
       function_name = camelize(event_data.event_name)
       if event_data.properties.empty?
         function_body = "\t\t\tcase .#{function_name}:\n" \
-                        "\t\t\t\treturn EventData(name: \"#{event_data.event_name}\")"
+                        "\t\t\t\treturn EventData(name: .#{function_name})"
       else
         function_header = prepend_let(event_data.properties)
         function_arguments = dictionary_pairs(event_data.properties)
         function_body = "\t\t\tcase .#{function_name}(#{function_header}):\n"\
-                        "\t\t\t\treturn EventData(name: \"#{event_data.event_name}\", properties: [\n"\
+                        "\t\t\t\treturn EventData(name: .#{function_name}, properties: [\n"\
                         "\t\t\t\t\t#{function_arguments.join(",\n\t\t\t\t\t")} ]\n"\
                         "\t\t\t\t)"
       end
@@ -83,7 +106,6 @@ module Evva
 import Foundation
 
 extension Analytics {
-
 #{yield.gsub("\t", "    ")}
 }
 """
