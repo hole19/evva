@@ -59,7 +59,7 @@ extension Analytics {
                                     .firebase,
                                  ])
 
-            case .cpPageViewA(let course_id, let course_name):
+            case let .cpPageViewA(course_id, course_name):
                 return EventData(name: .cpPageViewA,
                                  properties: [
                                     "course_id": course_id as Any,
@@ -70,7 +70,7 @@ extension Analytics {
                                     .customPlatform,
                                  ])
 
-            case .cpPageViewB(let course_id, let course_name, let from_screen):
+            case let .cpPageViewB(course_id, course_name, from_screen):
                 return EventData(name: .cpPageViewB,
                                  properties: [
                                     "course_id": course_id as Any,
@@ -79,7 +79,7 @@ extension Analytics {
                                  ],
                                  platforms: [])
 
-            case .cpPageViewC(let course_id, let course_name, let from_screen):
+            case let .cpPageViewC(course_id, course_name, from_screen):
                 return EventData(name: .cpPageViewC,
                                  properties: [
                                     "course_id": course_id as Any,
@@ -88,7 +88,7 @@ extension Analytics {
                                  ],
                                  platforms: [])
 
-            case .cpPageViewD(let course_id, let course_name):
+            case let .cpPageViewD(course_id, course_name):
                 return EventData(name: .cpPageViewD,
                                  properties: [
                                     "course_id": course_id as Any,

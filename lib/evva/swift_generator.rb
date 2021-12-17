@@ -1,169 +1,121 @@
+require 'erb'
+
 module Evva
   class SwiftGenerator
-    EXTENSION_HEADER =
-      "\nimport Foundation\n\n"\
-      "extension Analytics {\n\n".freeze
+    BASE_TEMPLATE = File.expand_path("./templates/swift/base.swift", __dir__)
+    EVENTS_TEMPLATE = File.expand_path("./templates/swift/events.swift", __dir__)
+    PEOPLE_PROPERTIES_TEMPLATE = File.expand_path("./templates/swift/people_properties.swift", __dir__)
+    SPECIAL_PROPERTY_ENUMS_TEMPLATE = File.expand_path("./templates/swift/special_property_enums.swift", __dir__)
+    PLATFORMS_TEMPLATE = File.expand_path("./templates/swift/platforms.swift", __dir__)
 
-    EXTENSION_FOOTER =
-      "\n\n}\n"
+    TAB_SIZE = "    " # \t -> 4 spaces
 
     NATIVE_TYPES = %w[Int String Double Float Bool].freeze
 
-    def events(bundle, file_name)
+    def events(bundle, _file_name)
       header_footer_wrapper do
-"""\tstruct EventData {
-\t\tlet name: String
-\t\tvar properties: [String: Any]?
-\t\tlet platforms: [Platform]
+        events = bundle.map do |event|
+          properties = event.properties.map { |k, v|
+            type = native_type(v)
 
-\t\tinit(name: String, properties: [String: Any]?, platforms: [Platform]) {
-\t\t\tself.name = name
-\t\t\tself.properties = properties
-\t\t\tself.platforms = platforms
-\t\t}
+            value_fetcher = k.to_s
 
-\t\tinit(name: EventName, properties: [String: Any]?, platforms: [Platform]) {
-\t\t\tself.init(name: name.rawValue, properties: properties, platforms: platforms)
-\t\t}
-\t}
+            if !NATIVE_TYPES.include?(type.chomp('?'))
+              # not a native type, we'll use rawValue
+              if type.end_with?('?')
+                # optional value, we need ? to access a parameter
+                value_fetcher += "?"
+              end
+              value_fetcher += ".rawValue"
+            end
 
-\tenum EventName: String {
-#{bundle.map { |e| event_name_case(e) }.join("\n")}
-\t}
+            {
+              name: k.to_s,
+              type: type,
+              value: value_fetcher,
+            }
+          }
 
-\tenum Event {
-#{bundle.map { |e| event_case(e) }.join("\n")}
+          {
+            case_name: camelize(event.event_name),
+            event_name: event.event_name,
+            properties: properties,
+            platforms: event.platforms.map { |p| camelize(p) },
+          }
+        end
 
-\t\tvar data: EventData {
-\t\t\tswitch self {
-#{bundle.map { |e| event_data(e) }.join("\n\n")}
-\t\t\t}
-\t\t}
-\t}"""
+        template_from(EVENTS_TEMPLATE).result(binding)
       end
     end
 
-    def event_name_case(event_data)
-      function_name = camelize(event_data.event_name)
-      "\t\tcase #{function_name} = \"#{event_data.event_name}\""
-    end
-
-    def event_case(event_data)
-      function_name = camelize(event_data.event_name)
-      if event_data.properties.empty?
-        "\t\tcase #{function_name}"
-      else
-        trimmed_properties = event_data.properties.map { |k, v| k.to_s + ': ' + native_type(v) }.join(", ")
-        "\t\tcase #{function_name}(#{trimmed_properties})"
-      end
-    end
-
-    def event_data(event_data)
-      function_name = camelize(event_data.event_name)
-      function_header = if event_data.properties.count > 0
-        "(#{prepend_let(event_data.properties)})"
-      else
-        ""
-      end
-
-      properties = dictionary_pairs(event_data.properties)
-      properties_body = "nil"
-      if properties.count > 0
-        before = "\t\t\t\t                 "
-        properties_body = "[\n" +
-          properties.map { |p| "#{before}   #{p}," }.join("\n") +
-          "\n#{before}]"
-      end
-
-      platforms_body = "[]"
-      if event_data.platforms.count > 0
-        before = "\t\t\t\t                 "
-        platforms_body = "[\n" +
-          event_data.platforms.map { |p| "#{before}   .#{camelize(p)}," }.join("\n") +
-          "\n#{before}]"
-      end
-
-      properties = ["["] + dictionary_pairs(event_data.properties) + ["]"]
-"""\t\t\tcase .#{function_name}#{function_header}:
-\t\t\t\treturn EventData(name: .#{function_name},
-\t\t\t\t                 properties: #{properties_body},
-\t\t\t\t                 platforms: #{platforms_body})"""
-    end
-
-    def event_enum(enum, file_name)
+    def event_enum(_enum_bundle, _file_name)
       # empty
     end
 
-    def people_properties(people_bundle, file_name)
+    def people_properties(people_bundle, _file_name)
       header_footer_wrapper do
-        props = "\tenum Property: String {\n"
-        people_bundle.map(&:property_name).each do |prop|
-          props << "\t\tcase #{camelize(prop)} = \"#{prop}\"\n"
+        properties = people_bundle.map do |p|
+          {
+            case_name: camelize(p.property_name),
+            property_name: p.property_name
+          }
         end
-        props << "\t}"
+
+        template_from(PEOPLE_PROPERTIES_TEMPLATE).result(binding)
       end
     end
 
-    def special_property_enums(enums)
+    def special_property_enums(enums_bundle)
       header_footer_wrapper do
-        enums.map do |enum|
-          body = "\tenum #{enum.enum_name}: String {\n"
-          enum.values.each do |value|
-            body << "\t\tcase #{camelize(value)} = \"#{value}\"\n"
+        enums = enums_bundle.map do |enum|
+          values = enum.values.map do |value|
+            {
+              case_name: camelize(value),
+              value: value
+            }
           end
-          body << "\t}"
-        end.join("\n\n")
+
+          {
+            name: enum.enum_name,
+            values: values
+          }
+        end
+
+        template_from(SPECIAL_PROPERTY_ENUMS_TEMPLATE).result(binding)
       end
     end
 
-    def platforms(platforms_bundle, file_name)
+    def platforms(platforms_bundle, _file_name)
       header_footer_wrapper do
-"""\tenum Platform {
-#{platforms_bundle.map { |value| "\t\tcase #{camelize(value)}" }.join("\n")}
-\t}"""
+        platforms = platforms_bundle.map { |p| camelize(p) }
+
+        template_from(PLATFORMS_TEMPLATE).result(binding)
       end
     end
 
     private
 
     def header_footer_wrapper
-"""// This file was automatically generated by evva: https://github.com/hole19/evva
+      content = yield
+        .gsub(/^/, "\t").gsub(/^\t+$/, "") # add tabs, unless it's an empty line
+        .chop # trim trailing newlines created by sublime
 
-import Foundation
-
-extension Analytics {
-#{yield.gsub("\t", "    ")}
-}
-"""
+      template_from(BASE_TEMPLATE).result(binding).gsub("\t", TAB_SIZE)
     end
 
-    def dictionary_pairs(props)
-      props.map do |name, type|
-        pair = "\"#{name}\": #{name}"
-        if is_raw_representable_property?(type)
-          if is_optional_property?(type)
-            pair += "?"
-          end
-          pair += ".rawValue"
-        end
-        pair += " as Any"
-      end
-    end
+    def template_from(path)
+      file = File.read(path)
 
-    def is_raw_representable_property?(type)
-      !NATIVE_TYPES.include?(native_type(type).chomp('?'))
-    end
-
-    def is_optional_property?(type)
-      type.end_with?('?')
+      # - 2nd argument (nil) changes nothing
+      # - 3rd argument activates trim mode using "-" so that you can decide to
+      # not include a line (useful on loops and if statements)
+      ERB.new(file, nil, '-')
     end
 
     def native_type(type)
-      type.gsub('Boolean','Bool').gsub('Long', 'Int')
-    end
-
-    def prepend_let(props)
-      props.map { |k, v| "let #{k}" }.join(', ')
+      type
+        .gsub('Boolean','Bool')
+        .gsub('Long', 'Int')
     end
 
     def camelize(term)
@@ -173,6 +125,5 @@ extension Analytics {
       string.gsub!("/".freeze, "::".freeze)
       string
     end
-
   end
 end
