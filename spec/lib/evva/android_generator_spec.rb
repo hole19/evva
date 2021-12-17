@@ -5,11 +5,11 @@ describe Evva::AndroidGenerator do
     subject { generator.events(events, "AnalyticsEvent") }
 
     let(:events) { [
-      Evva::AnalyticsEvent.new('cp_page_view', {}),
-      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }),
-      Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }),
-      Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }),
-      Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' })
+      Evva::AnalyticsEvent.new('cp_page_view', {}, []),
+      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }, []),
+      Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }, []),
+      Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }, []),
+      Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' }, []),
     ] }
 
     let(:expected) {
@@ -75,7 +75,7 @@ Kotlin
     subject { generator.special_property_enums(enums) }
     let(:enums) { [
       Evva::AnalyticsEnum.new('CourseProfileSource', ['course_discovery', 'synced_courses']),
-      Evva::AnalyticsEnum.new('PremiumFrom', ['Course Profile', 'Round Setup'])
+      Evva::AnalyticsEnum.new('PremiumFrom', ['Course Profile', 'Round Setup']),
     ] }
     let(:expected) {
 <<-Kotlin
@@ -102,8 +102,8 @@ Kotlin
   describe '#event_enum' do
     subject { generator.event_enum(event_bundle, 'AnalyticsEvents') }
     let(:event_bundle) { [
-      Evva::AnalyticsEvent.new('nav_feed_tap', {}),
-      Evva::AnalyticsEvent.new('nav_performance_tap', {})
+      Evva::AnalyticsEvent.new('nav_feed_tap', {}, []),
+      Evva::AnalyticsEvent.new('nav_performance_tap', {}, []),
       ] }
     let(:expected) {
 <<-Kotlin
@@ -125,8 +125,8 @@ Kotlin
   describe '#people_properties' do
     subject { generator.people_properties(people_bundle, 'AnalyticsProperties') }
     let(:people_bundle) { [
-      Evva::AnalyticsProperty.new('rounds_with_wear', 'String'),
-      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform'),
+      Evva::AnalyticsProperty.new('rounds_with_wear', 'String', []),
+      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', []),
     ] }
     let(:expected) {
 <<-Kotlin

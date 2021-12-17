@@ -23,9 +23,9 @@ describe Evva::GoogleSheet do
 
     it 'returns an array with the corresponding events' do
       expected = [
-        Evva::AnalyticsEvent.new('cp_page_view', { course_id: 'Long', course_name: 'String' }),
-        Evva::AnalyticsEvent.new('nav_feed_tap', {}),
-        Evva::AnalyticsEvent.new('cp_view_scorecard', { course_id: 'Long', course_name: 'String' }),
+        Evva::AnalyticsEvent.new('cp_page_view', { course_id: 'Long', course_name: 'String' }, ['firebase', 'custom platform']),
+        Evva::AnalyticsEvent.new('nav_feed_tap', {}, []),
+        Evva::AnalyticsEvent.new('cp_view_scorecard', { course_id: 'Long', course_name: 'String' }, ['custom platform']),
       ]
       expect(events).to eq(expected)
     end
@@ -56,9 +56,9 @@ describe Evva::GoogleSheet do
 
     it 'returns an array with the corresponding events' do
       expect(people_properties).to eq [
-        Evva::AnalyticsProperty.new('rounds_with_wear', 'String'),
-        Evva::AnalyticsProperty.new('total_friends', 'Int'),
-        Evva::AnalyticsProperty.new('wearable_platform', 'WearableAppPlatform'),
+        Evva::AnalyticsProperty.new('rounds_with_wear', 'String', ['firebase', 'custom platform']),
+        Evva::AnalyticsProperty.new('total_friends', 'Int', []),
+        Evva::AnalyticsProperty.new('wearable_platform', 'WearableAppPlatform', ['firebase']),
       ]
     end
   end

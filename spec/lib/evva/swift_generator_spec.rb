@@ -5,11 +5,11 @@ describe Evva::SwiftGenerator do
     subject { generator.events(event_bundle, "") }
 
     let(:event_bundle) { [
-      Evva::AnalyticsEvent.new('cp_page_view', {}),
-      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }),
-      Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }),
-      Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }),
-      Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' })
+      Evva::AnalyticsEvent.new('cp_page_view', {}, []),
+      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }, []),
+      Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }, []),
+      Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }, []),
+      Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' }, []),
     ] }
 
     let(:expected) {
@@ -93,7 +93,7 @@ Swift
 
     let(:enums) { [
       Evva::AnalyticsEnum.new('CourseProfileSource', ['course_discovery', 'synced_courses']),
-      Evva::AnalyticsEnum.new('PremiumFrom', ['Course Profile', 'Round Setup'])
+      Evva::AnalyticsEnum.new('PremiumFrom', ['Course Profile', 'Round Setup']),
     ] }
 
     let(:expected) {
@@ -123,8 +123,8 @@ Swift
     subject { generator.people_properties(people_bundle, "") }
 
     let(:people_bundle) { [
-      Evva::AnalyticsProperty.new('rounds_with_wear', 'String'),
-      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform'),
+      Evva::AnalyticsProperty.new('rounds_with_wear', 'String', []),
+      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', []),
     ] }
 
     let(:expected) {
