@@ -26,7 +26,7 @@ module Evva
         get_csv(@events_url)
       end
 
-      @events_csv.map do |row|
+      @events ||= @events_csv.map do |row|
         event_name = row[EVENT_NAME]
         properties = hash_parser(row[EVENT_PROPERTIES])
         platforms = row[EVENT_PLATFORMS]&.split(',')
@@ -40,7 +40,7 @@ module Evva
         get_csv(@people_properties_url)
       end
 
-      @people_properties_csv.map do |row|
+      @people_properties ||= @people_properties_csv.map do |row|
         property_name = row[PROPERTY_NAME]
         property_type = row[PROPERTY_TYPE]
         platforms = row[PROPERTY_PLATFORMS]&.split(',')
@@ -54,11 +54,15 @@ module Evva
         get_csv(@enum_classes_url)
       end
 
-      @enum_classes_csv.map do |row|
+      @enum_classes ||= @enum_classes_csv.map do |row|
         enum_name = row[ENUM_NAME]
         values = row[ENUM_VALUES].split(',')
         Evva::AnalyticsEnum.new(enum_name, values)
       end
+    end
+
+    def platforms
+      @platforms ||= events.map(&:platforms).flatten.uniq
     end
 
     private

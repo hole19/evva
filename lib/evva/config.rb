@@ -43,6 +43,10 @@ module Evva
       @hash[:special_enum_file_name]
     end
 
+    def platforms_file_name
+      @hash[:platforms_file_name]
+    end
+
     def package_name
       @hash[:package_name]
     end
@@ -58,6 +62,7 @@ module Evva
         event_file_name: { type: String },
         event_enum_file_name: { type: String },
         people_file_name: { type: String },
+        platforms_file_name: { type: String },
         package_name: { type: String }
       }
     }.freeze

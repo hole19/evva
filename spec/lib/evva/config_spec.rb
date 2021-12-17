@@ -14,7 +14,8 @@ describe Evva::Config do
       event_file_name: 'event/file/name',
       people_file_name: 'people/file/name',
       event_enum_file_name: 'event/enum/file',
-      package_name:         'com.package.name.analytics'
+      platforms_file_name: 'platforms/file/name',
+      package_name: 'com.package.name.analytics',
     }
   end
 
@@ -29,6 +30,7 @@ describe Evva::Config do
   its(:event_file_name) { should eq('event/file/name') }
   its(:people_file_name) { should eq('people/file/name') }
   its(:event_enum_file_name) { should eq 'event/enum/file' }
+  its(:platforms_file_name) { should eq 'platforms/file/name' }
   its(:package_name) { should eq 'com.package.name.analytics' }
 
   describe '#data_source' do

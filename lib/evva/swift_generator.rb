@@ -13,15 +13,17 @@ module Evva
       header_footer_wrapper do
 """\tstruct EventData {
 \t\tlet name: String
-\t\tlet properties: [String: Any]?
+\t\tvar properties: [String: Any]?
+\t\tlet platforms: [Platform]
 
-\t\tinit(name: String, properties: [String: Any]? = nil) {
+\t\tinit(name: String, properties: [String: Any]?, platforms: [Platform]) {
 \t\t\tself.name = name
 \t\t\tself.properties = properties
+\t\t\tself.platforms = platforms
 \t\t}
 
-\t\tinit(name: EventName, properties: [String: Any]? = nil) {
-\t\t\tself.init(name: name.rawValue, properties: properties)
+\t\tinit(name: EventName, properties: [String: Any]?, platforms: [Platform]) {
+\t\t\tself.init(name: name.rawValue, properties: properties, platforms: platforms)
 \t\t}
 \t}
 
@@ -58,18 +60,34 @@ module Evva
 
     def event_data(event_data)
       function_name = camelize(event_data.event_name)
-      if event_data.properties.empty?
-        function_body = "\t\t\tcase .#{function_name}:\n" \
-                        "\t\t\t\treturn EventData(name: .#{function_name})"
+      function_header = if event_data.properties.count > 0
+        "(#{prepend_let(event_data.properties)})"
       else
-        function_header = prepend_let(event_data.properties)
-        function_arguments = dictionary_pairs(event_data.properties)
-        function_body = "\t\t\tcase .#{function_name}(#{function_header}):\n"\
-                        "\t\t\t\treturn EventData(name: .#{function_name}, properties: [\n"\
-                        "\t\t\t\t\t#{function_arguments.join(",\n\t\t\t\t\t")} ]\n"\
-                        "\t\t\t\t)"
+        ""
       end
-      function_body
+
+      properties = dictionary_pairs(event_data.properties)
+      properties_body = "nil"
+      if properties.count > 0
+        before = "\t\t\t\t                 "
+        properties_body = "[\n" +
+          properties.map { |p| "#{before}   #{p}," }.join("\n") +
+          "\n#{before}]"
+      end
+
+      platforms_body = "[]"
+      if event_data.platforms.count > 0
+        before = "\t\t\t\t                 "
+        platforms_body = "[\n" +
+          event_data.platforms.map { |p| "#{before}   .#{camelize(p)}," }.join("\n") +
+          "\n#{before}]"
+      end
+
+      properties = ["["] + dictionary_pairs(event_data.properties) + ["]"]
+"""\t\t\tcase .#{function_name}#{function_header}:
+\t\t\t\treturn EventData(name: .#{function_name},
+\t\t\t\t                 properties: #{properties_body},
+\t\t\t\t                 platforms: #{platforms_body})"""
     end
 
     def event_enum(enum, file_name)
@@ -95,6 +113,14 @@ module Evva
           end
           body << "\t}"
         end.join("\n\n")
+      end
+    end
+
+    def platforms(platforms_bundle, file_name)
+      header_footer_wrapper do
+"""\tenum Platform {
+#{platforms_bundle.map { |value| "\t\tcase #{camelize(value)}" }.join("\n")}
+\t}"""
       end
     end
 

@@ -77,4 +77,19 @@ describe Evva::GoogleSheet do
       ]
     end
   end
+
+  describe '#platforms' do
+    subject(:platforms) { sheet.platforms }
+
+    it do
+      expect { platforms }.not_to raise_error
+    end
+
+    it 'returns an array with the corresponding events' do
+      expect(platforms).to eq [
+        'firebase',
+        'custom platform',
+      ]
+    end
+  end
 end

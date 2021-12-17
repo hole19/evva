@@ -5,8 +5,8 @@ describe Evva::SwiftGenerator do
     subject { generator.events(event_bundle, "") }
 
     let(:event_bundle) { [
-      Evva::AnalyticsEvent.new('cp_page_view', {}, []),
-      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }, []),
+      Evva::AnalyticsEvent.new('cp_page_view', {}, ['firebase']),
+      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }, ['firebase', 'Custom Platform']),
       Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }, []),
       Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }, []),
       Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' }, []),
@@ -21,15 +21,17 @@ import Foundation
 extension Analytics {
     struct EventData {
         let name: String
-        let properties: [String: Any]?
+        var properties: [String: Any]?
+        let platforms: [Platform]
 
-        init(name: String, properties: [String: Any]? = nil) {
+        init(name: String, properties: [String: Any]?, platforms: [Platform]) {
             self.name = name
             self.properties = properties
+            self.platforms = platforms
         }
 
-        init(name: EventName, properties: [String: Any]? = nil) {
-            self.init(name: name.rawValue, properties: properties)
+        init(name: EventName, properties: [String: Any]?, platforms: [Platform]) {
+            self.init(name: name.rawValue, properties: properties, platforms: platforms)
         }
     }
 
@@ -51,33 +53,48 @@ extension Analytics {
         var data: EventData {
             switch self {
             case .cpPageView:
-                return EventData(name: .cpPageView)
+                return EventData(name: .cpPageView,
+                                 properties: nil,
+                                 platforms: [
+                                    .firebase,
+                                 ])
 
             case .cpPageViewA(let course_id, let course_name):
-                return EventData(name: .cpPageViewA, properties: [
-                    "course_id": course_id as Any,
-                    "course_name": course_name as Any ]
-                )
+                return EventData(name: .cpPageViewA,
+                                 properties: [
+                                    "course_id": course_id as Any,
+                                    "course_name": course_name as Any,
+                                 ],
+                                 platforms: [
+                                    .firebase,
+                                    .customPlatform,
+                                 ])
 
             case .cpPageViewB(let course_id, let course_name, let from_screen):
-                return EventData(name: .cpPageViewB, properties: [
-                    "course_id": course_id as Any,
-                    "course_name": course_name as Any,
-                    "from_screen": from_screen.rawValue as Any ]
-                )
+                return EventData(name: .cpPageViewB,
+                                 properties: [
+                                    "course_id": course_id as Any,
+                                    "course_name": course_name as Any,
+                                    "from_screen": from_screen.rawValue as Any,
+                                 ],
+                                 platforms: [])
 
             case .cpPageViewC(let course_id, let course_name, let from_screen):
-                return EventData(name: .cpPageViewC, properties: [
-                    "course_id": course_id as Any,
-                    "course_name": course_name as Any,
-                    "from_screen": from_screen?.rawValue as Any ]
-                )
+                return EventData(name: .cpPageViewC,
+                                 properties: [
+                                    "course_id": course_id as Any,
+                                    "course_name": course_name as Any,
+                                    "from_screen": from_screen?.rawValue as Any,
+                                 ],
+                                 platforms: [])
 
             case .cpPageViewD(let course_id, let course_name):
-                return EventData(name: .cpPageViewD, properties: [
-                    "course_id": course_id as Any,
-                    "course_name": course_name as Any ]
-                )
+                return EventData(name: .cpPageViewD,
+                                 properties: [
+                                    "course_id": course_id as Any,
+                                    "course_name": course_name as Any,
+                                 ],
+                                 platforms: [])
             }
         }
     }
@@ -137,6 +154,32 @@ extension Analytics {
     enum Property: String {
         case roundsWithWear = "rounds_with_wear"
         case wearPlatform = "wear_platform"
+    }
+}
+Swift
+    }
+
+    it { should eq expected }
+  end
+
+  describe "#platforms" do
+    subject { generator.platforms(platforms, "") }
+
+    let(:platforms) { [
+      'firebase',
+      'whatever you want really'
+    ] }
+
+    let(:expected) {
+<<-Swift
+// This file was automatically generated by evva: https://github.com/hole19/evva
+
+import Foundation
+
+extension Analytics {
+    enum Platform {
+        case firebase
+        case whateverYouWantReally
     }
 }
 Swift
