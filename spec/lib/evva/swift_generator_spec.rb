@@ -140,8 +140,9 @@ Swift
     subject { generator.people_properties(people_bundle, "") }
 
     let(:people_bundle) { [
-      Evva::AnalyticsProperty.new('rounds_with_wear', 'String', []),
-      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', []),
+      Evva::AnalyticsProperty.new('rounds_with_wear', 'String', ["firebase"]),
+      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', ["firebase", "custom platform"]),
+      Evva::AnalyticsProperty.new('number_of_times_it_happened', 'Long', []),
     ] }
 
     let(:expected) {
@@ -151,9 +152,56 @@ Swift
 import Foundation
 
 extension Analytics {
-    enum Property: String {
+    struct PropertyData {
+        let name: String
+        let value: Any
+        let platforms: [Platform]
+
+        init(name: String, value: Any, platforms: [Platform]) {
+            self.name = name
+            self.value = value
+            self.platforms = platforms
+        }
+
+        init(name: PropertyName, value: Any, platforms: [Platform]) {
+            self.init(name: name.rawValue, value: value, platforms: platforms)
+        }
+    }
+
+    enum PropertyName: String {
         case roundsWithWear = "rounds_with_wear"
         case wearPlatform = "wear_platform"
+        case numberOfTimesItHappened = "number_of_times_it_happened"
+    }
+
+    enum Property {
+        case roundsWithWear(String)
+        case wearPlatform(WearableAppPlatform)
+        case numberOfTimesItHappened(Int)
+
+        var data: PropertyData {
+            switch self {
+            case let .roundsWithWear(value):
+                return PropertyData(name: .roundsWithWear,
+                                    value: value,
+                                    platforms: [
+                                        .firebase,
+                                    ])
+
+            case let .wearPlatform(value):
+                return PropertyData(name: .wearPlatform,
+                                    value: value,
+                                    platforms: [
+                                        .firebase,
+                                        .customPlatform,
+                                    ])
+
+            case let .numberOfTimesItHappened(value):
+                return PropertyData(name: .numberOfTimesItHappened,
+                                    value: value,
+                                    platforms: [])
+            }
+        }
     }
 }
 Swift

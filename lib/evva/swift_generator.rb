@@ -57,7 +57,9 @@ module Evva
         properties = people_bundle.map do |p|
           {
             case_name: camelize(p.property_name),
-            property_name: p.property_name
+            property_name: p.property_name,
+            type: native_type(p.type),
+            platforms: p.platforms.map { |p| camelize(p) },
           }
         end
 
