@@ -166,7 +166,7 @@ sealed class AnalyticsProperty(property: AnalyticsProperties) {
     data class WearPlatform(
         val value: WearableAppPlatform
     ) : AnalyticsProperty(AnalyticsProperties.WEAR_PLATFORM) {
-        override val value = value
+        override val value = value.key
         override val platforms = [
             AnalyticsPlatforms.FIREBASE,
             AnalyticsPlatforms.CUSTOM_PLATFORM

@@ -20,8 +20,7 @@ module Evva
 
             value_fetcher = k.to_s
 
-            if !NATIVE_TYPES.include?(type.chomp('?'))
-              # special property, we'll use rawValue
+            if is_special_property?(type)
               if type.end_with?('?')
                 # optional value, we need ? to access a parameter
                 value_fetcher += "?"
@@ -55,10 +54,12 @@ module Evva
     def people_properties(people_bundle, _file_name, _enums_file_name, _platforms_file_name)
       header_footer_wrapper do
         properties = people_bundle.map do |p|
+          type = native_type(p.type)
           {
             case_name: camelize(p.property_name),
             property_name: p.property_name,
-            type: native_type(p.type),
+            type: type,
+            is_special_property: is_special_property?(type),
             platforms: p.platforms.map { |p| camelize(p) },
           }
         end
@@ -122,6 +123,10 @@ module Evva
       type
         .gsub('Boolean','Bool')
         .gsub('Long', 'Int')
+    end
+
+    def is_special_property?(type)
+      !NATIVE_TYPES.include?(type.chomp('?'))
     end
 
     def camelize(term)

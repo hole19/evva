@@ -30,7 +30,7 @@ enum Property {
 		<%- properties.each_with_index do |p, index| -%>
 		case let .<%= p[:case_name] %>(value):
 			return PropertyData(name: .<%= p[:case_name] %>,
-								value: value,
+								value: value<% if p[:is_special_property] %>.rawValue<% end %>,
 			<%- if p[:platforms].count == 0 -%>
 								platforms: [])
 			<%- else -%>

@@ -190,7 +190,7 @@ extension Analytics {
 
             case let .wearPlatform(value):
                 return PropertyData(name: .wearPlatform,
-                                    value: value,
+                                    value: value.rawValue,
                                     platforms: [
                                         .firebase,
                                         .customPlatform,

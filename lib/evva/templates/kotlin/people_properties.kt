@@ -8,7 +8,7 @@ sealed class <%= class_name %>(property: <%= enums_class_name %>) {
 	data class <%= property[:class_name] %>(
 		val value: <%= property[:type] %>
 	) : <%= class_name %>(<%= enums_class_name %>.<%= property[:property_name] %>) {
-		override val value = value
+		override val value = value<% if property[:is_special_property] %>.key<% end %>
 		<%- if property[:platforms].count > 0 -%>
 		override val platforms = [
 			<%- property[:platforms].each_with_index do |p, index| -%>
