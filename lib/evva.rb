@@ -46,7 +46,12 @@ module Evva
     end
 
     path = "#{configuration.out_path}/#{configuration.people_file_name}.#{extension}"
-    write_to_file(path, generator.people_properties(bundle[:people], configuration.people_file_name))
+    write_to_file(path, generator.people_properties(bundle[:people], configuration.people_file_name, configuration.people_enum_file_name, configuration.platforms_file_name))
+
+    unless configuration.type.downcase == 'ios'
+      path = "#{configuration.out_path}/#{configuration.people_enum_file_name}.#{extension}"
+      write_to_file(path, generator.people_properties_enum(bundle[:people], configuration.people_enum_file_name))
+    end
 
     path = "#{configuration.out_path}/#{configuration.special_enum_file_name}.#{extension}"
     write_to_file(path, generator.special_property_enums(bundle[:enums]))

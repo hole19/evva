@@ -2,7 +2,7 @@ sealed class <%= class_name %>(event: <%= enums_class_name %>) {
     val name = event.key
 
     open val properties: Map<String, Any?>? = null
-    open val platforms: Array<Platform> = []
+    open val platforms: Array<<%= platforms_class_name %>> = []
 
     <%- events.each_with_index do |e, index| -%>
     <%- if e[:is_object] -%>

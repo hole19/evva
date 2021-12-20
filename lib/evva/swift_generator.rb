@@ -48,11 +48,11 @@ module Evva
       end
     end
 
-    def event_enum(_enum_bundle, _file_name)
+    def event_enum
       # empty
     end
 
-    def people_properties(people_bundle, _file_name)
+    def people_properties(people_bundle, _file_name, _enums_file_name, _platforms_file_name)
       header_footer_wrapper do
         properties = people_bundle.map do |p|
           {
@@ -65,6 +65,10 @@ module Evva
 
         template_from(PEOPLE_PROPERTIES_TEMPLATE).result(binding)
       end
+    end
+
+    def people_properties_enum
+      # empty
     end
 
     def special_property_enums(enums_bundle)

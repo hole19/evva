@@ -24,7 +24,6 @@ Evva automatically generates code for triggering events based on a Google Sheets
 
  data_source:
   type: google_sheet
-  sheet_id: <GOOGLE-DRIVE-SHEET-ID>
   events_url: <GOOGLE-DRIVE-EVENTS-SHEET-URL>
   people_properties_url: <GOOGLE-DRIVE-PEOPLE-PROPERTIES-SHEET-URL>
   enum_classes_url: <GOOGLE-DRIVE-ENUM-CLASSES-SHEET-URL>
@@ -33,5 +32,7 @@ Evva automatically generates code for triggering events based on a Google Sheets
  event_file_name: /file/with/tracking/functions
  event_enum_file_name: /file/with/event/names
  people_file_name: /file/with/people/properties
- special_enum_file_name: //file/with/special/enum/properties/
+ people_file_name: /file/with/people/property/names
+ platforms_file_name: /file/with/platforms
+ special_enum_file_name: /file/with/special/enum/properties/
  ```

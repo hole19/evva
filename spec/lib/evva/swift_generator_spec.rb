@@ -137,7 +137,7 @@ Swift
   end
 
   describe "#people_properties" do
-    subject { generator.people_properties(people_bundle, "") }
+    subject { generator.people_properties(people_bundle, "", "", "") }
 
     let(:people_bundle) { [
       Evva::AnalyticsProperty.new('rounds_with_wear', 'String', ["firebase"]),

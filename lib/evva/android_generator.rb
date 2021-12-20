@@ -7,9 +7,10 @@ module Evva
     end
 
     BASE_TEMPLATE = File.expand_path("./templates/kotlin/base.kt", __dir__)
-    EVENT_ENUM_TEMPLATE = File.expand_path("./templates/kotlin/event_enum.kt", __dir__)
     EVENTS_TEMPLATE = File.expand_path("./templates/kotlin/events.kt", __dir__)
+    EVENT_ENUM_TEMPLATE = File.expand_path("./templates/kotlin/event_enum.kt", __dir__)
     PEOPLE_PROPERTIES_TEMPLATE = File.expand_path("./templates/kotlin/people_properties.kt", __dir__)
+    PEOPLE_PROPERTIES_ENUM_TEMPLATE = File.expand_path("./templates/kotlin/people_properties_enum.kt", __dir__)
     SPECIAL_PROPERTY_ENUMS_TEMPLATE = File.expand_path("./templates/kotlin/special_property_enums.kt", __dir__)
     PLATFORMS_TEMPLATE = File.expand_path("./templates/kotlin/platforms.kt", __dir__)
 
@@ -60,21 +61,6 @@ module Evva
       end
     end
 
-    def people_properties(people_bundle, file_name)
-      header_footer_wrapper do
-        class_name = file_name
-
-        properties = people_bundle.map(&:property_name).map do |property_name|
-          {
-            name: constantize(property_name),
-            value: property_name,
-          }
-        end
-
-        template_from(PEOPLE_PROPERTIES_TEMPLATE).result(binding)
-      end
-    end
-
     def event_enum(bundle, file_name)
       header_footer_wrapper do
         class_name = file_name
@@ -87,6 +73,40 @@ module Evva
         end
 
         template_from(EVENT_ENUM_TEMPLATE).result(binding)
+      end
+    end
+
+    def people_properties(people_bundle, file_name, enums_file_name, platforms_file_name)
+      header_footer_wrapper do
+        class_name = file_name
+        enums_class_name = enums_file_name
+        platforms_class_name = platforms_file_name
+
+        properties = people_bundle.map do |property|
+          {
+            class_name: camelize(property.property_name),
+            property_name: constantize(property.property_name),
+            type: property.type,
+            platforms: property.platforms.map { |p| constantize(p) },
+          }
+        end
+
+        template_from(PEOPLE_PROPERTIES_TEMPLATE).result(binding)
+      end
+    end
+
+    def people_properties_enum(people_bundle, file_name)
+      header_footer_wrapper do
+        class_name = file_name
+
+        properties = people_bundle.map(&:property_name).map do |property_name|
+          {
+            name: constantize(property_name),
+            value: property_name,
+          }
+        end
+
+        template_from(PEOPLE_PROPERTIES_ENUM_TEMPLATE).result(binding)
       end
     end
 

@@ -9,6 +9,7 @@ data_source:
 out_path: analytics
 event_file_name: AnalyticsEvent
 event_enum_file_name: AnalyticsEvents
-people_file_name: AnalyticsProperties
+people_file_name: AnalyticsProperty
+people_enum_file_name: AnalyticsProperties
 platforms_file_name: AnalyticsPlatforms
 package_name: com.package.name.analytics
