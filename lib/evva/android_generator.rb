@@ -6,115 +6,158 @@ module Evva
       @package_name = package_name
     end
 
-    NATIVE_TYPES = %w[Long Int String Double Float Boolean].freeze
+    BASE_TEMPLATE = File.expand_path("./templates/kotlin/base.kt", __dir__)
+    EVENTS_TEMPLATE = File.expand_path("./templates/kotlin/events.kt", __dir__)
+    EVENT_ENUM_TEMPLATE = File.expand_path("./templates/kotlin/event_enum.kt", __dir__)
+    PEOPLE_PROPERTIES_TEMPLATE = File.expand_path("./templates/kotlin/people_properties.kt", __dir__)
+    PEOPLE_PROPERTIES_ENUM_TEMPLATE = File.expand_path("./templates/kotlin/people_properties_enum.kt", __dir__)
+    SPECIAL_PROPERTY_ENUMS_TEMPLATE = File.expand_path("./templates/kotlin/special_property_enums.kt", __dir__)
+    DESTINATIONS_TEMPLATE = File.expand_path("./templates/kotlin/destinations.kt", __dir__)
 
-    def events(bundle, file_name)
+    TAB_SIZE = "    " # \t -> 4 spaces
+
+    NATIVE_TYPES = %w[Long Int String Double Float Boolean Date].freeze
+
+    def events(bundle, file_name, enums_file_name, destinations_file_name)
       header_footer_wrapper do
-"""sealed class #{file_name}(event: AnalyticsEvents) {
-\tval name = event.key
+        class_name = file_name
+        enums_class_name = enums_file_name
+        destinations_class_name = destinations_file_name
 
-\topen val properties: Map<String, Any?>? = null
+        events = bundle.map do |event|
+          properties = event.properties.map do |name, type|
+            param_name = camelize(name.to_s, false)
+            value_fetcher = param_name
 
-#{bundle.map { |e| event_class(e, file_name) }.join("\n\n")}
-}"""
-      end
-    end
+            if is_special_property?(type)
+              if type.end_with?('?')
+                # optional value, we need ? to access a parameter
+                value_fetcher += "?"
+              end
+              value_fetcher += ".key"
+            end
 
-    def people_properties(people_bundle, file_name)
-      header_footer_wrapper do
-        body = "enum class #{file_name}(val key: String) {\n"
-        body << people_bundle.map { |prop| "\t#{prop.upcase}(\"#{prop}\")" }.join(",\n")
-        body << ";\n}"
+            {
+              param_name: param_name,
+              value_fetcher: value_fetcher,
+              type: type,
+              name: name.to_s,
+            }
+          end
+
+          destinations = event.destinations.map { |p| constantize(p) }
+
+          {
+            class_name: camelize(event.event_name),
+            event_name: constantize(event.event_name),
+            properties: properties,
+            destinations: destinations,
+            is_object: properties.count == 0 && destinations.count == 0,
+          }
+        end
+
+        template_from(EVENTS_TEMPLATE).result(binding)
       end
     end
 
     def event_enum(bundle, file_name)
       header_footer_wrapper do
-        body = "enum class #{file_name}(val key: String) {\n"
-        body << bundle.map(&:event_name).map { |prop| "\t#{prop.upcase}(\"#{prop}\")" }.join(",\n")
-        body << ";\n}"
+        class_name = file_name
+
+        events = bundle.map(&:event_name).map do |event_name|
+          {
+            name: constantize(event_name),
+            value: event_name,
+          }
+        end
+
+        template_from(EVENT_ENUM_TEMPLATE).result(binding)
       end
     end
 
-    def special_property_enums(enums)
+    def people_properties(people_bundle, file_name, enums_file_name, destinations_file_name)
       header_footer_wrapper do
-        enums.map do |enum|
-          body = "enum class #{enum.enum_name}(val key: String) {\n"
-          body << enum.values.map { |vals| "\t#{vals.tr(' ', '_').upcase}(\"#{vals}\")"}.join(",\n")
-          body << ";\n}"
-        end.join("\n\n")
+        class_name = file_name
+        enums_class_name = enums_file_name
+        destinations_class_name = destinations_file_name
+
+        properties = people_bundle.map do |property|
+          {
+            class_name: camelize(property.property_name),
+            property_name: constantize(property.property_name),
+            type: property.type,
+            is_special_property: is_special_property?(property.type),
+            destinations: property.destinations.map { |p| constantize(p) },
+          }
+        end
+
+        template_from(PEOPLE_PROPERTIES_TEMPLATE).result(binding)
+      end
+    end
+
+    def people_properties_enum(people_bundle, file_name)
+      header_footer_wrapper do
+        class_name = file_name
+
+        properties = people_bundle.map(&:property_name).map do |property_name|
+          {
+            name: constantize(property_name),
+            value: property_name,
+          }
+        end
+
+        template_from(PEOPLE_PROPERTIES_ENUM_TEMPLATE).result(binding)
+      end
+    end
+
+    def special_property_enums(enums_bundle)
+      header_footer_wrapper do
+        enums = enums_bundle.map do |enum|
+          values = enum.values.map do |value|
+            {
+              name: constantize(value),
+              value: value,
+            }
+          end
+
+          {
+            class_name: enum.enum_name,
+            values: values,
+          }
+        end
+
+        template_from(SPECIAL_PROPERTY_ENUMS_TEMPLATE).result(binding)
+      end
+    end
+
+    def destinations(bundle, file_name)
+      header_footer_wrapper do
+        class_name = file_name
+
+        destinations = bundle.map { |d| constantize(d) }
+
+        template_from(DESTINATIONS_TEMPLATE).result(binding)
       end
     end
 
     private
 
-    def imports_header(imports = [])
-      return unless imports.length > 0
-      imports.map { |ev| ev. gsub("packagename", @package_name) }
-             .join("\n") + "\n\n"
+    def header_footer_wrapper
+      package_name = @package_name
+
+      content = yield
+        .chop # trim trailing newlines created by sublime
+
+      template_from(BASE_TEMPLATE).result(binding).gsub("\t", TAB_SIZE)
     end
 
-    def header_footer_wrapper(imports = [])
-<<-Kotlin
-package #{@package_name}
+    def template_from(path)
+      file = File.read(path)
 
-#{imports_header(imports)}/**
- * This file was automatically generated by evva: https://github.com/hole19/evva
- */
-
-#{yield.gsub("\t", "    ")}
-Kotlin
-    end
-
-    def event_class(event_data, superclass_name)
-      class_name = camelize(event_data.event_name)
-      class_arguments = event_data.properties.map { |name, type| "val #{camelize(name, false)}: #{type}" }.join(', ')
-      if !class_arguments.empty?
-        props = props_map(event_data.properties)
-
-"""\tdata class #{class_name}(
-\t\t#{class_arguments}
-\t) : #{superclass_name}(AnalyticsEvents.#{event_data.event_name.upcase}) {
-#{props}
-\t}"""
-
-      else
-"""\tobject #{class_name} : #{superclass_name}(AnalyticsEvents.#{event_data.event_name.upcase})"""
-      end
-    end
-
-    def props_map(properties)
-      split_properties =
-        properties
-        .map.with_index do |data, index|
-          name, type = data
-          prop = "\t\t\t\"#{name}\" to #{camelize(name, false)}"
-
-          if special_property?(type)
-            if optional_property?(type)
-              prop = "#{prop}?"
-            end
-            prop = "#{prop}.key"
-          end
-
-          if index < properties.size - 1
-            # add list comma to every property except the last one
-            prop = "#{prop},"
-          end
-
-          prop
-        end
-        .join("\n")
-
-      "\t\toverride val properties = mapOf(\n#{split_properties}\n\t\t)"
-    end
-
-    def special_property?(type)
-      !NATIVE_TYPES.include?(type.chomp('?'))
-    end
-
-    def optional_property?(type)
-      type.include?('?')
+      # - 2nd argument (nil) changes nothing
+      # - 3rd argument activates trim mode using "-" so that you can decide to
+      # not include a line (useful on loops and if statements)
+      ERB.new(file, nil, '-')
     end
 
     # extracted from Rails' ActiveSupport
@@ -126,6 +169,14 @@ Kotlin
         string = string.sub(/^(?:(?=\b|[A-Z_])|\w)/) { |match| match.downcase }
       end
       string.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub("/", "::")
+    end
+
+    def constantize(string)
+      string.tr(' ', '_').upcase
+    end
+
+    def is_special_property?(type)
+      !NATIVE_TYPES.include?(type.chomp('?'))
     end
   end
 end

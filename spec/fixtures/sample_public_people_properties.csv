@@ -1,3 +1,4 @@
-Property Name,Comments
-rounds_with_wear,asldkaslkdlaksd
-total_friends,
+Property Name,Property Type,Property Destination
+rounds_with_wear,String,"firebase,custom destination"
+total_friends,Int,
+wearable_platform,WearableAppPlatform,firebase

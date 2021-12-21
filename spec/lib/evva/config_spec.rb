@@ -12,9 +12,11 @@ describe Evva::Config do
       },
       out_path: 'clear/path/to/event',
       event_file_name: 'event/file/name',
-      people_file_name: 'people/file/name',
       event_enum_file_name: 'event/enum/file',
-      package_name:         'com.package.name.analytics'
+      people_file_name: 'people/file/name',
+      people_enum_file_name: 'people/enum/file/name',
+      destinations_file_name: 'destinations/file/name',
+      package_name: 'com.package.name.analytics',
     }
   end
 
@@ -27,8 +29,10 @@ describe Evva::Config do
   its(:type) { should eq('EvvaOS') }
   its(:out_path) { should eq('clear/path/to/event') }
   its(:event_file_name) { should eq('event/file/name') }
-  its(:people_file_name) { should eq('people/file/name') }
   its(:event_enum_file_name) { should eq 'event/enum/file' }
+  its(:people_file_name) { should eq('people/file/name') }
+  its(:people_enum_file_name) { should eq('people/enum/file/name') }
+  its(:destinations_file_name) { should eq 'destinations/file/name' }
   its(:package_name) { should eq 'com.package.name.analytics' }
 
   describe '#data_source' do

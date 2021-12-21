@@ -1,121 +1,132 @@
+require 'erb'
+
 module Evva
   class SwiftGenerator
-    EXTENSION_HEADER =
-      "\nimport Foundation\n\n"\
-      "extension Analytics {\n\n".freeze
+    BASE_TEMPLATE = File.expand_path("./templates/swift/base.swift", __dir__)
+    EVENTS_TEMPLATE = File.expand_path("./templates/swift/events.swift", __dir__)
+    PEOPLE_PROPERTIES_TEMPLATE = File.expand_path("./templates/swift/people_properties.swift", __dir__)
+    SPECIAL_PROPERTY_ENUMS_TEMPLATE = File.expand_path("./templates/swift/special_property_enums.swift", __dir__)
+    DESTINATIONS_TEMPLATE = File.expand_path("./templates/swift/destinations.swift", __dir__)
 
-    EXTENSION_FOOTER =
-      "\n\n}\n"
+    TAB_SIZE = "    " # \t -> 4 spaces
 
-    NATIVE_TYPES = %w[Int String Double Float Bool].freeze
+    NATIVE_TYPES = %w[Int String Double Float Bool Date].freeze
 
-    def events(bundle, file_name)
+    def events(bundle, _file_name, _enums_file_name, _destinations_file_name)
       header_footer_wrapper do
-"""\tenum Event {
-#{bundle.map { |e| event_case(e) }.join("\n")}
+        events = bundle.map do |event|
+          properties = event.properties.map { |k, v|
+            type = native_type(v)
 
-\t\tvar data: EventData {
-\t\t\tswitch self {
-#{bundle.map { |e| event_data(e) }.join("\n\n")}
-\t\t\t}
-\t\t}
-\t}"""
+            value_fetcher = k.to_s
+
+            if is_special_property?(type)
+              if type.end_with?('?')
+                # optional value, we need ? to access a parameter
+                value_fetcher += "?"
+              end
+              value_fetcher += ".rawValue"
+            end
+
+            {
+              name: k.to_s,
+              type: type,
+              value: value_fetcher,
+            }
+          }
+
+          {
+            case_name: camelize(event.event_name),
+            event_name: event.event_name,
+            properties: properties,
+            destinations: event.destinations.map { |p| camelize(p) },
+          }
+        end
+
+        template_from(EVENTS_TEMPLATE).result(binding)
       end
     end
 
-    def event_case(event_data)
-      function_name = camelize(event_data.event_name)
-      if event_data.properties.empty?
-        "\t\tcase #{function_name}"
-      else
-        trimmed_properties = event_data.properties.map { |k, v| k.to_s + ': ' + native_type(v) }.join(", ")
-        "\t\tcase #{function_name}(#{trimmed_properties})"
-      end
-    end
-
-    def event_data(event_data)
-      function_name = camelize(event_data.event_name)
-      if event_data.properties.empty?
-        function_body = "\t\t\tcase .#{function_name}:\n" \
-                        "\t\t\t\treturn EventData(name: \"#{event_data.event_name}\")"
-      else
-        function_header = prepend_let(event_data.properties)
-        function_arguments = dictionary_pairs(event_data.properties)
-        function_body = "\t\t\tcase .#{function_name}(#{function_header}):\n"\
-                        "\t\t\t\treturn EventData(name: \"#{event_data.event_name}\", properties: [\n"\
-                        "\t\t\t\t\t#{function_arguments.join(",\n\t\t\t\t\t")} ]\n"\
-                        "\t\t\t\t)"
-      end
-      function_body
-    end
-
-    def event_enum(enum, file_name)
+    def event_enum
       # empty
     end
 
-    def people_properties(people_bundle, file_name)
+    def people_properties(people_bundle, _file_name, _enums_file_name, _destinations_file_name)
       header_footer_wrapper do
-        props = "\tenum Property: String {\n"
-        people_bundle.each do |prop|
-          props << "\t\tcase #{camelize(prop)} = \"#{prop}\"\n"
+        properties = people_bundle.map do |p|
+          type = native_type(p.type)
+          {
+            case_name: camelize(p.property_name),
+            property_name: p.property_name,
+            type: type,
+            is_special_property: is_special_property?(type),
+            destinations: p.destinations.map { |p| camelize(p) },
+          }
         end
-        props << "\t}"
+
+        template_from(PEOPLE_PROPERTIES_TEMPLATE).result(binding)
       end
     end
 
-    def special_property_enums(enums)
+    def people_properties_enum
+      # empty
+    end
+
+    def special_property_enums(enums_bundle)
       header_footer_wrapper do
-        enums.map do |enum|
-          body = "\tenum #{enum.enum_name}: String {\n"
-          enum.values.each do |value|
-            body << "\t\tcase #{camelize(value)} = \"#{value}\"\n"
+        enums = enums_bundle.map do |enum|
+          values = enum.values.map do |value|
+            {
+              case_name: camelize(value),
+              value: value
+            }
           end
-          body << "\t}"
-        end.join("\n\n")
+
+          {
+            name: enum.enum_name,
+            values: values
+          }
+        end
+
+        template_from(SPECIAL_PROPERTY_ENUMS_TEMPLATE).result(binding)
+      end
+    end
+
+    def destinations(destinations_bundle, _file_name)
+      header_footer_wrapper do
+        destinations = destinations_bundle.map { |p| camelize(p) }
+
+        template_from(DESTINATIONS_TEMPLATE).result(binding)
       end
     end
 
     private
 
     def header_footer_wrapper
-"""// This file was automatically generated by evva: https://github.com/hole19/evva
+      content = yield
+        .gsub(/^/, "\t").gsub(/^\t+$/, "") # add tabs, unless it's an empty line
+        .chop # trim trailing newlines created by sublime
 
-import Foundation
-
-extension Analytics {
-
-#{yield.gsub("\t", "    ")}
-}
-"""
+      template_from(BASE_TEMPLATE).result(binding).gsub("\t", TAB_SIZE)
     end
 
-    def dictionary_pairs(props)
-      props.map do |name, type|
-        pair = "\"#{name}\": #{name}"
-        if is_raw_representable_property?(type)
-          if is_optional_property?(type)
-            pair += "?"
-          end
-          pair += ".rawValue"
-        end
-        pair += " as Any"
-      end
-    end
+    def template_from(path)
+      file = File.read(path)
 
-    def is_raw_representable_property?(type)
-      !NATIVE_TYPES.include?(native_type(type).chomp('?'))
-    end
-
-    def is_optional_property?(type)
-      type.end_with?('?')
+      # - 2nd argument (nil) changes nothing
+      # - 3rd argument activates trim mode using "-" so that you can decide to
+      # not include a line (useful on loops and if statements)
+      ERB.new(file, nil, '-')
     end
 
     def native_type(type)
-      type.gsub('Boolean','Bool').gsub('Long', 'Int')
+      type
+        .gsub('Boolean','Bool')
+        .gsub('Long', 'Int')
     end
 
-    def prepend_let(props)
-      props.map { |k, v| "let #{k}" }.join(', ')
+    def is_special_property?(type)
+      !NATIVE_TYPES.include?(type.chomp('?'))
     end
 
     def camelize(term)
@@ -125,6 +136,5 @@ extension Analytics {
       string.gsub!("/".freeze, "::".freeze)
       string
     end
-
   end
 end

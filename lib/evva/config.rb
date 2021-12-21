@@ -31,16 +31,24 @@ module Evva
       @hash[:event_file_name]
     end
 
-    def people_file_name
-      @hash[:people_file_name]
-    end
-
     def event_enum_file_name
       @hash[:event_enum_file_name]
     end
 
+    def people_file_name
+      @hash[:people_file_name]
+    end
+
+    def people_enum_file_name
+      @hash[:people_enum_file_name]
+    end
+
     def special_enum_file_name
       @hash[:special_enum_file_name]
+    end
+
+    def destinations_file_name
+      @hash[:destinations_file_name]
     end
 
     def package_name
@@ -58,6 +66,8 @@ module Evva
         event_file_name: { type: String },
         event_enum_file_name: { type: String },
         people_file_name: { type: String },
+        people_enum_file_name: { type: String },
+        destinations_file_name: { type: String },
         package_name: { type: String }
       }
     }.freeze

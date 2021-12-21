@@ -7,6 +7,7 @@ require 'evva/config'
 require 'evva/file_reader'
 require 'evva/analytics_event'
 require 'evva/analytics_enum'
+require 'evva/analytics_property'
 require 'evva/object_extension'
 require 'evva/version'
 require 'evva/android_generator'
@@ -37,7 +38,7 @@ module Evva
 
   def evva_write(bundle, generator, configuration, extension)
     path = "#{configuration.out_path}/#{configuration.event_file_name}.#{extension}"
-    write_to_file(path, generator.events(bundle[:events], configuration.event_file_name))
+    write_to_file(path, generator.events(bundle[:events], configuration.event_file_name, configuration.event_enum_file_name, configuration.destinations_file_name))
 
     unless configuration.type.downcase == 'ios'
       path = "#{configuration.out_path}/#{configuration.event_enum_file_name}.#{extension}"
@@ -45,10 +46,18 @@ module Evva
     end
 
     path = "#{configuration.out_path}/#{configuration.people_file_name}.#{extension}"
-    write_to_file(path, generator.people_properties(bundle[:people], configuration.people_file_name))
+    write_to_file(path, generator.people_properties(bundle[:people], configuration.people_file_name, configuration.people_enum_file_name, configuration.destinations_file_name))
+
+    unless configuration.type.downcase == 'ios'
+      path = "#{configuration.out_path}/#{configuration.people_enum_file_name}.#{extension}"
+      write_to_file(path, generator.people_properties_enum(bundle[:people], configuration.people_enum_file_name))
+    end
 
     path = "#{configuration.out_path}/#{configuration.special_enum_file_name}.#{extension}"
     write_to_file(path, generator.special_property_enums(bundle[:enums]))
+
+    path = "#{configuration.out_path}/#{configuration.destinations_file_name}.#{extension}"
+    write_to_file(path, generator.destinations(bundle[:destinations], configuration.destinations_file_name))
   end
 
   def analytics_data(config:)
@@ -61,6 +70,7 @@ module Evva
     events_bundle[:events] = source.events
     events_bundle[:people] = source.people_properties
     events_bundle[:enums] = source.enum_classes
+    events_bundle[:destinations] = source.destinations
     events_bundle
   end
 

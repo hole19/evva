@@ -6,12 +6,10 @@ describe Evva do
 
     before do
       allow_any_instance_of(Evva::FileReader).to receive(:open_file).and_return(file)
-      allow_any_instance_of(Evva::GoogleSheet).to receive(:events).and_return(
-        [Evva::AnalyticsEvent.new('trackEvent',[])])
-
+      allow_any_instance_of(Evva::GoogleSheet).to receive(:events).and_return([])
       allow_any_instance_of(Evva::GoogleSheet).to receive(:people_properties).and_return([])
       allow_any_instance_of(Evva::GoogleSheet).to receive(:enum_classes).and_return([])
-
+      allow_any_instance_of(Evva::GoogleSheet).to receive(:destinations).and_return([])
       allow(Evva).to receive(:write_to_file)
     end
 

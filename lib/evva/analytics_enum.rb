@@ -1,6 +1,7 @@
 module Evva
   class AnalyticsEnum
     attr_reader :enum_name, :values
+
     def initialize(enum_name, values)
       @enum_name = enum_name
       @values = values

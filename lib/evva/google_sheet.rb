@@ -3,6 +3,17 @@ require 'csv'
 
 module Evva
   class GoogleSheet
+    EVENT_NAME = 'Event Name'
+    EVENT_PROPERTIES = 'Event Properties'
+    EVENT_DESTINATION = 'Event Destination'
+
+    PROPERTY_NAME = 'Property Name'
+    PROPERTY_TYPE = 'Property Type'
+    PROPERTY_DESTINATION = 'Property Destination'
+
+    ENUM_NAME = 'Enum Name'
+    ENUM_VALUES = 'Possible Values'
+
     def initialize(events_url, people_properties_url, enum_classes_url)
       @events_url = events_url
       @people_properties_url = people_properties_url
@@ -10,41 +21,48 @@ module Evva
     end
 
     def events
-      Logger.info("Downloading data from Google Sheet at #{@events_url}")
-      csv = get_csv(@events_url)
-
-      event_list = []
-      csv.each do |row|
-        event_name = row['Event Name']
-        properties = hash_parser(row['Event Properties'])
-        event_list << Evva::AnalyticsEvent.new(event_name, properties)
+      @events_csv ||= begin
+        Logger.info("Downloading data from Google Sheet at #{@events_url}")
+        get_csv(@events_url)
       end
-      event_list
+
+      @events ||= @events_csv.map do |row|
+        event_name = row[EVENT_NAME]
+        properties = hash_parser(row[EVENT_PROPERTIES])
+        destinations = row[EVENT_DESTINATION]&.split(',')
+        Evva::AnalyticsEvent.new(event_name, properties, destinations || [])
+      end
     end
 
     def people_properties
-      Logger.info("Downloading data from Google Sheet at #{@people_properties_url}")
-      csv = get_csv(@people_properties_url)
-
-      people_list = []
-      csv.each do |row|
-        value = row['Property Name']
-        people_list << value
+      @people_properties_csv ||= begin
+        Logger.info("Downloading data from Google Sheet at #{@people_properties_url}")
+        get_csv(@people_properties_url)
       end
-      people_list
+
+      @people_properties ||= @people_properties_csv.map do |row|
+        property_name = row[PROPERTY_NAME]
+        property_type = row[PROPERTY_TYPE]
+        destinations = row[PROPERTY_DESTINATION]&.split(',')
+        Evva::AnalyticsProperty.new(property_name, property_type, destinations || [])
+      end
     end
 
     def enum_classes
-      Logger.info("Downloading data from Google Sheet at #{@enum_classes_url}")
-      csv = get_csv(@enum_classes_url)
-
-      enum_list = []
-      csv.each do |row|
-        enum_name = row['Enum Name']
-        values = row['Possible Values'].split(',')
-        enum_list << Evva::AnalyticsEnum.new(enum_name, values)
+      @enum_classes_csv ||= begin
+        Logger.info("Downloading data from Google Sheet at #{@enum_classes_url}")
+        get_csv(@enum_classes_url)
       end
-      enum_list
+
+      @enum_classes ||= @enum_classes_csv.map do |row|
+        enum_name = row[ENUM_NAME]
+        values = row[ENUM_VALUES].split(',')
+        Evva::AnalyticsEnum.new(enum_name, values)
+      end
+    end
+
+    def destinations
+      @destinations ||= events.map(&:destinations).flatten.uniq
     end
 
     private

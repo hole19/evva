@@ -2,14 +2,14 @@ describe Evva::SwiftGenerator do
   let(:generator) { described_class.new }
 
   describe '#events' do
-    subject { generator.events(event_bundle, "") }
+    subject { generator.events(event_bundle, nil, nil, nil) }
 
     let(:event_bundle) { [
-      Evva::AnalyticsEvent.new('cp_page_view'),
-      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }),
-      Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }),
-      Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }),
-      Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' })
+      Evva::AnalyticsEvent.new('cp_page_view', {}, ['firebase']),
+      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }, ['firebase', 'Custom Destination']),
+      Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }, []),
+      Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }, []),
+      Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' }, []),
     ] }
 
     let(:expected) {
@@ -19,6 +19,29 @@ describe Evva::SwiftGenerator do
 import Foundation
 
 extension Analytics {
+    struct EventData {
+        let name: String
+        var properties: [String: Any]?
+        let destinations: [Destination]
+
+        init(name: String, properties: [String: Any]?, destinations: [Destination]) {
+            self.name = name
+            self.properties = properties
+            self.destinations = destinations
+        }
+
+        init(name: EventName, properties: [String: Any]?, destinations: [Destination]) {
+            self.init(name: name.rawValue, properties: properties, destinations: destinations)
+        }
+    }
+
+    enum EventName: String {
+        case cpPageView = "cp_page_view"
+        case cpPageViewA = "cp_page_view_a"
+        case cpPageViewB = "cp_page_view_b"
+        case cpPageViewC = "cp_page_view_c"
+        case cpPageViewD = "cp_page_view_d"
+    }
 
     enum Event {
         case cpPageView
@@ -30,33 +53,48 @@ extension Analytics {
         var data: EventData {
             switch self {
             case .cpPageView:
-                return EventData(name: "cp_page_view")
+                return EventData(name: .cpPageView,
+                                 properties: nil,
+                                 destinations: [
+                                    .firebase,
+                                 ])
 
-            case .cpPageViewA(let course_id, let course_name):
-                return EventData(name: "cp_page_view_a", properties: [
-                    "course_id": course_id as Any,
-                    "course_name": course_name as Any ]
-                )
+            case let .cpPageViewA(course_id, course_name):
+                return EventData(name: .cpPageViewA,
+                                 properties: [
+                                    "course_id": course_id as Any,
+                                    "course_name": course_name as Any,
+                                 ],
+                                 destinations: [
+                                    .firebase,
+                                    .customDestination,
+                                 ])
 
-            case .cpPageViewB(let course_id, let course_name, let from_screen):
-                return EventData(name: "cp_page_view_b", properties: [
-                    "course_id": course_id as Any,
-                    "course_name": course_name as Any,
-                    "from_screen": from_screen.rawValue as Any ]
-                )
+            case let .cpPageViewB(course_id, course_name, from_screen):
+                return EventData(name: .cpPageViewB,
+                                 properties: [
+                                    "course_id": course_id as Any,
+                                    "course_name": course_name as Any,
+                                    "from_screen": from_screen.rawValue as Any,
+                                 ],
+                                 destinations: [])
 
-            case .cpPageViewC(let course_id, let course_name, let from_screen):
-                return EventData(name: "cp_page_view_c", properties: [
-                    "course_id": course_id as Any,
-                    "course_name": course_name as Any,
-                    "from_screen": from_screen?.rawValue as Any ]
-                )
+            case let .cpPageViewC(course_id, course_name, from_screen):
+                return EventData(name: .cpPageViewC,
+                                 properties: [
+                                    "course_id": course_id as Any,
+                                    "course_name": course_name as Any,
+                                    "from_screen": from_screen?.rawValue as Any,
+                                 ],
+                                 destinations: [])
 
-            case .cpPageViewD(let course_id, let course_name):
-                return EventData(name: "cp_page_view_d", properties: [
-                    "course_id": course_id as Any,
-                    "course_name": course_name as Any ]
-                )
+            case let .cpPageViewD(course_id, course_name):
+                return EventData(name: .cpPageViewD,
+                                 properties: [
+                                    "course_id": course_id as Any,
+                                    "course_name": course_name as Any,
+                                 ],
+                                 destinations: [])
             }
         }
     }
@@ -72,7 +110,7 @@ Swift
 
     let(:enums) { [
       Evva::AnalyticsEnum.new('CourseProfileSource', ['course_discovery', 'synced_courses']),
-      Evva::AnalyticsEnum.new('PremiumFrom', ['Course Profile', 'Round Setup'])
+      Evva::AnalyticsEnum.new('PremiumFrom', ['Course Profile', 'Round Setup']),
     ] }
 
     let(:expected) {
@@ -82,7 +120,6 @@ Swift
 import Foundation
 
 extension Analytics {
-
     enum CourseProfileSource: String {
         case courseDiscovery = "course_discovery"
         case syncedCourses = "synced_courses"
@@ -100,9 +137,13 @@ Swift
   end
 
   describe "#people_properties" do
-    subject { generator.people_properties(people_bundle, "") }
+    subject { generator.people_properties(people_bundle, "", "", "") }
 
-    let(:people_bundle) { ['rounds_with_wear', 'friends_from_facebook'] }
+    let(:people_bundle) { [
+      Evva::AnalyticsProperty.new('rounds_with_wear', 'String', ["firebase"]),
+      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', ["firebase", "custom destination"]),
+      Evva::AnalyticsProperty.new('number_of_times_it_happened', 'Long', []),
+    ] }
 
     let(:expected) {
 <<-Swift
@@ -111,10 +152,82 @@ Swift
 import Foundation
 
 extension Analytics {
+    struct PropertyData {
+        let name: String
+        let value: Any
+        let destinations: [Destination]
 
-    enum Property: String {
+        init(name: String, value: Any, destinations: [Destination]) {
+            self.name = name
+            self.value = value
+            self.destinations = destinations
+        }
+
+        init(name: PropertyName, value: Any, destinations: [Destination]) {
+            self.init(name: name.rawValue, value: value, destinations: destinations)
+        }
+    }
+
+    enum PropertyName: String {
         case roundsWithWear = "rounds_with_wear"
-        case friendsFromFacebook = "friends_from_facebook"
+        case wearPlatform = "wear_platform"
+        case numberOfTimesItHappened = "number_of_times_it_happened"
+    }
+
+    enum Property {
+        case roundsWithWear(String)
+        case wearPlatform(WearableAppPlatform)
+        case numberOfTimesItHappened(Int)
+
+        var data: PropertyData {
+            switch self {
+            case let .roundsWithWear(value):
+                return PropertyData(name: .roundsWithWear,
+                                    value: value,
+                                    destinations: [
+                                        .firebase,
+                                    ])
+
+            case let .wearPlatform(value):
+                return PropertyData(name: .wearPlatform,
+                                    value: value.rawValue,
+                                    destinations: [
+                                        .firebase,
+                                        .customDestination,
+                                    ])
+
+            case let .numberOfTimesItHappened(value):
+                return PropertyData(name: .numberOfTimesItHappened,
+                                    value: value,
+                                    destinations: [])
+            }
+        }
+    }
+}
+Swift
+    }
+
+    it { should eq expected }
+  end
+
+  describe "#destinations" do
+    subject { generator.destinations(destinations, "") }
+
+    let(:destinations) { [
+      'firebase',
+      'whatever you want really'
+    ] }
+
+    let(:expected) {
+<<-Swift
+// This file was automatically generated by evva: https://github.com/hole19/evva
+
+import Foundation
+
+extension Analytics {
+    enum Destination {
+        case firebase
+        case whateverYouWantReally
     }
 }
 Swift

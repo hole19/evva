@@ -22,9 +22,11 @@ describe Evva::GoogleSheet do
     end
 
     it 'returns an array with the corresponding events' do
-      expected = [Evva::AnalyticsEvent.new('cp_page_view', { course_id: 'Long', course_name: 'String' }),
-                  Evva::AnalyticsEvent.new('nav_feed_tap', {}),
-                  Evva::AnalyticsEvent.new('cp_view_scorecard', { course_id: 'Long', course_name: 'String' })]
+      expected = [
+        Evva::AnalyticsEvent.new('cp_page_view', { course_id: 'Long', course_name: 'String' }, ['firebase', 'custom destination']),
+        Evva::AnalyticsEvent.new('nav_feed_tap', {}, []),
+        Evva::AnalyticsEvent.new('cp_view_scorecard', { course_id: 'Long', course_name: 'String' }, ['custom destination']),
+      ]
       expect(events).to eq(expected)
     end
 
@@ -54,8 +56,9 @@ describe Evva::GoogleSheet do
 
     it 'returns an array with the corresponding events' do
       expect(people_properties).to eq [
-        'rounds_with_wear',
-        'total_friends'
+        Evva::AnalyticsProperty.new('rounds_with_wear', 'String', ['firebase', 'custom destination']),
+        Evva::AnalyticsProperty.new('total_friends', 'Int', []),
+        Evva::AnalyticsProperty.new('wearable_platform', 'WearableAppPlatform', ['firebase']),
       ]
     end
   end
@@ -71,6 +74,21 @@ describe Evva::GoogleSheet do
       expect(enum_classes).to eq [
         Evva::AnalyticsEnum.new('PageViewSourceScreen', ['course_discovery','synced_courses','nearby','deal']),
         Evva::AnalyticsEnum.new('PremiumClickBuy', ['notes','hi_res_maps','whatever'])
+      ]
+    end
+  end
+
+  describe '#destinations' do
+    subject(:destinations) { sheet.destinations }
+
+    it do
+      expect { destinations }.not_to raise_error
+    end
+
+    it 'returns an array with the corresponding events' do
+      expect(destinations).to eq [
+        'firebase',
+        'custom destination',
       ]
     end
   end
