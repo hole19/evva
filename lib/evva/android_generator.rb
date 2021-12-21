@@ -16,7 +16,7 @@ module Evva
 
     TAB_SIZE = "    " # \t -> 4 spaces
 
-    NATIVE_TYPES = %w[Long Int String Double Float Boolean].freeze
+    NATIVE_TYPES = %w[Long Int String Double Float Boolean Date].freeze
 
     def events(bundle, file_name, enums_file_name, platforms_file_name)
       header_footer_wrapper do
