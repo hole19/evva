@@ -1,17 +1,17 @@
 module Evva
   class AnalyticsProperty
-    attr_reader :property_name, :type, :platforms
+    attr_reader :property_name, :type, :destinations
 
-    def initialize(property_name, type, platforms)
+    def initialize(property_name, type, destinations)
       @property_name = property_name
       @type = type
-      @platforms = platforms
+      @destinations = destinations
     end
 
     def ==(other)
       property_name == other.property_name &&
       type == other.type &&
-      platforms == other.platforms
+      destinations == other.destinations
     end
   end
 end

@@ -9,7 +9,7 @@ describe Evva do
       allow_any_instance_of(Evva::GoogleSheet).to receive(:events).and_return([])
       allow_any_instance_of(Evva::GoogleSheet).to receive(:people_properties).and_return([])
       allow_any_instance_of(Evva::GoogleSheet).to receive(:enum_classes).and_return([])
-      allow_any_instance_of(Evva::GoogleSheet).to receive(:platforms).and_return([])
+      allow_any_instance_of(Evva::GoogleSheet).to receive(:destinations).and_return([])
       allow(Evva).to receive(:write_to_file)
     end
 

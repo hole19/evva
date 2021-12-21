@@ -5,11 +5,11 @@ module Evva
   class GoogleSheet
     EVENT_NAME = 'Event Name'
     EVENT_PROPERTIES = 'Event Properties'
-    EVENT_PLATFORMS = 'Event Destination'
+    EVENT_DESTINATION = 'Event Destination'
 
     PROPERTY_NAME = 'Property Name'
     PROPERTY_TYPE = 'Property Type'
-    PROPERTY_PLATFORMS = 'Property Destination'
+    PROPERTY_DESTINATION = 'Property Destination'
 
     ENUM_NAME = 'Enum Name'
     ENUM_VALUES = 'Possible Values'
@@ -29,8 +29,8 @@ module Evva
       @events ||= @events_csv.map do |row|
         event_name = row[EVENT_NAME]
         properties = hash_parser(row[EVENT_PROPERTIES])
-        platforms = row[EVENT_PLATFORMS]&.split(',')
-        Evva::AnalyticsEvent.new(event_name, properties, platforms || [])
+        destinations = row[EVENT_DESTINATION]&.split(',')
+        Evva::AnalyticsEvent.new(event_name, properties, destinations || [])
       end
     end
 
@@ -43,8 +43,8 @@ module Evva
       @people_properties ||= @people_properties_csv.map do |row|
         property_name = row[PROPERTY_NAME]
         property_type = row[PROPERTY_TYPE]
-        platforms = row[PROPERTY_PLATFORMS]&.split(',')
-        Evva::AnalyticsProperty.new(property_name, property_type, platforms || [])
+        destinations = row[PROPERTY_DESTINATION]&.split(',')
+        Evva::AnalyticsProperty.new(property_name, property_type, destinations || [])
       end
     end
 
@@ -61,8 +61,8 @@ module Evva
       end
     end
 
-    def platforms
-      @platforms ||= events.map(&:platforms).flatten.uniq
+    def destinations
+      @destinations ||= events.map(&:destinations).flatten.uniq
     end
 
     private

@@ -1,16 +1,16 @@
 struct PropertyData {
 	let name: String
 	let value: Any
-	let platforms: [Platform]
+	let destinations: [Destination]
 
-	init(name: String, value: Any, platforms: [Platform]) {
+	init(name: String, value: Any, destinations: [Destination]) {
 		self.name = name
 		self.value = value
-		self.platforms = platforms
+		self.destinations = destinations
 	}
 
-	init(name: PropertyName, value: Any, platforms: [Platform]) {
-		self.init(name: name.rawValue, value: value, platforms: platforms)
+	init(name: PropertyName, value: Any, destinations: [Destination]) {
+		self.init(name: name.rawValue, value: value, destinations: destinations)
 	}
 }
 
@@ -31,12 +31,12 @@ enum Property {
 		case let .<%= p[:case_name] %>(value):
 			return PropertyData(name: .<%= p[:case_name] %>,
 								value: value<% if p[:is_special_property] %>.rawValue<% end %>,
-			<%- if p[:platforms].count == 0 -%>
-								platforms: [])
+			<%- if p[:destinations].count == 0 -%>
+								destinations: [])
 			<%- else -%>
-								platforms: [
-				<%- p[:platforms].each do |p| -%>
-									.<%= p %>,
+								destinations: [
+				<%- p[:destinations].each do |d| -%>
+									.<%= d %>,
 				<%- end -%>
 								])
 			<%- end -%>

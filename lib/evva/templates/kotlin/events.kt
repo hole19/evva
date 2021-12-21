@@ -2,7 +2,7 @@ sealed class <%= class_name %>(event: <%= enums_class_name %>) {
     val name = event.key
 
     open val properties: Map<String, Any?>? = null
-    open val platforms: Array<<%= platforms_class_name %>> = []
+    open val destinations: Array<<%= destinations_class_name %>> = []
 
     <%- events.each_with_index do |e, index| -%>
     <%- if e[:is_object] -%>
@@ -18,10 +18,10 @@ sealed class <%= class_name %>(event: <%= enums_class_name %>) {
             <%- end -%>
         )
         <%- end -%>
-        <%- if e[:platforms].count > 0 -%>
-        override val platforms = [
-            <%- e[:platforms].each_with_index do |p, index| -%>
-            <%= platforms_class_name %>.<%= p %><% if index < e[:platforms].count - 1 %>,<% end %>
+        <%- if e[:destinations].count > 0 -%>
+        override val destinations = [
+            <%- e[:destinations].each_with_index do |d, index| -%>
+            <%= destinations_class_name %>.<%= d %><% if index < e[:destinations].count - 1 %>,<% end %>
             <%- end -%>
         ]
         <%- end -%>

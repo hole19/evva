@@ -1,4 +1,4 @@
 Property Name,Property Type,Property Destination
-rounds_with_wear,String,"firebase,custom platform"
+rounds_with_wear,String,"firebase,custom destination"
 total_friends,Int,
 wearable_platform,WearableAppPlatform,firebase

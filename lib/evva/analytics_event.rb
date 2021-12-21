@@ -1,17 +1,17 @@
 module Evva
   class AnalyticsEvent
-    attr_reader :event_name, :properties, :platforms
+    attr_reader :event_name, :properties, :destinations
 
-    def initialize(event_name, properties, platforms)
+    def initialize(event_name, properties, destinations)
       @event_name = event_name
       @properties = properties
-      @platforms = platforms
+      @destinations = destinations
     end
 
     def ==(other)
       event_name == other.event_name &&
       properties == other.properties &&
-      platforms == other.platforms
+      destinations == other.destinations
     end
   end
 end

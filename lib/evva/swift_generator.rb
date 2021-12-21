@@ -6,13 +6,13 @@ module Evva
     EVENTS_TEMPLATE = File.expand_path("./templates/swift/events.swift", __dir__)
     PEOPLE_PROPERTIES_TEMPLATE = File.expand_path("./templates/swift/people_properties.swift", __dir__)
     SPECIAL_PROPERTY_ENUMS_TEMPLATE = File.expand_path("./templates/swift/special_property_enums.swift", __dir__)
-    PLATFORMS_TEMPLATE = File.expand_path("./templates/swift/platforms.swift", __dir__)
+    DESTINATIONS_TEMPLATE = File.expand_path("./templates/swift/destinations.swift", __dir__)
 
     TAB_SIZE = "    " # \t -> 4 spaces
 
     NATIVE_TYPES = %w[Int String Double Float Bool Date].freeze
 
-    def events(bundle, _file_name, _enums_file_name, _platforms_file_name)
+    def events(bundle, _file_name, _enums_file_name, _destinations_file_name)
       header_footer_wrapper do
         events = bundle.map do |event|
           properties = event.properties.map { |k, v|
@@ -39,7 +39,7 @@ module Evva
             case_name: camelize(event.event_name),
             event_name: event.event_name,
             properties: properties,
-            platforms: event.platforms.map { |p| camelize(p) },
+            destinations: event.destinations.map { |p| camelize(p) },
           }
         end
 
@@ -51,7 +51,7 @@ module Evva
       # empty
     end
 
-    def people_properties(people_bundle, _file_name, _enums_file_name, _platforms_file_name)
+    def people_properties(people_bundle, _file_name, _enums_file_name, _destinations_file_name)
       header_footer_wrapper do
         properties = people_bundle.map do |p|
           type = native_type(p.type)
@@ -60,7 +60,7 @@ module Evva
             property_name: p.property_name,
             type: type,
             is_special_property: is_special_property?(type),
-            platforms: p.platforms.map { |p| camelize(p) },
+            destinations: p.destinations.map { |p| camelize(p) },
           }
         end
 
@@ -92,11 +92,11 @@ module Evva
       end
     end
 
-    def platforms(platforms_bundle, _file_name)
+    def destinations(destinations_bundle, _file_name)
       header_footer_wrapper do
-        platforms = platforms_bundle.map { |p| camelize(p) }
+        destinations = destinations_bundle.map { |p| camelize(p) }
 
-        template_from(PLATFORMS_TEMPLATE).result(binding)
+        template_from(DESTINATIONS_TEMPLATE).result(binding)
       end
     end
 

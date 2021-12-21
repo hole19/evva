@@ -12,17 +12,17 @@ module Evva
     PEOPLE_PROPERTIES_TEMPLATE = File.expand_path("./templates/kotlin/people_properties.kt", __dir__)
     PEOPLE_PROPERTIES_ENUM_TEMPLATE = File.expand_path("./templates/kotlin/people_properties_enum.kt", __dir__)
     SPECIAL_PROPERTY_ENUMS_TEMPLATE = File.expand_path("./templates/kotlin/special_property_enums.kt", __dir__)
-    PLATFORMS_TEMPLATE = File.expand_path("./templates/kotlin/platforms.kt", __dir__)
+    DESTINATIONS_TEMPLATE = File.expand_path("./templates/kotlin/destinations.kt", __dir__)
 
     TAB_SIZE = "    " # \t -> 4 spaces
 
     NATIVE_TYPES = %w[Long Int String Double Float Boolean Date].freeze
 
-    def events(bundle, file_name, enums_file_name, platforms_file_name)
+    def events(bundle, file_name, enums_file_name, destinations_file_name)
       header_footer_wrapper do
         class_name = file_name
         enums_class_name = enums_file_name
-        platforms_class_name = platforms_file_name
+        destinations_class_name = destinations_file_name
 
         events = bundle.map do |event|
           properties = event.properties.map do |name, type|
@@ -45,14 +45,14 @@ module Evva
             }
           end
 
-          platforms = event.platforms.map { |p| constantize(p) }
+          destinations = event.destinations.map { |p| constantize(p) }
 
           {
             class_name: camelize(event.event_name),
             event_name: constantize(event.event_name),
             properties: properties,
-            platforms: platforms,
-            is_object: properties.count == 0 && platforms.count == 0,
+            destinations: destinations,
+            is_object: properties.count == 0 && destinations.count == 0,
           }
         end
 
@@ -75,11 +75,11 @@ module Evva
       end
     end
 
-    def people_properties(people_bundle, file_name, enums_file_name, platforms_file_name)
+    def people_properties(people_bundle, file_name, enums_file_name, destinations_file_name)
       header_footer_wrapper do
         class_name = file_name
         enums_class_name = enums_file_name
-        platforms_class_name = platforms_file_name
+        destinations_class_name = destinations_file_name
 
         properties = people_bundle.map do |property|
           {
@@ -87,7 +87,7 @@ module Evva
             property_name: constantize(property.property_name),
             type: property.type,
             is_special_property: is_special_property?(property.type),
-            platforms: property.platforms.map { |p| constantize(p) },
+            destinations: property.destinations.map { |p| constantize(p) },
           }
         end
 
@@ -130,13 +130,13 @@ module Evva
       end
     end
 
-    def platforms(bundle, file_name)
+    def destinations(bundle, file_name)
       header_footer_wrapper do
         class_name = file_name
 
-        platforms = bundle.map { |platform| constantize(platform) }
+        destinations = bundle.map { |d| constantize(d) }
 
-        template_from(PLATFORMS_TEMPLATE).result(binding)
+        template_from(DESTINATIONS_TEMPLATE).result(binding)
       end
     end
 

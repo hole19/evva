@@ -1,16 +1,16 @@
 struct EventData {
 	let name: String
 	var properties: [String: Any]?
-	let platforms: [Platform]
+	let destinations: [Destination]
 
-	init(name: String, properties: [String: Any]?, platforms: [Platform]) {
+	init(name: String, properties: [String: Any]?, destinations: [Destination]) {
 		self.name = name
 		self.properties = properties
-		self.platforms = platforms
+		self.destinations = destinations
 	}
 
-	init(name: EventName, properties: [String: Any]?, platforms: [Platform]) {
-		self.init(name: name.rawValue, properties: properties, platforms: platforms)
+	init(name: EventName, properties: [String: Any]?, destinations: [Destination]) {
+		self.init(name: name.rawValue, properties: properties, destinations: destinations)
 	}
 }
 
@@ -47,12 +47,12 @@ enum Event {
 					<%- end -%>
 							 ],
 				<%- end -%>
-				<%- if e[:platforms].count == 0 -%>
-							 platforms: [])
+				<%- if e[:destinations].count == 0 -%>
+							 destinations: [])
 				<%- else -%>
-							 platforms: [
-					<%- e[:platforms].each do |p| -%>
-								.<%= p %>,
+							 destinations: [
+					<%- e[:destinations].each do |d| -%>
+								.<%= d %>,
 					<%- end -%>
 							 ])
 				<%- end -%>

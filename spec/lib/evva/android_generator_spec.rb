@@ -2,12 +2,12 @@ describe Evva::AndroidGenerator do
   let(:generator) { described_class.new("com.hole19golf.hole19.analytics") }
 
   describe '#events' do
-    subject { generator.events(events, "AnalyticsEvent", "AnalyticsEvents", "AnalyticsPlatforms") }
+    subject { generator.events(events, "AnalyticsEvent", "AnalyticsEvents", "AnalyticsDestinations") }
 
     let(:events) { [
       Evva::AnalyticsEvent.new('cp_page_view', {}, []),
       Evva::AnalyticsEvent.new('cp_page_view_2', {}, ["firebase"]),
-      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }, ["firebase", "custom platform"]),
+      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }, ["firebase", "custom destination"]),
       Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }, ["firebase"]),
       Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }, []),
       Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' }, []),
@@ -25,13 +25,13 @@ sealed class AnalyticsEvent(event: AnalyticsEvents) {
     val name = event.key
 
     open val properties: Map<String, Any?>? = null
-    open val platforms: Array<AnalyticsPlatforms> = []
+    open val destinations: Array<AnalyticsDestinations> = []
 
     object CpPageView : AnalyticsEvent(AnalyticsEvents.CP_PAGE_VIEW)
 
     data class CpPageView2 : AnalyticsEvent(AnalyticsEvents.CP_PAGE_VIEW_2) {
-        override val platforms = [
-            AnalyticsPlatforms.FIREBASE
+        override val destinations = [
+            AnalyticsDestinations.FIREBASE
         ]
     }
 
@@ -42,9 +42,9 @@ sealed class AnalyticsEvent(event: AnalyticsEvents) {
             "course_id" to courseId,
             "course_name" to courseName
         )
-        override val platforms = [
-            AnalyticsPlatforms.FIREBASE,
-            AnalyticsPlatforms.CUSTOM_PLATFORM
+        override val destinations = [
+            AnalyticsDestinations.FIREBASE,
+            AnalyticsDestinations.CUSTOM_DESTINATION
         ]
     }
 
@@ -56,8 +56,8 @@ sealed class AnalyticsEvent(event: AnalyticsEvents) {
             "course_name" to courseName,
             "from_screen" to fromScreen.key
         )
-        override val platforms = [
-            AnalyticsPlatforms.FIREBASE
+        override val destinations = [
+            AnalyticsDestinations.FIREBASE
         ]
     }
 
@@ -138,10 +138,10 @@ Kotlin
   end
 
   describe '#people_properties' do
-    subject { generator.people_properties(people_bundle, 'AnalyticsProperty', 'AnalyticsProperties', 'AnalyticsPlatforms') }
+    subject { generator.people_properties(people_bundle, 'AnalyticsProperty', 'AnalyticsProperties', 'AnalyticsDestinations') }
     let(:people_bundle) { [
       Evva::AnalyticsProperty.new('rounds_with_wear', 'String', []),
-      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', ["firebase", "custom platform"]),
+      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', ["firebase", "custom destination"]),
     ] }
     let(:expected) {
 <<-Kotlin
@@ -155,7 +155,7 @@ sealed class AnalyticsProperty(property: AnalyticsProperties) {
     val name = property.key
 
     open val value: Any = ""
-    open val platforms: Array<AnalyticsPlatforms> = []
+    open val destinations: Array<AnalyticsDestinations> = []
 
     data class RoundsWithWear(
         val value: String
@@ -167,9 +167,9 @@ sealed class AnalyticsProperty(property: AnalyticsProperties) {
         val value: WearableAppPlatform
     ) : AnalyticsProperty(AnalyticsProperties.WEAR_PLATFORM) {
         override val value = value.key
-        override val platforms = [
-            AnalyticsPlatforms.FIREBASE,
-            AnalyticsPlatforms.CUSTOM_PLATFORM
+        override val destinations = [
+            AnalyticsDestinations.FIREBASE,
+            AnalyticsDestinations.CUSTOM_DESTINATION
         ]
     }
 }
@@ -183,7 +183,7 @@ Kotlin
     subject { generator.people_properties_enum(people_bundle, 'AnalyticsProperties') }
     let(:people_bundle) { [
       Evva::AnalyticsProperty.new('rounds_with_wear', 'String', ["firebase"]),
-      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', ["firebase", "custom platform"]),
+      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', ["firebase", "custom destination"]),
     ] }
     let(:expected) {
 <<-Kotlin
@@ -202,9 +202,9 @@ Kotlin
     it { should eq expected }
   end
 
-  describe '#platforms' do
-    subject { generator.platforms(platforms_bundle, 'AnalyticsPlatforms') }
-    let(:platforms_bundle) { [
+  describe '#destinations' do
+    subject { generator.destinations(destinations_bundle, 'AnalyticsDestinations') }
+    let(:destinations_bundle) { [
       'firebase',
       'whatever you want really'
     ] }
@@ -216,7 +216,7 @@ package com.hole19golf.hole19.analytics
  * This file was automatically generated by evva: https://github.com/hole19/evva
  */
 
-enum class AnalyticsPlatforms {
+enum class AnalyticsDestinations {
     FIREBASE,
     WHATEVER_YOU_WANT_REALLY;
 }

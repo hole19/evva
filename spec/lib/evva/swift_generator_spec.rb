@@ -6,7 +6,7 @@ describe Evva::SwiftGenerator do
 
     let(:event_bundle) { [
       Evva::AnalyticsEvent.new('cp_page_view', {}, ['firebase']),
-      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }, ['firebase', 'Custom Platform']),
+      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }, ['firebase', 'Custom Destination']),
       Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }, []),
       Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }, []),
       Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' }, []),
@@ -22,16 +22,16 @@ extension Analytics {
     struct EventData {
         let name: String
         var properties: [String: Any]?
-        let platforms: [Platform]
+        let destinations: [Destination]
 
-        init(name: String, properties: [String: Any]?, platforms: [Platform]) {
+        init(name: String, properties: [String: Any]?, destinations: [Destination]) {
             self.name = name
             self.properties = properties
-            self.platforms = platforms
+            self.destinations = destinations
         }
 
-        init(name: EventName, properties: [String: Any]?, platforms: [Platform]) {
-            self.init(name: name.rawValue, properties: properties, platforms: platforms)
+        init(name: EventName, properties: [String: Any]?, destinations: [Destination]) {
+            self.init(name: name.rawValue, properties: properties, destinations: destinations)
         }
     }
 
@@ -55,7 +55,7 @@ extension Analytics {
             case .cpPageView:
                 return EventData(name: .cpPageView,
                                  properties: nil,
-                                 platforms: [
+                                 destinations: [
                                     .firebase,
                                  ])
 
@@ -65,9 +65,9 @@ extension Analytics {
                                     "course_id": course_id as Any,
                                     "course_name": course_name as Any,
                                  ],
-                                 platforms: [
+                                 destinations: [
                                     .firebase,
-                                    .customPlatform,
+                                    .customDestination,
                                  ])
 
             case let .cpPageViewB(course_id, course_name, from_screen):
@@ -77,7 +77,7 @@ extension Analytics {
                                     "course_name": course_name as Any,
                                     "from_screen": from_screen.rawValue as Any,
                                  ],
-                                 platforms: [])
+                                 destinations: [])
 
             case let .cpPageViewC(course_id, course_name, from_screen):
                 return EventData(name: .cpPageViewC,
@@ -86,7 +86,7 @@ extension Analytics {
                                     "course_name": course_name as Any,
                                     "from_screen": from_screen?.rawValue as Any,
                                  ],
-                                 platforms: [])
+                                 destinations: [])
 
             case let .cpPageViewD(course_id, course_name):
                 return EventData(name: .cpPageViewD,
@@ -94,7 +94,7 @@ extension Analytics {
                                     "course_id": course_id as Any,
                                     "course_name": course_name as Any,
                                  ],
-                                 platforms: [])
+                                 destinations: [])
             }
         }
     }
@@ -141,7 +141,7 @@ Swift
 
     let(:people_bundle) { [
       Evva::AnalyticsProperty.new('rounds_with_wear', 'String', ["firebase"]),
-      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', ["firebase", "custom platform"]),
+      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', ["firebase", "custom destination"]),
       Evva::AnalyticsProperty.new('number_of_times_it_happened', 'Long', []),
     ] }
 
@@ -155,16 +155,16 @@ extension Analytics {
     struct PropertyData {
         let name: String
         let value: Any
-        let platforms: [Platform]
+        let destinations: [Destination]
 
-        init(name: String, value: Any, platforms: [Platform]) {
+        init(name: String, value: Any, destinations: [Destination]) {
             self.name = name
             self.value = value
-            self.platforms = platforms
+            self.destinations = destinations
         }
 
-        init(name: PropertyName, value: Any, platforms: [Platform]) {
-            self.init(name: name.rawValue, value: value, platforms: platforms)
+        init(name: PropertyName, value: Any, destinations: [Destination]) {
+            self.init(name: name.rawValue, value: value, destinations: destinations)
         }
     }
 
@@ -184,22 +184,22 @@ extension Analytics {
             case let .roundsWithWear(value):
                 return PropertyData(name: .roundsWithWear,
                                     value: value,
-                                    platforms: [
+                                    destinations: [
                                         .firebase,
                                     ])
 
             case let .wearPlatform(value):
                 return PropertyData(name: .wearPlatform,
                                     value: value.rawValue,
-                                    platforms: [
+                                    destinations: [
                                         .firebase,
-                                        .customPlatform,
+                                        .customDestination,
                                     ])
 
             case let .numberOfTimesItHappened(value):
                 return PropertyData(name: .numberOfTimesItHappened,
                                     value: value,
-                                    platforms: [])
+                                    destinations: [])
             }
         }
     }
@@ -210,10 +210,10 @@ Swift
     it { should eq expected }
   end
 
-  describe "#platforms" do
-    subject { generator.platforms(platforms, "") }
+  describe "#destinations" do
+    subject { generator.destinations(destinations, "") }
 
-    let(:platforms) { [
+    let(:destinations) { [
       'firebase',
       'whatever you want really'
     ] }
@@ -225,7 +225,7 @@ Swift
 import Foundation
 
 extension Analytics {
-    enum Platform {
+    enum Destination {
         case firebase
         case whateverYouWantReally
     }

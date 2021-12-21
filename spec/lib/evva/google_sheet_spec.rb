@@ -23,9 +23,9 @@ describe Evva::GoogleSheet do
 
     it 'returns an array with the corresponding events' do
       expected = [
-        Evva::AnalyticsEvent.new('cp_page_view', { course_id: 'Long', course_name: 'String' }, ['firebase', 'custom platform']),
+        Evva::AnalyticsEvent.new('cp_page_view', { course_id: 'Long', course_name: 'String' }, ['firebase', 'custom destination']),
         Evva::AnalyticsEvent.new('nav_feed_tap', {}, []),
-        Evva::AnalyticsEvent.new('cp_view_scorecard', { course_id: 'Long', course_name: 'String' }, ['custom platform']),
+        Evva::AnalyticsEvent.new('cp_view_scorecard', { course_id: 'Long', course_name: 'String' }, ['custom destination']),
       ]
       expect(events).to eq(expected)
     end
@@ -56,7 +56,7 @@ describe Evva::GoogleSheet do
 
     it 'returns an array with the corresponding events' do
       expect(people_properties).to eq [
-        Evva::AnalyticsProperty.new('rounds_with_wear', 'String', ['firebase', 'custom platform']),
+        Evva::AnalyticsProperty.new('rounds_with_wear', 'String', ['firebase', 'custom destination']),
         Evva::AnalyticsProperty.new('total_friends', 'Int', []),
         Evva::AnalyticsProperty.new('wearable_platform', 'WearableAppPlatform', ['firebase']),
       ]
@@ -78,17 +78,17 @@ describe Evva::GoogleSheet do
     end
   end
 
-  describe '#platforms' do
-    subject(:platforms) { sheet.platforms }
+  describe '#destinations' do
+    subject(:destinations) { sheet.destinations }
 
     it do
-      expect { platforms }.not_to raise_error
+      expect { destinations }.not_to raise_error
     end
 
     it 'returns an array with the corresponding events' do
-      expect(platforms).to eq [
+      expect(destinations).to eq [
         'firebase',
-        'custom platform',
+        'custom destination',
       ]
     end
   end
