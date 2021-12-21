@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.4.0] - 2021-12-21
+- Adds type to people properties
+- Adds a list of destinations to events and people properties
+
 ## [0.3.0] - 2021-12-16
 - Revamp Android generator to generate events as classes instead of methods.
 
