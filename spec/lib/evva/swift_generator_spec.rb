@@ -30,17 +30,29 @@ extension Analytics {
             self.destinations = destinations
         }
 
-        init(name: EventName, properties: [String: Any]?, destinations: [Destination]) {
-            self.init(name: name.rawValue, properties: properties, destinations: destinations)
+        init(type: EventType, properties: [String: Any]?) {
+            self.init(name: type.name, properties: properties, destinations: type.destinations)
         }
     }
 
-    enum EventName: String {
+    enum EventType: String {
         case cpPageView = "cp_page_view"
         case cpPageViewA = "cp_page_view_a"
         case cpPageViewB = "cp_page_view_b"
         case cpPageViewC = "cp_page_view_c"
         case cpPageViewD = "cp_page_view_d"
+
+        var name: String { return rawValue }
+
+        var destinations: [Destination] {
+            switch self {
+            case .cpPageView: return [.firebase]
+            case .cpPageViewA: return [.firebase, .customDestination]
+            case .cpPageViewB: return []
+            case .cpPageViewC: return []
+            case .cpPageViewD: return []
+            }
+        }
     }
 
     enum Event {
@@ -53,48 +65,38 @@ extension Analytics {
         var data: EventData {
             switch self {
             case .cpPageView:
-                return EventData(name: .cpPageView,
-                                 properties: nil,
-                                 destinations: [
-                                    .firebase,
-                                 ])
+                return EventData(type: .cpPageView,
+                                 properties: nil)
 
             case let .cpPageViewA(course_id, course_name):
-                return EventData(name: .cpPageViewA,
+                return EventData(type: .cpPageViewA,
                                  properties: [
                                     "course_id": course_id as Any,
                                     "course_name": course_name as Any,
-                                 ],
-                                 destinations: [
-                                    .firebase,
-                                    .customDestination,
                                  ])
 
             case let .cpPageViewB(course_id, course_name, from_screen):
-                return EventData(name: .cpPageViewB,
+                return EventData(type: .cpPageViewB,
                                  properties: [
                                     "course_id": course_id as Any,
                                     "course_name": course_name as Any,
                                     "from_screen": from_screen.rawValue as Any,
-                                 ],
-                                 destinations: [])
+                                 ])
 
             case let .cpPageViewC(course_id, course_name, from_screen):
-                return EventData(name: .cpPageViewC,
+                return EventData(type: .cpPageViewC,
                                  properties: [
                                     "course_id": course_id as Any,
                                     "course_name": course_name as Any,
                                     "from_screen": from_screen?.rawValue as Any,
-                                 ],
-                                 destinations: [])
+                                 ])
 
             case let .cpPageViewD(course_id, course_name):
-                return EventData(name: .cpPageViewD,
+                return EventData(type: .cpPageViewD,
                                  properties: [
                                     "course_id": course_id as Any,
                                     "course_name": course_name as Any,
-                                 ],
-                                 destinations: [])
+                                 ])
             }
         }
     }
@@ -163,15 +165,25 @@ extension Analytics {
             self.destinations = destinations
         }
 
-        init(name: PropertyName, value: Any, destinations: [Destination]) {
-            self.init(name: name.rawValue, value: value, destinations: destinations)
+        init(type: PropertyType, value: Any) {
+            self.init(name: type.name, value: value, destinations: type.destinations)
         }
     }
 
-    enum PropertyName: String {
+    enum PropertyType: String {
         case roundsWithWear = "rounds_with_wear"
         case wearPlatform = "wear_platform"
         case numberOfTimesItHappened = "number_of_times_it_happened"
+
+        var name: String { return rawValue }
+
+        var destinations: [Destination] {
+            switch self {
+            case .roundsWithWear: return [.firebase]
+            case .wearPlatform: return [.firebase, .customDestination]
+            case .numberOfTimesItHappened: return []
+            }
+        }
     }
 
     enum Property {
@@ -182,24 +194,16 @@ extension Analytics {
         var data: PropertyData {
             switch self {
             case let .roundsWithWear(value):
-                return PropertyData(name: .roundsWithWear,
-                                    value: value,
-                                    destinations: [
-                                        .firebase,
-                                    ])
+                return PropertyData(type: .roundsWithWear,
+                                    value: value)
 
             case let .wearPlatform(value):
-                return PropertyData(name: .wearPlatform,
-                                    value: value.rawValue,
-                                    destinations: [
-                                        .firebase,
-                                        .customDestination,
-                                    ])
+                return PropertyData(type: .wearPlatform,
+                                    value: value.rawValue)
 
             case let .numberOfTimesItHappened(value):
-                return PropertyData(name: .numberOfTimesItHappened,
-                                    value: value,
-                                    destinations: [])
+                return PropertyData(type: .numberOfTimesItHappened,
+                                    value: value)
             }
         }
     }

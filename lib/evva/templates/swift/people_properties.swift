@@ -9,15 +9,25 @@ struct PropertyData {
 		self.destinations = destinations
 	}
 
-	init(name: PropertyName, value: Any, destinations: [Destination]) {
-		self.init(name: name.rawValue, value: value, destinations: destinations)
+	init(type: PropertyType, value: Any) {
+		self.init(name: type.name, value: value, destinations: type.destinations)
 	}
 }
 
-enum PropertyName: String {
+enum PropertyType: String {
 	<%- properties.each do |p| -%>
 	case <%= p[:case_name] %> = "<%= p[:property_name ] %>"
 	<%- end -%>
+
+	var name: String { return rawValue }
+
+	var destinations: [Destination] {
+		switch self {
+		<%- properties.each_with_index do |p, index| -%>
+		case .<%= p[:case_name] %>: return [<%= p[:destinations].map { |d| ".#{d}" }.join(", ") %>]
+		<%- end -%>
+		}
+	}
 }
 
 enum Property {
@@ -29,17 +39,8 @@ enum Property {
 		switch self {
 		<%- properties.each_with_index do |p, index| -%>
 		case let .<%= p[:case_name] %>(value):
-			return PropertyData(name: .<%= p[:case_name] %>,
-								value: value<% if p[:is_special_property] %>.rawValue<% end %>,
-			<%- if p[:destinations].count == 0 -%>
-								destinations: [])
-			<%- else -%>
-								destinations: [
-				<%- p[:destinations].each do |d| -%>
-									.<%= d %>,
-				<%- end -%>
-								])
-			<%- end -%>
+			return PropertyData(type: .<%= p[:case_name] %>,
+								value: value<% if p[:is_special_property] %>.rawValue<% end %>)
 			<%- unless index == properties.count - 1 -%>
 
 			<%- end -%>
