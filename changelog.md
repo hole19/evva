@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.4.1] - 2021-12-23
+- Changes swift implementation so that destinations belong to EventType/PropertyType instead of Event/Property
+
 ## [0.4.0] - 2021-12-21
 - Adds type to people properties
 - Adds a list of destinations to events and people properties
