@@ -9,15 +9,25 @@ struct EventData {
 		self.destinations = destinations
 	}
 
-	init(name: EventName, properties: [String: Any]?, destinations: [Destination]) {
-		self.init(name: name.rawValue, properties: properties, destinations: destinations)
+	init(type: EventType, properties: [String: Any]?) {
+		self.init(name: type.name, properties: properties, destinations: type.destinations)
 	}
 }
 
-enum EventName: String {
+enum EventType: String {
 	<%- events.each do |e| -%>
 	case <%= e[:case_name] %> = "<%= e[:event_name] %>"
 	<%- end -%>
+
+	var name: String { return rawValue }
+
+	var destinations: [Destination] {
+		switch self {
+		<%- events.each do |e| -%>
+		case .<%= e[:case_name] %>: return [<%= e[:destinations].map { |d| ".#{d}" }.join(", ") %>]
+		<%- end -%>
+		}
+	}
 }
 
 enum Event {
@@ -37,22 +47,13 @@ enum Event {
 		<%- else -%>
 		case let .<%= e[:case_name] %>(<%= e[:properties].map { |p| p[:name] }.join(", ") %>):
 		<%- end -%>
-			return EventData(name: .<%= e[:case_name] %>,
+			return EventData(type: .<%= e[:case_name] %>,
 				<%- if e[:properties].count == 0 -%>
-							 properties: nil,
+							 properties: nil)
 				<%- else -%>
 							 properties: [
 					<%- e[:properties].each do |p| -%>
 								"<%= p[:name] %>": <%= p[:value] %> as Any,
-					<%- end -%>
-							 ],
-				<%- end -%>
-				<%- if e[:destinations].count == 0 -%>
-							 destinations: [])
-				<%- else -%>
-							 destinations: [
-					<%- e[:destinations].each do |d| -%>
-								.<%= d %>,
 					<%- end -%>
 							 ])
 				<%- end -%>
