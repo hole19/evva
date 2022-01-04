@@ -26,6 +26,8 @@ module Evva
 
         events = bundle.map do |event|
           properties = event.properties.map do |name, type|
+            type = native_type(type)
+
             param_name = camelize(name.to_s, false)
             value_fetcher = param_name
 
@@ -81,10 +83,11 @@ module Evva
         destinations_class_name = destinations_file_name
 
         properties = people_bundle.map do |property|
+          type = native_type(property.type)
           {
             class_name: camelize(property.property_name),
             property_name: constantize(property.property_name),
-            type: property.type,
+            type: type,
             is_special_property: is_special_property?(property.type),
             destinations: property.destinations.map { |p| constantize(p) },
           }
@@ -172,6 +175,11 @@ module Evva
 
     def constantize(string)
       string.tr(' ', '_').upcase
+    end
+
+    def native_type(type)
+      type
+        .gsub('Date','String')
     end
 
     def is_special_property?(type)

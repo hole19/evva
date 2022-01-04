@@ -10,7 +10,7 @@ describe Evva::AndroidGenerator do
       Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }, ["firebase", "custom destination"]),
       Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }, ["firebase"]),
       Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }, []),
-      Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' }, []),
+      Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String', viewed_at: 'Date' }, []),
     ] }
 
     let(:expected) {
@@ -79,12 +79,13 @@ sealed class AnalyticsEvent(
     )
 
     data class CpPageViewD(
-        val courseId: Long?, val courseName: String
+        val courseId: Long?, val courseName: String, val viewedAt: String
     ) : AnalyticsEvent(
         event = AnalyticsEvents.CP_PAGE_VIEW_D,
         properties = mapOf(
             "course_id" to courseId,
-            "course_name" to courseName
+            "course_name" to courseName,
+            "viewed_at" to viewedAt
         ),
     )
 }
@@ -149,6 +150,7 @@ Kotlin
     subject { generator.people_properties(people_bundle, 'AnalyticsProperty', 'AnalyticsProperties', 'AnalyticsDestinations') }
     let(:people_bundle) { [
       Evva::AnalyticsProperty.new('rounds_with_wear', 'String', []),
+      Evva::AnalyticsProperty.new('last_active_at', 'Date', []),
       Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', ["firebase", "custom destination"]),
     ] }
     let(:expected) {
@@ -170,6 +172,13 @@ sealed class AnalyticsProperty(
         val value: String
     ) : AnalyticsProperty(
         property = AnalyticsProperties.ROUNDS_WITH_WEAR,
+        innerValue = value,
+    )
+
+    data class LastActiveAt(
+        val value: String
+    ) : AnalyticsProperty(
+        property = AnalyticsProperties.LAST_ACTIVE_AT,
         innerValue = value,
     )
 
