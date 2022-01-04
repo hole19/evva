@@ -51,8 +51,7 @@ module Evva
             class_name: camelize(event.event_name),
             event_name: constantize(event.event_name),
             properties: properties,
-            destinations: destinations,
-            is_object: properties.count == 0 && destinations.count == 0,
+            destinations: destinations
           }
         end
 
