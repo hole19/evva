@@ -1,6 +1,6 @@
 sealed class <%= class_name %>(
 	property: <%= enums_class_name %>,
-	val innerValue: Any? = null,
+	val innerValue: Any,
 	val destinations: Array<<%= destinations_class_name %>> = emptyArray()
 ) {
 	val name = property.key

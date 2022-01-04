@@ -161,7 +161,7 @@ package com.hole19golf.hole19.analytics
 
 sealed class AnalyticsProperty(
     property: AnalyticsProperties,
-    val innerValue: Any? = null,
+    val innerValue: Any,
     val destinations: Array<AnalyticsDestinations> = emptyArray()
 ) {
     val name = property.key
