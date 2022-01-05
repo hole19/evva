@@ -1,4 +1,4 @@
 module Evva
-  VERSION = '0.4.1'.freeze
-  VERSION_UPDATED_AT = '2021-12-23'.freeze
+  VERSION = '0.4.2'.freeze
+  VERSION_UPDATED_AT = '2022-01-05'.freeze
 end
