@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- Fix kotlin generation changes in 0.4.0
+
 ## [0.4.1] - 2021-12-23
 - Changes swift implementation so that destinations belong to EventType/PropertyType instead of Event/Property
 
