@@ -40,7 +40,8 @@ sealed class AnalyticsEvent(
     )
 
     data class CpPageViewA(
-        val courseId: Long, val courseName: String
+        val courseId: Long,
+        val courseName: String
     ) : AnalyticsEvent(
         event = AnalyticsEvents.CP_PAGE_VIEW_A,
         properties = mapOf(
@@ -54,7 +55,9 @@ sealed class AnalyticsEvent(
     )
 
     data class CpPageViewB(
-        val courseId: Long, val courseName: String, val fromScreen: CourseProfileSource
+        val courseId: Long,
+        val courseName: String,
+        val fromScreen: CourseProfileSource
     ) : AnalyticsEvent(
         event = AnalyticsEvents.CP_PAGE_VIEW_B,
         properties = mapOf(
@@ -68,7 +71,9 @@ sealed class AnalyticsEvent(
     )
 
     data class CpPageViewC(
-        val courseId: Long, val courseName: String, val fromScreen: CourseProfileSource?
+        val courseId: Long,
+        val courseName: String,
+        val fromScreen: CourseProfileSource?
     ) : AnalyticsEvent(
         event = AnalyticsEvents.CP_PAGE_VIEW_C,
         properties = mapOf(
@@ -79,7 +84,9 @@ sealed class AnalyticsEvent(
     )
 
     data class CpPageViewD(
-        val courseId: Long?, val courseName: String, val viewedAt: String
+        val courseId: Long?,
+        val courseName: String,
+        val viewedAt: String
     ) : AnalyticsEvent(
         event = AnalyticsEvents.CP_PAGE_VIEW_D,
         properties = mapOf(

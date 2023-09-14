@@ -10,7 +10,9 @@ sealed class <%= class_name %>(
     object <%= e[:class_name] %> : <%= class_name %>(
     <%- else -%>
     data class <%= e[:class_name] %>(
-        <%= e[:properties].map { |p| "val #{p[:param_name]}: #{p[:type]}" }.join(", ") %>
+        <%- e[:properties].each_with_index do |p, index| -%>
+        <%= "val #{p[:param_name]}: #{p[:type]}" %><% if index < e[:properties].count - 1 %>,<% end %>
+        <%- end -%>
     ) : <%= class_name %>(
     <%- end -%>
         event = <%= enums_class_name %>.<%= e[:event_name] %>,
