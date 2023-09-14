@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.4.3] - 2023-09-14
+- Put class properties in newline for Kotlin
 
 ## [0.4.2] - 2022-01-05
 - Fix kotlin generation changes in 0.4.0
