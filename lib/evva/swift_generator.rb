@@ -113,10 +113,8 @@ module Evva
     def template_from(path)
       file = File.read(path)
 
-      # - 2nd argument (nil) changes nothing
-      # - 3rd argument activates trim mode using "-" so that you can decide to
-      # not include a line (useful on loops and if statements)
-      ERB.new(file, nil, '-')
+      # trim mode using "-" so that you can decide to not include a line (useful on loops and if statements)
+      ERB.new(file, trim_mode: '-')
     end
 
     def native_type(type)
