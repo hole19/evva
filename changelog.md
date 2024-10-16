@@ -1,6 +1,8 @@
 # Change Log
 
 ## Unreleased
+### Breaking Changes
+- Update to Kotlin 2.0 notation which doesn't require a ';' in the last item of an enum
 
 ## [0.4.3] - 2023-09-14
 - Put class properties in newline for Kotlin
