@@ -1,6 +1,9 @@
 # Change Log
 
 ## Unreleased
+
+- Change `object` events in Kotlin to `data object` as an improvement brought by Kotlin 2.0
+
 ### Breaking Changes
 - Fix deprecation warnings
 - Set minimum ruby version as 3.2
