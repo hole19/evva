@@ -1,18 +1,18 @@
-require 'net/https'
-require 'csv'
+require "net/https"
+require "csv"
 
 module Evva
   class GoogleSheet
-    EVENT_NAME = 'Event Name'
-    EVENT_PROPERTIES = 'Event Properties'
-    EVENT_DESTINATION = 'Event Destination'
+    EVENT_NAME = "Event Name"
+    EVENT_PROPERTIES = "Event Properties"
+    EVENT_DESTINATION = "Event Destination"
 
-    PROPERTY_NAME = 'Property Name'
-    PROPERTY_TYPE = 'Property Type'
-    PROPERTY_DESTINATION = 'Property Destination'
+    PROPERTY_NAME = "Property Name"
+    PROPERTY_TYPE = "Property Type"
+    PROPERTY_DESTINATION = "Property Destination"
 
-    ENUM_NAME = 'Enum Name'
-    ENUM_VALUES = 'Possible Values'
+    ENUM_NAME = "Enum Name"
+    ENUM_VALUES = "Possible Values"
 
     def initialize(events_url, people_properties_url, enum_classes_url)
       @events_url = events_url
@@ -29,7 +29,7 @@ module Evva
       @events ||= @events_csv.map do |row|
         event_name = row[EVENT_NAME]
         properties = hash_parser(row[EVENT_PROPERTIES])
-        destinations = row[EVENT_DESTINATION]&.split(',')
+        destinations = row[EVENT_DESTINATION]&.split(",")
         Evva::AnalyticsEvent.new(event_name, properties, destinations || [])
       end
     end
@@ -43,7 +43,7 @@ module Evva
       @people_properties ||= @people_properties_csv.map do |row|
         property_name = row[PROPERTY_NAME]
         property_type = row[PROPERTY_TYPE]
-        destinations = row[PROPERTY_DESTINATION]&.split(',')
+        destinations = row[PROPERTY_DESTINATION]&.split(",")
         Evva::AnalyticsProperty.new(property_name, property_type, destinations || [])
       end
     end
@@ -56,7 +56,7 @@ module Evva
 
       @enum_classes ||= @enum_classes_csv.map do |row|
         enum_name = row[ENUM_NAME]
-        values = row[ENUM_VALUES].split(',')
+        values = row[ENUM_VALUES].split(",")
         Evva::AnalyticsEnum.new(enum_name, values)
       end
     end
@@ -65,7 +65,7 @@ module Evva
       @destinations ||= events.map(&:destinations).flatten.uniq
     end
 
-    private
+  private
 
     def get_csv(url)
       data = get(url)
@@ -89,7 +89,7 @@ module Evva
       request = Net::HTTP::Get.new(uri.request_uri)
       response = http.request(request)
 
-      return get(response['location'], max_redirects - 1) if response.is_a? Net::HTTPRedirection
+      return get(response["location"], max_redirects - 1) if response.is_a? Net::HTTPRedirection
 
       raise "Http Error #{response.body}" if response.code.to_i >= 400
 
@@ -99,8 +99,8 @@ module Evva
     def hash_parser(property_array)
       h = {}
       unless property_array.nil? || property_array.empty?
-        property_array.split(',').each do |prop|
-          split_prop = prop.split(':')
+        property_array.split(",").each do |prop|
+          split_prop = prop.split(":")
           prop_name = split_prop[0].to_sym
           prop_type = split_prop[1].to_s
           h[prop_name] = prop_type

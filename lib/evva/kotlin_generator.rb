@@ -32,7 +32,7 @@ module Evva
             value_fetcher = param_name
 
             if is_special_property?(type)
-              if type.end_with?('?')
+              if type.end_with?("?")
                 # optional value, we need ? to access a parameter
                 value_fetcher += "?"
               end
@@ -142,7 +142,7 @@ module Evva
       end
     end
 
-    private
+  private
 
     def header_footer_wrapper
       package_name = @package_name
@@ -157,7 +157,7 @@ module Evva
       file = File.read(path)
 
       # trim mode using "-" so that you can decide to not include a line (useful on loops and if statements)
-      ERB.new(file, trim_mode: '-')
+      ERB.new(file, trim_mode: "-")
     end
 
     # extracted from Rails' ActiveSupport
@@ -172,16 +172,16 @@ module Evva
     end
 
     def constantize(string)
-      string.tr(' ', '_').upcase
+      string.tr(" ", "_").upcase
     end
 
     def native_type(type)
       type
-        .gsub('Date','String')
+        .gsub("Date","String")
     end
 
     def is_special_property?(type)
-      !NATIVE_TYPES.include?(type.chomp('?'))
+      !NATIVE_TYPES.include?(type.chomp("?"))
     end
   end
 end

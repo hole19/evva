@@ -1,5 +1,5 @@
-require 'singleton'
-require 'colorize'
+require "singleton"
+require "colorize"
 
 module Evva
   module Logger
@@ -27,11 +27,11 @@ module Evva
 
     def print_summary
       if @levels[:warn] > 0 || @levels[:error] > 0
-        info ''
-        info 'Finished with:'
+        info ""
+        info "Finished with:"
         info "  #{@levels[:warn]} warnings" if @levels[:warn]  > 0
         info "  #{@levels[:error]} errors"  if @levels[:error] > 0
-        info ''
+        info ""
       end
     end
 
@@ -39,7 +39,7 @@ module Evva
       @silent_mode = value
     end
 
-    private
+  private
 
     @levels = { info: 0, warn: 0, error: 0 }
     @silent_mode = false

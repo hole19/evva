@@ -1,24 +1,24 @@
-require 'optparse'
-require 'yaml'
+require "optparse"
+require "yaml"
 
-require 'evva/logger'
-require 'evva/google_sheet'
-require 'evva/config'
-require 'evva/file_reader'
-require 'evva/analytics_event'
-require 'evva/analytics_enum'
-require 'evva/analytics_property'
-require 'evva/object_extension'
-require 'evva/version'
-require 'evva/kotlin_generator'
-require 'evva/swift_generator'
+require "evva/logger"
+require "evva/google_sheet"
+require "evva/config"
+require "evva/file_reader"
+require "evva/analytics_event"
+require "evva/analytics_enum"
+require "evva/analytics_property"
+require "evva/object_extension"
+require "evva/version"
+require "evva/kotlin_generator"
+require "evva/swift_generator"
 
 module Evva
   extend self
   def run(options)
     file_reader = Evva::FileReader.new
     options = command_line_options(options)
-    unless config_file = file_reader.open_file('evva_config.yml', 'r', true)
+    unless config_file = file_reader.open_file("evva_config.yml", "r", true)
       Logger.error("Could not open evva_config.yml")
       return
     end
@@ -26,12 +26,12 @@ module Evva
     config = Evva::Config.new(hash: YAML.safe_load(config_file))
     bundle = analytics_data(config: config.data_source)
     case config.type.downcase
-    when 'android'
+    when "android"
       generator = Evva::KotlinGenerator.new(config.package_name)
-      evva_write(bundle, generator, config, 'kt')
-    when 'ios'
+      evva_write(bundle, generator, config, "kt")
+    when "ios"
       generator = Evva::SwiftGenerator.new
-      evva_write(bundle, generator, config, 'swift')
+      evva_write(bundle, generator, config, "swift")
     end
     Evva::Logger.print_summary
   end
@@ -40,7 +40,7 @@ module Evva
     path = "#{configuration.out_path}/#{configuration.event_file_name}.#{extension}"
     write_to_file(path, generator.events(bundle[:events], configuration.event_file_name, configuration.event_enum_file_name, configuration.destinations_file_name))
 
-    unless configuration.type.downcase == 'ios'
+    unless configuration.type.downcase == "ios"
       path = "#{configuration.out_path}/#{configuration.event_enum_file_name}.#{extension}"
       write_to_file(path, generator.event_enum(bundle[:events], configuration.event_enum_file_name))
     end
@@ -48,7 +48,7 @@ module Evva
     path = "#{configuration.out_path}/#{configuration.people_file_name}.#{extension}"
     write_to_file(path, generator.people_properties(bundle[:people], configuration.people_file_name, configuration.people_enum_file_name, configuration.destinations_file_name))
 
-    unless configuration.type.downcase == 'ios'
+    unless configuration.type.downcase == "ios"
       path = "#{configuration.out_path}/#{configuration.people_enum_file_name}.#{extension}"
       write_to_file(path, generator.people_properties_enum(bundle[:people], configuration.people_enum_file_name))
     end
@@ -63,7 +63,7 @@ module Evva
   def analytics_data(config:)
     source =
       case config[:type]
-      when 'google_sheet'
+      when "google_sheet"
         Evva::GoogleSheet.new(config[:events_url], config[:people_properties_url], config[:enum_classes_url])
       end
     events_bundle = {}
@@ -78,12 +78,12 @@ module Evva
     opts_hash = {}
 
     opts_parser = OptionParser.new do |opts|
-      opts.on_tail('-h', '--help', 'Show this message') do
+      opts.on_tail("-h", "--help", "Show this message") do
         puts opts
         exit
       end
 
-      opts.on_tail('-v', '--version', 'Show version') do
+      opts.on_tail("-v", "--version", "Show version") do
         puts Evva::VERSION
         exit
       end

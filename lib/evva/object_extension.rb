@@ -13,7 +13,7 @@ Object.class_eval do
   def validate_structure!(structure, error_prefix = [])
     return if nil? && structure[:optional]
 
-    prepend_error = error_prefix.empty? ? '' : (['self'] + error_prefix + [': ']).join
+    prepend_error = error_prefix.empty? ? "" : (["self"] + error_prefix + [": "]).join
 
     unless is_a? structure[:type]
       raise ArgumentError, "#{prepend_error}Expected #{structure[:type]}, got #{self.class}"

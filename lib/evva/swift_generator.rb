@@ -1,4 +1,4 @@
-require 'erb'
+require "erb"
 
 module Evva
   class SwiftGenerator
@@ -21,7 +21,7 @@ module Evva
             value_fetcher = k.to_s
 
             if is_special_property?(type)
-              if type.end_with?('?')
+              if type.end_with?("?")
                 # optional value, we need ? to access a parameter
                 value_fetcher += "?"
               end
@@ -100,7 +100,7 @@ module Evva
       end
     end
 
-    private
+  private
 
     def header_footer_wrapper
       content = yield
@@ -114,21 +114,21 @@ module Evva
       file = File.read(path)
 
       # trim mode using "-" so that you can decide to not include a line (useful on loops and if statements)
-      ERB.new(file, trim_mode: '-')
+      ERB.new(file, trim_mode: "-")
     end
 
     def native_type(type)
       type
-        .gsub('Boolean','Bool')
-        .gsub('Long', 'Int')
+        .gsub("Boolean","Bool")
+        .gsub("Long", "Int")
     end
 
     def is_special_property?(type)
-      !NATIVE_TYPES.include?(type.chomp('?'))
+      !NATIVE_TYPES.include?(type.chomp("?"))
     end
 
     def camelize(term)
-      string = term.to_s.tr(' ', '_').downcase
+      string = term.to_s.tr(" ", "_").downcase
       string = string.sub(/^(?:#{@acronym_regex}(?=\b|[A-Z_])|\w)/) { |match| match.downcase }
       string.gsub!(/(?:_|(\/))([a-z\d]*)/i) { "#{$1}#{$2.capitalize}" }
       string.gsub!("/".freeze, "::".freeze)
