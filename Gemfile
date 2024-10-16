@@ -1,14 +1,16 @@
-source 'https://rubygems.org'
+# frozen_string_literal: true
 
-gem 'colorize'
-gem 'safe_yaml'
+source "https://rubygems.org"
+
+gem "colorize"
+gem "safe_yaml"
 
 group :test do
-  gem 'rake'
-  gem 'rspec'
-  gem 'rspec-its'
-  gem 'simplecov', require: false, group: :test
-  gem 'simplecov-rcov', require: false
-  gem 'webmock', '~> 1.20'
-  gem 'rubocop'
+  gem "rake"
+  gem "rspec"
+  gem "rspec-its"
+  gem "rubocop"
+  gem "simplecov", require: false, group: :test
+  gem "simplecov-rcov", require: false
+  gem "webmock"
 end

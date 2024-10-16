@@ -1,4 +1,4 @@
-require 'fileutils'
+require "fileutils"
 
 module Evva
   class FileReader

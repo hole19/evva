@@ -1,15 +1,15 @@
 describe Evva::SwiftGenerator do
   let(:generator) { described_class.new }
 
-  describe '#events' do
+  describe "#events" do
     subject { generator.events(event_bundle, nil, nil, nil) }
 
     let(:event_bundle) { [
-      Evva::AnalyticsEvent.new('cp_page_view', {}, ['firebase']),
-      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }, ['firebase', 'Custom Destination']),
-      Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }, []),
-      Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }, []),
-      Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String' }, []),
+      Evva::AnalyticsEvent.new("cp_page_view", {}, ["firebase"]),
+      Evva::AnalyticsEvent.new("cp_page_view_a", { course_id: "Long", course_name: "String" }, ["firebase", "Custom Destination"]),
+      Evva::AnalyticsEvent.new("cp_page_view_b", { course_id: "Long", course_name: "String", from_screen: "CourseProfileSource" }, []),
+      Evva::AnalyticsEvent.new("cp_page_view_c", { course_id: "Long", course_name: "String", from_screen: "CourseProfileSource?" }, []),
+      Evva::AnalyticsEvent.new("cp_page_view_d", { course_id: "Long?", course_name: "String" }, []),
     ] }
 
     let(:expected) {
@@ -107,12 +107,12 @@ Swift
     it { should eq expected }
   end
 
-  describe '#special_property_enums' do
+  describe "#special_property_enums" do
     subject { generator.special_property_enums(enums) }
 
     let(:enums) { [
-      Evva::AnalyticsEnum.new('CourseProfileSource', ['course_discovery', 'synced_courses']),
-      Evva::AnalyticsEnum.new('PremiumFrom', ['Course Profile', 'Round Setup']),
+      Evva::AnalyticsEnum.new("CourseProfileSource", ["course_discovery", "synced_courses"]),
+      Evva::AnalyticsEnum.new("PremiumFrom", ["Course Profile", "Round Setup"]),
     ] }
 
     let(:expected) {
@@ -142,9 +142,9 @@ Swift
     subject { generator.people_properties(people_bundle, "", "", "") }
 
     let(:people_bundle) { [
-      Evva::AnalyticsProperty.new('rounds_with_wear', 'String', ["firebase"]),
-      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', ["firebase", "custom destination"]),
-      Evva::AnalyticsProperty.new('number_of_times_it_happened', 'Long', []),
+      Evva::AnalyticsProperty.new("rounds_with_wear", "String", ["firebase"]),
+      Evva::AnalyticsProperty.new("wear_platform", "WearableAppPlatform", ["firebase", "custom destination"]),
+      Evva::AnalyticsProperty.new("number_of_times_it_happened", "Long", []),
     ] }
 
     let(:expected) {
@@ -218,8 +218,8 @@ Swift
     subject { generator.destinations(destinations, "") }
 
     let(:destinations) { [
-      'firebase',
-      'whatever you want really'
+      "firebase",
+      "whatever you want really"
     ] }
 
     let(:expected) {

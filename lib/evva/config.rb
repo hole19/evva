@@ -83,7 +83,7 @@ module Evva
     }.freeze
 
     DICTIONARY_STRUCT = {
-      'google_sheet' => GOOGLE_SHEET_STRUCT
+      "google_sheet" => GOOGLE_SHEET_STRUCT
     }.freeze
   end
 end

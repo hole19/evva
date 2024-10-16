@@ -1,16 +1,16 @@
 describe Evva::KotlinGenerator do
   let(:generator) { described_class.new("com.hole19golf.hole19.analytics") }
 
-  describe '#events' do
+  describe "#events" do
     subject { generator.events(events, "AnalyticsEvent", "AnalyticsEvents", "AnalyticsDestinations") }
 
     let(:events) { [
-      Evva::AnalyticsEvent.new('cp_page_view', {}, []),
-      Evva::AnalyticsEvent.new('cp_page_view_2', {}, ["firebase"]),
-      Evva::AnalyticsEvent.new('cp_page_view_a', { course_id: 'Long', course_name: 'String' }, ["firebase", "custom destination"]),
-      Evva::AnalyticsEvent.new('cp_page_view_b', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource' }, ["firebase"]),
-      Evva::AnalyticsEvent.new('cp_page_view_c', { course_id: 'Long', course_name: 'String', from_screen: 'CourseProfileSource?' }, []),
-      Evva::AnalyticsEvent.new('cp_page_view_d', { course_id: 'Long?', course_name: 'String', viewed_at: 'Date' }, []),
+      Evva::AnalyticsEvent.new("cp_page_view", {}, []),
+      Evva::AnalyticsEvent.new("cp_page_view_2", {}, ["firebase"]),
+      Evva::AnalyticsEvent.new("cp_page_view_a", { course_id: "Long", course_name: "String" }, ["firebase", "custom destination"]),
+      Evva::AnalyticsEvent.new("cp_page_view_b", { course_id: "Long", course_name: "String", from_screen: "CourseProfileSource" }, ["firebase"]),
+      Evva::AnalyticsEvent.new("cp_page_view_c", { course_id: "Long", course_name: "String", from_screen: "CourseProfileSource?" }, []),
+      Evva::AnalyticsEvent.new("cp_page_view_d", { course_id: "Long?", course_name: "String", viewed_at: "Date" }, []),
     ] }
 
     let(:expected) {
@@ -102,11 +102,11 @@ Kotlin
     it { should eq expected }
   end
 
-  describe '#special_property_enums' do
+  describe "#special_property_enums" do
     subject { generator.special_property_enums(enums) }
     let(:enums) { [
-      Evva::AnalyticsEnum.new('CourseProfileSource', ['course_discovery', 'synced_courses']),
-      Evva::AnalyticsEnum.new('PremiumFrom', ['Course Profile', 'Round Setup']),
+      Evva::AnalyticsEnum.new("CourseProfileSource", ["course_discovery", "synced_courses"]),
+      Evva::AnalyticsEnum.new("PremiumFrom", ["Course Profile", "Round Setup"]),
     ] }
     let(:expected) {
 <<-Kotlin
@@ -130,12 +130,12 @@ Kotlin
     it { should eq expected }
   end
 
-  describe '#event_enum' do
-    subject { generator.event_enum(event_bundle, 'AnalyticsEvents') }
+  describe "#event_enum" do
+    subject { generator.event_enum(event_bundle, "AnalyticsEvents") }
     let(:event_bundle) { [
-      Evva::AnalyticsEvent.new('nav_feed_tap', {}, []),
-      Evva::AnalyticsEvent.new('nav_performance_tap', {}, []),
-      ] }
+      Evva::AnalyticsEvent.new("nav_feed_tap", {}, []),
+      Evva::AnalyticsEvent.new("nav_performance_tap", {}, []),
+    ] }
     let(:expected) {
 <<-Kotlin
 package com.hole19golf.hole19.analytics
@@ -153,12 +153,12 @@ Kotlin
     it { should eq expected }
   end
 
-  describe '#people_properties' do
-    subject { generator.people_properties(people_bundle, 'AnalyticsProperty', 'AnalyticsProperties', 'AnalyticsDestinations') }
+  describe "#people_properties" do
+    subject { generator.people_properties(people_bundle, "AnalyticsProperty", "AnalyticsProperties", "AnalyticsDestinations") }
     let(:people_bundle) { [
-      Evva::AnalyticsProperty.new('rounds_with_wear', 'String', []),
-      Evva::AnalyticsProperty.new('last_active_at', 'Date', []),
-      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', ["firebase", "custom destination"]),
+      Evva::AnalyticsProperty.new("rounds_with_wear", "String", []),
+      Evva::AnalyticsProperty.new("last_active_at", "Date", []),
+      Evva::AnalyticsProperty.new("wear_platform", "WearableAppPlatform", ["firebase", "custom destination"]),
     ] }
     let(:expected) {
 <<-Kotlin
@@ -206,11 +206,11 @@ Kotlin
     it { should eq expected }
   end
 
-  describe '#people_properties_enum' do
-    subject { generator.people_properties_enum(people_bundle, 'AnalyticsProperties') }
+  describe "#people_properties_enum" do
+    subject { generator.people_properties_enum(people_bundle, "AnalyticsProperties") }
     let(:people_bundle) { [
-      Evva::AnalyticsProperty.new('rounds_with_wear', 'String', ["firebase"]),
-      Evva::AnalyticsProperty.new('wear_platform', 'WearableAppPlatform', ["firebase", "custom destination"]),
+      Evva::AnalyticsProperty.new("rounds_with_wear", "String", ["firebase"]),
+      Evva::AnalyticsProperty.new("wear_platform", "WearableAppPlatform", ["firebase", "custom destination"]),
     ] }
     let(:expected) {
 <<-Kotlin
@@ -229,11 +229,11 @@ Kotlin
     it { should eq expected }
   end
 
-  describe '#destinations' do
-    subject { generator.destinations(destinations_bundle, 'AnalyticsDestinations') }
+  describe "#destinations" do
+    subject { generator.destinations(destinations_bundle, "AnalyticsDestinations") }
     let(:destinations_bundle) { [
-      'firebase',
-      'whatever you want really'
+      "firebase",
+      "whatever you want really"
     ] }
     let(:expected) {
 <<-Kotlin
