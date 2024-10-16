@@ -4,7 +4,7 @@ Evva
 [![Status](https://travis-ci.org/hole19/evva.svg?branch=master)](https://travis-ci.org/hole19/evva?branch=master)
 [![Gem](https://img.shields.io/gem/v/evva.svg?style=flat)](http://rubygems.org/gems/evva "View this project in Rubygems")
 
-Evva automatically generates code for triggering events based on a Google Sheets specification. It generated code for both iOS (Swift) and Android (Kotlin).
+Evva automatically generates code for triggering events based on a Google Sheets specification. It generates code for both Swift (iOS) and Kotlin (Android).
 
 # Instalation
 

@@ -10,7 +10,7 @@ require 'evva/analytics_enum'
 require 'evva/analytics_property'
 require 'evva/object_extension'
 require 'evva/version'
-require 'evva/android_generator'
+require 'evva/kotlin_generator'
 require 'evva/swift_generator'
 
 module Evva
@@ -27,7 +27,7 @@ module Evva
     bundle = analytics_data(config: config.data_source)
     case config.type.downcase
     when 'android'
-      generator = Evva::AndroidGenerator.new(config.package_name)
+      generator = Evva::KotlinGenerator.new(config.package_name)
       evva_write(bundle, generator, config, 'kt')
     when 'ios'
       generator = Evva::SwiftGenerator.new
