@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Update all dependencies
 - Change `object` events in Kotlin to `data object` as an improvement brought by Kotlin 2.0
 
 ### Breaking Changes
