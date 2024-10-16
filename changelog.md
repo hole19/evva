@@ -1,6 +1,9 @@
 # Change Log
 
 ## Unreleased
+
+## [0.4.4] - 2024-10-16
+
 ### Breaking Changes
 - Update to Kotlin 2.0 notation which doesn't require a ';' in the last item of an enum
 
