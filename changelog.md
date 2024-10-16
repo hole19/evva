@@ -2,12 +2,14 @@
 
 ## Unreleased
 
+## [0.5.0] - 2024-10-16
+
 - Update all dependencies
-- Change `object` events in Kotlin to `data object` as an improvement brought by Kotlin 2.0
 
 ### Breaking Changes
 - Fix deprecation warnings
 - Set minimum ruby version as 3.2
+- Change `object` events in Kotlin to `data object` as an improvement brought by Kotlin 2.0
 
 ## [0.4.4] - 2024-10-16
 
