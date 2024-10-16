@@ -1,5 +1,5 @@
 module Evva
-  class AndroidGenerator
+  class KotlinGenerator
     attr_accessor :package_name
 
     def initialize(package_name)

@@ -7,7 +7,7 @@ sealed class <%= class_name %>(
 
     <%- events.each_with_index do |e, index| -%>
     <%- if e[:properties].count == 0 -%>
-    object <%= e[:class_name] %> : <%= class_name %>(
+    data object <%= e[:class_name] %> : <%= class_name %>(
     <%- else -%>
     data class <%= e[:class_name] %>(
         <%- e[:properties].each_with_index do |p, index| -%>

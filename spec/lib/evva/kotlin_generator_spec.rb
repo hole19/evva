@@ -1,4 +1,4 @@
-describe Evva::AndroidGenerator do
+describe Evva::KotlinGenerator do
   let(:generator) { described_class.new("com.hole19golf.hole19.analytics") }
 
   describe '#events' do
@@ -28,11 +28,11 @@ sealed class AnalyticsEvent(
 ) {
     val name = event.key
 
-    object CpPageView : AnalyticsEvent(
+    data object CpPageView : AnalyticsEvent(
         event = AnalyticsEvents.CP_PAGE_VIEW,
     )
 
-    object CpPageView2 : AnalyticsEvent(
+    data object CpPageView2 : AnalyticsEvent(
         event = AnalyticsEvents.CP_PAGE_VIEW_2,
         destinations = arrayOf(
             AnalyticsDestinations.FIREBASE
