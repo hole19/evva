@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.date        = Evva::VERSION_UPDATED_AT
   s.summary     = 'An event generating service'
   s.description = 'Evva generates all the analytics event tracking functions for you'
-  s.authors     = ['RicardoTrindade']
+  s.authors     = ['André Andrade', 'João Costa', 'Ricardo Trindade']
   s.email       = 'ricardo.trindade743@gmail.com'
   s.license     = 'MIT'
   s.homepage    = 'https://github.com/hole19/'
@@ -15,6 +15,8 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.executables << 'evva'
+
+  spec.required_ruby_version = '>= 3.2.0'
 
   s.add_runtime_dependency 'safe_yaml',  '~> 1.0'
   s.add_runtime_dependency 'colorize',   '~> 0.7'

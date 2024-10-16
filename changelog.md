@@ -1,6 +1,9 @@
 # Change Log
 
 ## Unreleased
+### Breaking Changes
+- Fix deprecation warnings
+- Set minimum ruby version as 3.2
 
 ## [0.4.4] - 2024-10-16
 
