@@ -118,12 +118,12 @@ package com.hole19golf.hole19.analytics
 
 enum class CourseProfileSource(val key: String) {
     COURSE_DISCOVERY("course_discovery"),
-    SYNCED_COURSES("synced_courses");
+    SYNCED_COURSES("synced_courses")
 }
 
 enum class PremiumFrom(val key: String) {
     COURSE_PROFILE("Course Profile"),
-    ROUND_SETUP("Round Setup");
+    ROUND_SETUP("Round Setup")
 }
 Kotlin
      }
@@ -146,7 +146,7 @@ package com.hole19golf.hole19.analytics
 
 enum class AnalyticsEvents(val key: String) {
     NAV_FEED_TAP("nav_feed_tap"),
-    NAV_PERFORMANCE_TAP("nav_performance_tap");
+    NAV_PERFORMANCE_TAP("nav_performance_tap")
 }
 Kotlin
      }
@@ -222,7 +222,7 @@ package com.hole19golf.hole19.analytics
 
 enum class AnalyticsProperties(val key: String) {
     ROUNDS_WITH_WEAR("rounds_with_wear"),
-    WEAR_PLATFORM("wear_platform");
+    WEAR_PLATFORM("wear_platform")
 }
 Kotlin
     }
@@ -245,7 +245,7 @@ package com.hole19golf.hole19.analytics
 
 enum class AnalyticsDestinations {
     FIREBASE,
-    WHATEVER_YOU_WANT_REALLY;
+    WHATEVER_YOU_WANT_REALLY
 }
 Kotlin
     }
