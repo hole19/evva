@@ -1,7 +1,9 @@
+inherit_from: .rubocop_todo.yml
+
 Metrics/BlockNesting:
   Max: 2
 
-Metrics/LineLength:
+Layout/LineLength:
   AllowURI: true
   Enabled: false
 
@@ -13,7 +15,7 @@ Metrics/ParameterLists:
   Max: 4
   CountKeywordArgs: true
 
-Style/AccessModifierIndentation:
+Layout/AccessModifierIndentation:
   EnforcedStyle: outdent
 
 Style/CollectionMethods:
@@ -26,7 +28,7 @@ Style/CollectionMethods:
 Style/Documentation:
   Enabled: false
 
-Style/DotPosition:
+Layout/DotPosition:
   EnforcedStyle: trailing
 
 Style/DoubleNegation:
@@ -47,8 +49,10 @@ Style/Lambda:
 Style/RaiseArgs:
   EnforcedStyle: compact
 
-Style/SpaceInsideHashLiteralBraces:
+Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
-Style/TrailingComma:
-  EnforcedStyleForMultiline: 'comma'
+# Check quotes usage according to lint rule below.
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
