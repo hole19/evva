@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Kotlin support for handling "identifier:Bool "
+
 ## [0.5.0] - 2024-10-16
 
 - Update all dependencies
