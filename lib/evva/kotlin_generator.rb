@@ -177,7 +177,8 @@ module Evva
 
     def native_type(type)
       type
-        .gsub("Date","String")
+        .gsub("Date", "String")
+        .gsub(/\bBool\b/, "Boolean")
     end
 
     def is_special_property?(type)

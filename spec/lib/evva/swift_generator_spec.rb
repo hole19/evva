@@ -10,6 +10,7 @@ describe Evva::SwiftGenerator do
       Evva::AnalyticsEvent.new("cp_page_view_b", { course_id: "Long", course_name: "String", from_screen: "CourseProfileSource" }, []),
       Evva::AnalyticsEvent.new("cp_page_view_c", { course_id: "Long", course_name: "String", from_screen: "CourseProfileSource?" }, []),
       Evva::AnalyticsEvent.new("cp_page_view_d", { course_id: "Long?", course_name: "String" }, []),
+      Evva::AnalyticsEvent.new("example_booleans", { example_bool: "Bool", example_boolean: "Boolean" }, []),
     ] }
 
     let(:expected) {
@@ -41,6 +42,7 @@ extension Analytics {
         case cpPageViewB = "cp_page_view_b"
         case cpPageViewC = "cp_page_view_c"
         case cpPageViewD = "cp_page_view_d"
+        case exampleBooleans = "example_booleans"
 
         var name: String { return rawValue }
 
@@ -51,6 +53,7 @@ extension Analytics {
             case .cpPageViewB: return []
             case .cpPageViewC: return []
             case .cpPageViewD: return []
+            case .exampleBooleans: return []
             }
         }
     }
@@ -61,6 +64,7 @@ extension Analytics {
         case cpPageViewB(course_id: Int, course_name: String, from_screen: CourseProfileSource)
         case cpPageViewC(course_id: Int, course_name: String, from_screen: CourseProfileSource?)
         case cpPageViewD(course_id: Int?, course_name: String)
+        case exampleBooleans(example_bool: Bool, example_boolean: Bool)
 
         var data: EventData {
             switch self {
@@ -96,6 +100,13 @@ extension Analytics {
                                  properties: [
                                     "course_id": course_id as Any,
                                     "course_name": course_name as Any,
+                                 ])
+
+            case let .exampleBooleans(example_bool, example_boolean):
+                return EventData(type: .exampleBooleans,
+                                 properties: [
+                                    "example_bool": example_bool as Any,
+                                    "example_boolean": example_boolean as Any,
                                  ])
             }
         }

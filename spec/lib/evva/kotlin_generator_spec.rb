@@ -11,6 +11,7 @@ describe Evva::KotlinGenerator do
       Evva::AnalyticsEvent.new("cp_page_view_b", { course_id: "Long", course_name: "String", from_screen: "CourseProfileSource" }, ["firebase"]),
       Evva::AnalyticsEvent.new("cp_page_view_c", { course_id: "Long", course_name: "String", from_screen: "CourseProfileSource?" }, []),
       Evva::AnalyticsEvent.new("cp_page_view_d", { course_id: "Long?", course_name: "String", viewed_at: "Date" }, []),
+      Evva::AnalyticsEvent.new("example_booleans", { example_bool: "Bool", example_boolean: "Boolean" }, []),
     ] }
 
     let(:expected) {
@@ -93,6 +94,17 @@ sealed class AnalyticsEvent(
             "course_id" to courseId,
             "course_name" to courseName,
             "viewed_at" to viewedAt
+        ),
+    )
+
+    data class ExampleBooleans(
+        val exampleBool: Boolean,
+        val exampleBoolean: Boolean
+    ) : AnalyticsEvent(
+        event = AnalyticsEvents.EXAMPLE_BOOLEANS,
+        properties = mapOf(
+            "example_bool" to exampleBool,
+            "example_boolean" to exampleBoolean
         ),
     )
 }
