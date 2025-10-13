@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## [0.6.0] - 2025-10-13
+
+- Add support for ruby 3.4
+- Add Github test workflow
+
 ## [0.5.0] - 2024-10-16
 
 - Update all dependencies
