@@ -2,8 +2,7 @@
 
 source "https://rubygems.org"
 
-gem "colorize"
-gem "safe_yaml"
+gemspec
 
 group :test do
   gem "rake"

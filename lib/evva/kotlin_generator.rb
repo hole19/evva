@@ -31,7 +31,7 @@ module Evva
             param_name = camelize(name.to_s, false)
             value_fetcher = param_name
 
-            if is_special_property?(type)
+            if special_property?(type)
               if type.end_with?("?")
                 # optional value, we need ? to access a parameter
                 value_fetcher += "?"
@@ -88,7 +88,7 @@ module Evva
             class_name: camelize(property.property_name),
             property_name: constantize(property.property_name),
             type: type,
-            is_special_property: is_special_property?(property.type),
+            is_special_property: special_property?(property.type),
             destinations: property.destinations.map { |p| constantize(p) },
           }
         end
@@ -180,7 +180,7 @@ module Evva
         .gsub("Date","String")
     end
 
-    def is_special_property?(type)
+    def special_property?(type)
       !NATIVE_TYPES.include?(type.chomp("?"))
     end
   end
