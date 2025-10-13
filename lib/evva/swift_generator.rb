@@ -20,7 +20,7 @@ module Evva
 
             value_fetcher = k.to_s
 
-            if is_special_property?(type)
+            if special_property?(type)
               if type.end_with?("?")
                 # optional value, we need ? to access a parameter
                 value_fetcher += "?"
@@ -59,7 +59,7 @@ module Evva
             case_name: camelize(p.property_name),
             property_name: p.property_name,
             type: type,
-            is_special_property: is_special_property?(type),
+            is_special_property: special_property?(type),
             destinations: p.destinations.map { |p| camelize(p) },
           }
         end
@@ -123,7 +123,7 @@ module Evva
         .gsub("Long", "Int")
     end
 
-    def is_special_property?(type)
+    def special_property?(type)
       !NATIVE_TYPES.include?(type.chomp("?"))
     end
 
