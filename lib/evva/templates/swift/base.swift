@@ -2,6 +2,6 @@
 
 import Foundation
 
-extension Analytics {
+public extension Analytics {
 <%= content %>
 }
