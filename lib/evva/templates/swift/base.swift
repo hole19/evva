@@ -2,6 +2,6 @@
 
 import Foundation
 
-extension Analytics {
+<%= @swift_public_modifier %>extension Analytics {
 <%= content %>
 }

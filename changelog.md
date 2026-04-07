@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add `swift_public` configuration which modifies the accessibility of all the Swift code extensions to `public`
+
 ## [0.6.0] - 2025-10-13
 
 - Add support for ruby 3.4

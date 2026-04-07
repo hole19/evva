@@ -12,6 +12,10 @@ module Evva
 
     NATIVE_TYPES = %w[Int String Double Float Bool Date].freeze
 
+    def initialize(swift_public: false)
+      @swift_public_modifier = swift_public ? "public " : ""
+    end
+
     def events(bundle, _file_name, _enums_file_name, _destinations_file_name)
       header_footer_wrapper do
         events = bundle.map do |event|

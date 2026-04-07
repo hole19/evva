@@ -3,13 +3,13 @@ struct PropertyData {
 	let value: Any
 	let destinations: [Destination]
 
-	init(name: String, value: Any, destinations: [Destination]) {
+	<%= @swift_public_modifier %>init(name: String, value: Any, destinations: [Destination]) {
 		self.name = name
 		self.value = value
 		self.destinations = destinations
 	}
 
-	init(type: PropertyType, value: Any) {
+	<%= @swift_public_modifier %>init(type: PropertyType, value: Any) {
 		self.init(name: type.name, value: value, destinations: type.destinations)
 	}
 }

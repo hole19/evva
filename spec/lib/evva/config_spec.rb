@@ -34,6 +34,7 @@ describe Evva::Config do
   its(:people_enum_file_name) { should eq("people/enum/file/name") }
   its(:destinations_file_name) { should eq "destinations/file/name" }
   its(:package_name) { should eq "com.package.name.analytics" }
+  its(:swift_public?) { should eq(false) }
 
   describe "#data_source" do
     subject(:data_source) { config.data_source }
@@ -43,6 +44,26 @@ describe Evva::Config do
     context "when given an unknown type data source" do
       before { hash[:data_source] = { type: "i_dunno" } }
       it { expect { config }.to raise_error /unknown data source type 'i_dunno'/i }
+    end
+  end
+
+  describe "#swift_public?" do
+    context "when swift_public is true" do
+      before { hash[:swift_public] = true }
+
+      its(:swift_public?) { should eq(true) }
+    end
+
+    context "when swift_public is false" do
+      before { hash[:swift_public] = false }
+
+      its(:swift_public?) { should eq(false) }
+    end
+
+    context "when swift_public is not a boolean" do
+      before { hash[:swift_public] = "yes" }
+
+      it { expect { config }.to raise_error(ArgumentError, "swift_public must be true or false") }
     end
   end
 end
