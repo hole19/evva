@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.7.0] - 2026-04-07
+
 - Add `swift_public` configuration which modifies the accessibility of all the Swift code extensions to `public`
 
 ## [0.6.0] - 2025-10-13
