@@ -3,13 +3,13 @@ struct EventData {
 	var properties: [String: Any]?
 	let destinations: [Destination]
 
-	public init(name: String, properties: [String: Any]?, destinations: [Destination]) {
+	<%= @swift_public_modifier %>init(name: String, properties: [String: Any]?, destinations: [Destination]) {
 		self.name = name
 		self.properties = properties
 		self.destinations = destinations
 	}
 
-	public init(type: EventType, properties: [String: Any]?) {
+	<%= @swift_public_modifier %>init(type: EventType, properties: [String: Any]?) {
 		self.init(name: type.name, properties: properties, destinations: type.destinations)
 	}
 }

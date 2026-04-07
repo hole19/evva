@@ -30,7 +30,7 @@ module Evva
       generator = Evva::KotlinGenerator.new(config.package_name)
       evva_write(bundle, generator, config, "kt")
     when "ios"
-      generator = Evva::SwiftGenerator.new
+      generator = Evva::SwiftGenerator.new(swift_public: config.swift_public?)
       evva_write(bundle, generator, config, "swift")
     end
     Evva::Logger.print_summary

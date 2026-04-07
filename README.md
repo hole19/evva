@@ -32,7 +32,8 @@ Evva automatically generates code for triggering events based on a Google Sheets
  event_file_name: /file/with/tracking/functions
  event_enum_file_name: /file/with/event/names
  people_file_name: /file/with/people/properties
- people_file_name: /file/with/people/property/names
+ people_enum_file_name: /file/with/people/property/names
  destinations_file_name: /file/with/destinations
  special_enum_file_name: /file/with/special/enum/properties/
+ swift_public: false  # optional; when true (iOS), generated Swift uses the public access modifier for generated extensions
  ```
