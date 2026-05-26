@@ -23,6 +23,40 @@ describe Evva do
     end
   end
 
+  describe ".filter_destinations!" do
+    let(:bundle) do
+      {
+        destinations: ["firebase", "mixpanel"],
+        events: [Evva::AnalyticsEvent.new("test_event", {}, ["firebase", "mixpanel"])],
+        people: [Evva::AnalyticsProperty.new("test_prop", "String", ["firebase", "mixpanel"])],
+      }
+    end
+
+    context "when excluding a destination" do
+      before { Evva.filter_destinations!(bundle, ["firebase"]) }
+
+      it "removes it from the destinations list" do
+        expect(bundle[:destinations]).to eq(["mixpanel"])
+      end
+
+      it "removes it from event destinations" do
+        expect(bundle[:events].first.destinations).to eq(["mixpanel"])
+      end
+
+      it "removes it from people property destinations" do
+        expect(bundle[:people].first.destinations).to eq(["mixpanel"])
+      end
+    end
+
+    context "when exclude list is empty" do
+      before { Evva.filter_destinations!(bundle, []) }
+
+      it "does not change anything" do
+        expect(bundle[:destinations]).to eq(["firebase", "mixpanel"])
+      end
+    end
+  end
+
   context "when generic.yml does not exist locally" do
     let(:error) { "Could not open yml file" }
     before do

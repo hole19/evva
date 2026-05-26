@@ -13,6 +13,7 @@ module Evva
       if @hash.key?(:swift_public) && ![true, false].include?(@hash[:swift_public])
         raise ArgumentError, "swift_public must be true or false"
       end
+
     end
 
     def to_h
@@ -63,6 +64,10 @@ module Evva
       @hash[:swift_public] == true
     end
 
+    def exclude_destinations
+      @hash[:exclude_destinations] || []
+    end
+
     CONFIG_STRUCT = {
       type: Hash,
       elements: {
@@ -77,7 +82,8 @@ module Evva
         people_enum_file_name: { type: String },
         destinations_file_name: { type: String },
         package_name: { type: String },
-        swift_public: { type: Object, optional: true }
+        swift_public: { type: Object, optional: true },
+        exclude_destinations: { type: Array, optional: true }
       }
     }.freeze
 
