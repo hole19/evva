@@ -144,6 +144,7 @@ Swift
     let(:people_bundle) { [
       Evva::AnalyticsProperty.new("rounds_with_wear", "String", ["firebase"]),
       Evva::AnalyticsProperty.new("wear_platform", "WearableAppPlatform", ["firebase", "custom destination"]),
+      Evva::AnalyticsProperty.new("reverse_trial_type", "ReverseTrialType?", ["firebase"]),
       Evva::AnalyticsProperty.new("number_of_times_it_happened", "Long", []),
     ] }
 
@@ -173,6 +174,7 @@ extension Analytics {
     enum PropertyType: String {
         case roundsWithWear = "rounds_with_wear"
         case wearPlatform = "wear_platform"
+        case reverseTrialType = "reverse_trial_type"
         case numberOfTimesItHappened = "number_of_times_it_happened"
 
         var name: String { return rawValue }
@@ -181,6 +183,7 @@ extension Analytics {
             switch self {
             case .roundsWithWear: return [.firebase]
             case .wearPlatform: return [.firebase, .customDestination]
+            case .reverseTrialType: return [.firebase]
             case .numberOfTimesItHappened: return []
             }
         }
@@ -189,6 +192,7 @@ extension Analytics {
     enum Property {
         case roundsWithWear(String)
         case wearPlatform(WearableAppPlatform)
+        case reverseTrialType(ReverseTrialType?)
         case numberOfTimesItHappened(Int)
 
         var data: PropertyData {
@@ -200,6 +204,10 @@ extension Analytics {
             case let .wearPlatform(value):
                 return PropertyData(type: .wearPlatform,
                                     value: value.rawValue)
+
+            case let .reverseTrialType(value):
+                return PropertyData(type: .reverseTrialType,
+                                    value: value?.rawValue)
 
             case let .numberOfTimesItHappened(value):
                 return PropertyData(type: .numberOfTimesItHappened,

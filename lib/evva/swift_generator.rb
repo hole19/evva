@@ -64,6 +64,7 @@ module Evva
             property_name: p.property_name,
             type: type,
             is_special_property: special_property?(type),
+            is_optional: type.end_with?("?"),
             destinations: p.destinations.map { |p| camelize(p) },
           }
         end
