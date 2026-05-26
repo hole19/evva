@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.8.2] - 2026-05-26
+
+- Strip whitespace from property names and types when parsing CSV, fixing double spaces in generated Swift code
+
 ## [0.8.1] - 2026-05-26
 
 - Fix missing optional chaining for Swift people properties (`value?.rawValue` instead of `value.rawValue`)
