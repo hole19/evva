@@ -113,6 +113,7 @@ Swift
     let(:enums) { [
       Evva::AnalyticsEnum.new("CourseProfileSource", ["course_discovery", "synced_courses"]),
       Evva::AnalyticsEnum.new("PremiumFrom", ["Course Profile", "Round Setup"]),
+      Evva::AnalyticsEnum.new("PreAuthenticationScreenType", ["default", "self_improvement"]),
     ] }
 
     let(:expected) {
@@ -130,6 +131,11 @@ extension Analytics {
     enum PremiumFrom: String {
         case courseProfile = "Course Profile"
         case roundSetup = "Round Setup"
+    }
+
+    enum PreAuthenticationScreenType: String {
+        case `default` = "default"
+        case selfImprovement = "self_improvement"
     }
 }
 Swift
