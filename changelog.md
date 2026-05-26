@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.8.0] - 2026-05-26
+
 - Add `exclude_destinations` configuration to filter out specific destinations from generated code
 
 ## [0.7.0] - 2026-04-07
