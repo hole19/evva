@@ -1,6 +1,10 @@
 # Change Log
 
-## Unreleased
+## [0.8.1] - 2026-05-26
+
+- Fix missing optional chaining for Swift people properties (`value?.rawValue` instead of `value.rawValue`)
+- Escape Swift reserved keywords in generated enum case names (e.g. `` case `default` ``)
+- Remove redundant `public` modifier from `Destination` enum inside `public extension`
 
 ## [0.8.0] - 2026-05-26
 
