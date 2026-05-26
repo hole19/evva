@@ -263,7 +263,7 @@ Swift
 import Foundation
 
 public extension Analytics {
-    public enum Destination {
+    enum Destination {
         case firebase
         case whateverYouWantReally
     }
