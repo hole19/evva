@@ -11,6 +11,7 @@ module Evva
     TAB_SIZE = "    " # \t -> 4 spaces
 
     NATIVE_TYPES = %w[Int String Double Float Bool Date].freeze
+    SWIFT_KEYWORDS = %w[default].freeze
 
     def initialize(swift_public: false)
       @swift_public_modifier = swift_public ? "public " : ""
@@ -64,6 +65,7 @@ module Evva
             property_name: p.property_name,
             type: type,
             is_special_property: special_property?(type),
+            is_optional: type.end_with?("?"),
             destinations: p.destinations.map { |p| camelize(p) },
           }
         end
@@ -136,6 +138,7 @@ module Evva
       string = string.sub(/^(?:#{@acronym_regex}(?=\b|[A-Z_])|\w)/) { |match| match.downcase }
       string.gsub!(/(?:_|(\/))([a-z\d]*)/i) { "#{$1}#{$2.capitalize}" }
       string.gsub!("/".freeze, "::".freeze)
+      string = "`#{string}`" if SWIFT_KEYWORDS.include?(string)
       string
     end
   end
