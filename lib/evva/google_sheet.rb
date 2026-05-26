@@ -101,8 +101,8 @@ module Evva
       unless property_array.nil? || property_array.empty?
         property_array.split(",").each do |prop|
           split_prop = prop.split(":")
-          prop_name = split_prop[0].to_sym
-          prop_type = split_prop[1].to_s
+          prop_name = split_prop[0].strip.to_sym
+          prop_type = split_prop[1].to_s.strip
           h[prop_name] = prop_type
         end
       end
