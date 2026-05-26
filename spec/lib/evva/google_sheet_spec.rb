@@ -26,6 +26,7 @@ describe Evva::GoogleSheet do
         Evva::AnalyticsEvent.new("cp_page_view", { course_id: "Long", course_name: "String" }, ["firebase", "custom destination"]),
         Evva::AnalyticsEvent.new("nav_feed_tap", {}, []),
         Evva::AnalyticsEvent.new("cp_view_scorecard", { course_id: "Long", course_name: "String" }, ["custom destination"]),
+        Evva::AnalyticsEvent.new("side_game_delete", { fromScreen: "SideGameFromScreen", round_group_creation_token: "String" }, ["firebase"]),
       ]
       expect(events).to eq(expected)
     end

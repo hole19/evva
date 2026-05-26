@@ -2,3 +2,4 @@ Event Name,Event Properties,Event Destination
 cp_page_view,"course_id:Long,course_name:String","firebase,custom destination"
 nav_feed_tap,,
 cp_view_scorecard,"course_id:Long,course_name:String","custom destination"
+side_game_delete,"fromScreen: SideGameFromScreen,round_group_creation_token:String",firebase
