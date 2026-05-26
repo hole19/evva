@@ -47,6 +47,24 @@ describe Evva::Config do
     end
   end
 
+  describe "#exclude_destinations" do
+    context "when not set" do
+      its(:exclude_destinations) { should eq([]) }
+    end
+
+    context "when set to an array" do
+      before { hash[:exclude_destinations] = ["firebase"] }
+
+      its(:exclude_destinations) { should eq(["firebase"]) }
+    end
+
+    context "when not an array" do
+      before { hash[:exclude_destinations] = "firebase" }
+
+      it { expect { config }.to raise_error(ArgumentError, /Expected Array, got String/) }
+    end
+  end
+
   describe "#swift_public?" do
     context "when swift_public is true" do
       before { hash[:swift_public] = true }

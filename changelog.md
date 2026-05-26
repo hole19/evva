@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add `exclude_destinations` configuration to filter out specific destinations from generated code
+
 ## [0.7.0] - 2026-04-07
 
 - Add `swift_public` configuration which modifies the accessibility of all the Swift code extensions to `public`

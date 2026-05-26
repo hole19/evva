@@ -25,6 +25,7 @@ module Evva
 
     config = Evva::Config.new(hash: YAML.safe_load(config_file))
     bundle = analytics_data(config: config.data_source)
+    filter_destinations!(bundle, config.exclude_destinations)
     case config.type.downcase
     when "android"
       generator = Evva::KotlinGenerator.new(config.package_name)
@@ -91,6 +92,14 @@ module Evva
     opts_parser.parse!(options)
 
     opts_hash
+  end
+
+  def filter_destinations!(bundle, excluded)
+    return if excluded.empty?
+
+    bundle[:destinations].reject! { |d| excluded.include?(d) }
+    bundle[:events].each { |e| e.destinations.reject! { |d| excluded.include?(d) } }
+    bundle[:people].each { |p| p.destinations.reject! { |d| excluded.include?(d) } }
   end
 
   def write_to_file(path, data)
