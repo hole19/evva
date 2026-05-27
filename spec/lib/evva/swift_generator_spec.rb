@@ -213,7 +213,7 @@ extension Analytics {
 
             case let .reverseTrialType(value):
                 return PropertyData(type: .reverseTrialType,
-                                    value: value?.rawValue)
+                                    value: value?.rawValue as Any)
 
             case let .numberOfTimesItHappened(value):
                 return PropertyData(type: .numberOfTimesItHappened,
