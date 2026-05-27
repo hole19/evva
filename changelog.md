@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.8.3] - 2026-05-27
+
+- Add explicit `as Any` cast for optional people property values to silence Swift compiler warning
+
 ## [0.8.2] - 2026-05-26
 
 - Strip whitespace from property names and types when parsing CSV, fixing double spaces in generated Swift code
