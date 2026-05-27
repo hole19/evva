@@ -40,7 +40,7 @@ enum Property {
 		<%- properties.each_with_index do |p, index| -%>
 		case let .<%= p[:case_name] %>(value):
 			return PropertyData(type: .<%= p[:case_name] %>,
-								value: value<% if p[:is_special_property] %><%= "?" if p[:is_optional] %>.rawValue<% end %>)
+								value: value<% if p[:is_special_property] %><%= "?" if p[:is_optional] %>.rawValue<% end %><%= " as Any" if p[:is_optional] %>)
 			<%- unless index == properties.count - 1 -%>
 
 			<%- end -%>
