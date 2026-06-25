@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.8.4] - 2026-06-25
+
+- Add trailing commas to all generated Kotlin declarations
+
 ## [0.8.3] - 2026-05-27
 
 - Add explicit `as Any` cast for optional people property values to silence Swift compiler warning
