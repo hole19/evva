@@ -1,11 +1,14 @@
 require "net/https"
 require "csv"
 
+require "evva/analytics_event"
+
 module Evva
   class GoogleSheet
     EVENT_NAME = "Event Name"
     EVENT_PROPERTIES = "Event Properties"
     EVENT_DESTINATION = "Event Destination"
+    EVENT_PLATFORM = "Platform"
 
     PROPERTY_NAME = "Property Name"
     PROPERTY_TYPE = "Property Type"
@@ -13,6 +16,16 @@ module Evva
 
     ENUM_NAME = "Enum Name"
     ENUM_VALUES = "Possible Values"
+
+    # What a human may write in the `Platform` cell, mapped to the platforms each
+    # spelling expands to. The identity entries are derived so that a platform
+    # added to PLATFORMS cannot be accepted as a config type but rejected in a
+    # cell.
+    PLATFORM_ALIASES = begin
+      platforms = Evva::AnalyticsEvent::PLATFORMS
+      identities = platforms.to_h { |platform| [platform, [platform].freeze] }
+      identities.merge("both" => platforms, "all" => platforms).freeze
+    end
 
     def initialize(events_url, people_properties_url, enum_classes_url)
       @events_url = events_url
@@ -26,11 +39,17 @@ module Evva
         get_csv(@events_url)
       end
 
-      @events ||= @events_csv.map do |row|
-        event_name = row[EVENT_NAME]
-        properties = hash_parser(row[EVENT_PROPERTIES])
-        destinations = row[EVENT_DESTINATION]&.split(",")
-        Evva::AnalyticsEvent.new(event_name, properties, destinations || [])
+      @events ||= begin
+        platform_header = header_matching(@events_csv, EVENT_PLATFORM)
+        Logger.info("No #{EVENT_PLATFORM} column in the events sheet, every event will be generated for every platform") if platform_header.nil?
+
+        @events_csv.map do |row|
+          event_name = row[EVENT_NAME]
+          properties = hash_parser(row[EVENT_PROPERTIES])
+          destinations = row[EVENT_DESTINATION]&.split(",")
+          platforms = platform_parser(platform_header && row[platform_header], event_name)
+          Evva::AnalyticsEvent.new(event_name, properties, destinations || [], platforms)
+        end
       end
     end
 
@@ -94,6 +113,35 @@ module Evva
       raise "Http Error #{response.body}" if response.code.to_i >= 400
 
       response.body
+    end
+
+    # Matched ignoring case and surrounding whitespace, because a header of
+    # "platform" or "Platform " means what it plainly means, and matching it
+    # strictly would silently disable the filter for the whole sheet rather than
+    # fail. Deliberately used for this column only: a mistyped `Platform` fails
+    # silently, whereas a mistyped `Event Name` fails loudly and at once.
+    def header_matching(csv, name)
+      csv.headers.compact.find { |header| header.to_s.strip.casecmp?(name) }
+    end
+
+    # nil (no Platform column) or a cell holding no tokens both mean every
+    # platform, so a blank cell can never drop an event.
+    def platform_parser(platform_list, event_name)
+      tokens = platform_list.to_s.split(",").map(&:strip).reject(&:empty?)
+      return Evva::AnalyticsEvent::PLATFORMS if tokens.empty?
+
+      expanded = tokens.flat_map do |token|
+        # The message quotes the token as written, not as normalised, so it can be
+        # searched for in the sheet.
+        PLATFORM_ALIASES.fetch(token.downcase) do
+          raise "Unknown platform '#{token}' for event '#{event_name}'. " \
+                "Expected any of #{PLATFORM_ALIASES.keys.join(', ')}, or an empty cell for every platform."
+        end
+      end
+
+      # Intersecting dedups and takes canonical order from PLATFORMS itself,
+      # rather than relying on it happening to be alphabetical.
+      Evva::AnalyticsEvent::PLATFORMS & expanded
     end
 
     def hash_parser(property_array)
