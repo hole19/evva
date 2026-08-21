@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.8.5] - 2026-08-21
+
 - Fix `native_type` replacing `Long`/`Boolean` substrings inside custom type names (e.g. `FlyoverLongPressAction` → `FlyoverIntPressAction`)
 
 ## [0.8.4] - 2026-06-25
