@@ -109,6 +109,7 @@ Layout/SpaceInsideHashLiteralBraces:
   Exclude:
     - 'lib/evva/config.rb'
     - 'lib/evva/logger.rb'
+    - 'spec/evva_spec.rb'
     - 'spec/lib/evva/config_spec.rb'
     - 'spec/lib/evva/google_sheet_spec.rb'
     - 'spec/lib/evva/kotlin_generator_spec.rb'
@@ -253,6 +254,8 @@ Style/HashSyntax:
     - 'Gemfile'
     - 'Rakefile'
     - 'lib/evva.rb'
+    - 'spec/evva_spec.rb'
+    - 'spec/platform_filter_spec.rb'
     - 'lib/evva/config.rb'
     - 'lib/evva/google_sheet.rb'
     - 'lib/evva/kotlin_generator.rb'
@@ -359,6 +362,7 @@ Style/SymbolProc:
 # SupportedStylesForMultiline: comma, consistent_comma, no_comma
 Style/TrailingCommaInArrayLiteral:
   Exclude:
+    - 'spec/evva_spec.rb'
     - 'spec/lib/evva/google_sheet_spec.rb'
     - 'spec/lib/evva/kotlin_generator_spec.rb'
     - 'spec/lib/evva/swift_generator_spec.rb'
@@ -370,6 +374,7 @@ Style/TrailingCommaInArrayLiteral:
 Style/TrailingCommaInHashLiteral:
   Exclude:
     - 'lib/evva/config.rb'
+    - 'spec/evva_spec.rb'
     - 'lib/evva/kotlin_generator.rb'
     - 'lib/evva/swift_generator.rb'
     - 'spec/lib/evva/config_spec.rb'

@@ -1,0 +1,6 @@
+Enum Name,Possible Values
+PageViewSourceScreen,"course_discovery,synced_courses,nearby,deal"
+IosOnlyEnum,"a,b"
+AndroidOnlyEnum,"c,d"
+SharedEnum,"e,f"
+WearableAppPlatform,"wear_os,watch_os"
