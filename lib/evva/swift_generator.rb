@@ -125,8 +125,8 @@ module Evva
 
     def native_type(type)
       type
-        .gsub("Boolean","Bool")
-        .gsub("Long", "Int")
+        .gsub(/\bBoolean\b/, "Bool")
+        .gsub(/\bLong\b/, "Int")
     end
 
     def special_property?(type)

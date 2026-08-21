@@ -10,6 +10,7 @@ describe Evva::SwiftGenerator do
       Evva::AnalyticsEvent.new("cp_page_view_b", { course_id: "Long", course_name: "String", from_screen: "CourseProfileSource" }, []),
       Evva::AnalyticsEvent.new("cp_page_view_c", { course_id: "Long", course_name: "String", from_screen: "CourseProfileSource?" }, []),
       Evva::AnalyticsEvent.new("cp_page_view_d", { course_id: "Long?", course_name: "String" }, []),
+      Evva::AnalyticsEvent.new("flyover_long_press_action_selected", { action: "FlyoverLongPressAction" }, ["firebase"]),
     ] }
 
     let(:expected) {
@@ -41,6 +42,7 @@ extension Analytics {
         case cpPageViewB = "cp_page_view_b"
         case cpPageViewC = "cp_page_view_c"
         case cpPageViewD = "cp_page_view_d"
+        case flyoverLongPressActionSelected = "flyover_long_press_action_selected"
 
         var name: String { return rawValue }
 
@@ -51,6 +53,7 @@ extension Analytics {
             case .cpPageViewB: return []
             case .cpPageViewC: return []
             case .cpPageViewD: return []
+            case .flyoverLongPressActionSelected: return [.firebase]
             }
         }
     }
@@ -61,6 +64,7 @@ extension Analytics {
         case cpPageViewB(course_id: Int, course_name: String, from_screen: CourseProfileSource)
         case cpPageViewC(course_id: Int, course_name: String, from_screen: CourseProfileSource?)
         case cpPageViewD(course_id: Int?, course_name: String)
+        case flyoverLongPressActionSelected(action: FlyoverLongPressAction)
 
         var data: EventData {
             switch self {
@@ -96,6 +100,12 @@ extension Analytics {
                                  properties: [
                                     "course_id": course_id as Any,
                                     "course_name": course_name as Any,
+                                 ])
+
+            case let .flyoverLongPressActionSelected(action):
+                return EventData(type: .flyoverLongPressActionSelected,
+                                 properties: [
+                                    "action": action.rawValue as Any,
                                  ])
             }
         }
