@@ -15,9 +15,6 @@ module Evva
     ENUM_NAME = "Enum Name"
     ENUM_VALUES = "Possible Values"
 
-    # Keywords that mean "every platform" (i.e. unrestricted, never filtered out).
-    UNRESTRICTED_KEYWORDS = %w[all].freeze
-
     def initialize(events_url, people_properties_url, enum_classes_url)
       @events_url = events_url
       @people_properties_url = people_properties_url
@@ -112,17 +109,13 @@ module Evva
       csv.headers.compact.find { |header| header.to_s.strip.casecmp?(name) }
     end
 
-    # nil (no Platform column) or a cell holding only unrestricted keywords / no
-    # tokens → nil (unrestricted, never filtered out).
+    # nil (no Platform column or empty cell) means unrestricted (never filtered out).
     # Concrete platform tokens are stored lowercased and deduplicated.
     def platform_parser(platform_list)
       tokens = platform_list.to_s.split(",").map(&:strip).reject(&:empty?)
       return nil if tokens.empty?
 
-      concrete = tokens.map(&:downcase).reject { |t| UNRESTRICTED_KEYWORDS.include?(t) }
-      return nil if concrete.empty?
-
-      concrete.uniq
+      tokens.map(&:downcase).uniq
     end
 
     def hash_parser(property_array)

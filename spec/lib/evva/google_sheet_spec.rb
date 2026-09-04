@@ -55,7 +55,6 @@ describe Evva::GoogleSheet do
           android_only_event
           multi_platform_event
           mixed_case_event
-          all_keyword_event
           wear_sync_event
         ])
       end
@@ -75,10 +74,6 @@ describe Evva::GoogleSheet do
 
       it "normalises casing" do
         expect(platforms_for("mixed_case_event")).to eq(["ios"])
-      end
-
-      it "treats the all keyword as unrestricted" do
-        expect(platforms_for("all_keyword_event")).to be_nil
       end
     end
 
@@ -123,14 +118,6 @@ describe Evva::GoogleSheet do
 
       it "normalises it" do
         expect(events.first.platforms).to eq(["android"])
-      end
-    end
-
-    context "when a platform cell uses the all keyword" do
-      let(:events_file) { "Event Name,Platform\nsome_event,ALL\n" }
-
-      it "treats it as unrestricted" do
-        expect(events.first.platforms).to be_nil
       end
     end
 

@@ -48,13 +48,12 @@ describe "filtering by platform end to end" do
         ios_only_event
         multi_platform_event
         mixed_case_event
-        all_keyword_event
         wear_sync_event
       ])
     end
 
     it "accounts for every event it was given" do
-      filtered = logged_while { bundle }.grep(/^filtered/).first.to_s[/\((.*)\)/, 1].to_s.split(", ")
+      filtered = logged_while { bundle }.grep(/^Filtered/).first.to_s[/\((.*)\)/, 1].to_s.split(", ")
 
       expect(bundle[:events].size + filtered.size).to eq(unfiltered_bundle[:events].size)
     end
@@ -77,7 +76,6 @@ describe "filtering by platform end to end" do
         cp_page_view
         android_only_event
         multi_platform_event
-        all_keyword_event
       ])
     end
 
@@ -106,7 +104,6 @@ describe "filtering by platform end to end" do
         android_only_event
         multi_platform_event
         mixed_case_event
-        all_keyword_event
         wear_sync_event
       ])
     end

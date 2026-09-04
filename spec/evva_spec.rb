@@ -231,11 +231,11 @@ describe Evva do
       end
 
       it "names the filtered events" do
-        expect(messages).to include("filtered 1 events (android_only)")
+        expect(messages).to include("Filtered 1 events (android_only)")
       end
 
       it "names the pruned enums" do
-        expect(messages).to include("pruned 1 enums (AndroidOnlyEnum)")
+        expect(messages).to include("Pruned 1 enums (AndroidOnlyEnum)")
       end
     end
   end

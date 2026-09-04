@@ -60,8 +60,7 @@ Evva automatically generates code for triggering events based on a Google Sheets
  absent, every event is generated.
 
  Any value is accepted as a platform name (case insensitive, comma separated).
- The keyword `all` and an empty cell both mean the event is unrestricted and will
- never be filtered out.
+ An empty cell means the event is unrestricted and will never be filtered out.
 
  The header is matched ignoring case and surrounding whitespace, so `platform` and
  `Platform ` are both found.
@@ -73,7 +72,7 @@ Evva automatically generates code for triggering events based on a Google Sheets
  [INFO] No Platform column in the events sheet, every event will be generated for every platform
  ```
 
- Enums that no longer have a referencing event after filtering are pruned. Enums
- that already had no reference before filtering are left alone.
+ Enums whose only referencing events were filtered out are pruned, unless a
+ people property also references them.
 
  People properties have no `Platform` column and are never filtered.

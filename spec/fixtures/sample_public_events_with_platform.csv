@@ -4,5 +4,4 @@ ios_only_event,iOS,from_screen:IosOnlyEnum,1.1,firebase,Only tracked on iOS
 android_only_event,Android,from_screen:AndroidOnlyEnum,1.1,firebase,Only tracked on Android
 multi_platform_event,"iOS, Android",source:SharedEnum,1.2,firebase,Both platforms spelled out as a list
 mixed_case_event,IOS,,1.2,firebase,Casing is normalised
-all_keyword_event,all,,1.2,firebase,The all keyword
 wear_sync_event,iOS,platform:WearableAppPlatform,1.3,firebase,Enum also referenced by a people property
