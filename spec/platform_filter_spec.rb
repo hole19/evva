@@ -26,9 +26,9 @@ describe "filtering by platform end to end" do
     Evva.analytics_data(config: source)
   end
 
-  def bundle_for(type)
+  def bundle_for(platforms)
     bundle = unfiltered_bundle
-    Evva.filter_platforms!(bundle, type)
+    Evva.filter_platforms!(bundle, platforms)
     bundle
   end
 
@@ -40,15 +40,15 @@ describe "filtering by platform end to end" do
   end
 
   describe "for iOS" do
-    let(:bundle) { bundle_for("iOS") }
+    let(:bundle) { bundle_for(["ios"]) }
 
-    it "keeps the iOS and every-platform events" do
+    it "keeps the iOS and unrestricted events" do
       expect(bundle[:events].map(&:event_name)).to eq(%w[
         cp_page_view
         ios_only_event
-        both_listed_event
+        multi_platform_event
         mixed_case_event
-        both_keyword_event
+        all_keyword_event
         wear_sync_event
       ])
     end
@@ -70,14 +70,14 @@ describe "filtering by platform end to end" do
   end
 
   describe "for Android" do
-    let(:bundle) { bundle_for("Android") }
+    let(:bundle) { bundle_for(["android"]) }
 
-    it "keeps the Android and every-platform events" do
+    it "keeps the Android and unrestricted events" do
       expect(bundle[:events].map(&:event_name)).to eq(%w[
         cp_page_view
         android_only_event
-        both_listed_event
-        both_keyword_event
+        multi_platform_event
+        all_keyword_event
       ])
     end
 
@@ -96,17 +96,33 @@ describe "filtering by platform end to end" do
     end
   end
 
-  # What protects the sheets that predate the column, the CORE Golf one included.
+  describe "for multiple platforms" do
+    let(:bundle) { bundle_for(["ios", "android"]) }
+
+    it "keeps events matching any of the platforms" do
+      expect(bundle[:events].map(&:event_name)).to eq(%w[
+        cp_page_view
+        ios_only_event
+        android_only_event
+        multi_platform_event
+        mixed_case_event
+        all_keyword_event
+        wear_sync_event
+      ])
+    end
+  end
+
+  # What protects the sheets that predate the column.
   # The generators are pure functions of the bundle and are untouched here, so a
   # bundle the filter left alone generates exactly what it generated before.
   describe "a sheet with no Platform column" do
     let(:events_fixture) { "sample_public_events.csv" }
     let(:enums_fixture) { "sample_public_enums.csv" }
 
-    %w[iOS Android].each do |type|
-      it "leaves the #{type} bundle untouched" do
+    [["ios"], ["android"]].each do |platforms|
+      it "leaves the #{platforms} bundle untouched" do
         before_filtering = unfiltered_bundle
-        after_filtering = bundle_for(type)
+        after_filtering = bundle_for(platforms)
 
         expect(after_filtering[:events].map(&:event_name)).to eq(before_filtering[:events].map(&:event_name))
         expect(after_filtering[:enums].map(&:enum_name)).to eq(before_filtering[:enums].map(&:enum_name))
@@ -115,11 +131,20 @@ describe "filtering by platform end to end" do
     end
 
     it "keeps enums that no event references" do
-      expect(bundle_for("iOS")[:enums].map(&:enum_name)).to eq(%w[PageViewSourceScreen PremiumClickBuy])
+      expect(bundle_for(["ios"])[:enums].map(&:enum_name)).to eq(%w[PageViewSourceScreen PremiumClickBuy])
     end
 
     it "reports no filtering" do
-      expect(logged_while { bundle_for("iOS") }.grep(/filtered|pruned/)).to be_empty
+      expect(logged_while { bundle_for(["ios"]) }.grep(/filtered|pruned/)).to be_empty
+    end
+  end
+
+  describe "when filter_by_platforms is nil" do
+    it "leaves the bundle untouched" do
+      before_filtering = unfiltered_bundle
+      after_filtering = bundle_for(nil)
+
+      expect(after_filtering[:events].map(&:event_name)).to eq(before_filtering[:events].map(&:event_name))
     end
   end
 end

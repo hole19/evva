@@ -62,11 +62,11 @@ describe Evva do
       Evva::AnalyticsEvent.new(name, properties, ["firebase"], platforms)
     end
 
-    let(:everywhere) { event("everywhere", Evva::AnalyticsEvent::PLATFORMS) }
+    let(:unrestricted) { event("unrestricted", nil) }
     let(:ios_only) { event("ios_only", ["ios"], { from_screen: "IosOnlyEnum" }) }
     let(:android_only) { event("android_only", ["android"], { from_screen: "AndroidOnlyEnum" }) }
 
-    let(:events) { [everywhere, ios_only, android_only] }
+    let(:events) { [unrestricted, ios_only, android_only] }
 
     let(:enums) do
       [
@@ -90,11 +90,11 @@ describe Evva do
       bundle[:events].map(&:event_name)
     end
 
-    context "when generating for iOS" do
-      before { Evva.filter_platforms!(bundle, "iOS") }
+    context "when filtering for iOS" do
+      before { Evva.filter_platforms!(bundle, ["ios"]) }
 
-      it "keeps events marked for every platform" do
-        expect(event_names).to include("everywhere")
+      it "keeps unrestricted events" do
+        expect(event_names).to include("unrestricted")
       end
 
       it "keeps iOS events" do
@@ -106,11 +106,11 @@ describe Evva do
       end
     end
 
-    context "when generating for Android" do
-      before { Evva.filter_platforms!(bundle, "Android") }
+    context "when filtering for Android" do
+      before { Evva.filter_platforms!(bundle, ["android"]) }
 
-      it "keeps events marked for every platform" do
-        expect(event_names).to include("everywhere")
+      it "keeps unrestricted events" do
+        expect(event_names).to include("unrestricted")
       end
 
       it "keeps Android events" do
@@ -122,25 +122,33 @@ describe Evva do
       end
     end
 
-    context "when the configured type is in another casing" do
-      before { Evva.filter_platforms!(bundle, "IOS") }
+    context "when filtering for multiple platforms" do
+      before { Evva.filter_platforms!(bundle, ["ios", "android"]) }
 
-      it "filters all the same" do
-        expect(event_names).to eq(["everywhere", "ios_only"])
+      it "keeps events matching any of them" do
+        expect(event_names).to eq(["unrestricted", "ios_only", "android_only"])
       end
     end
 
-    context "when the configured type is lowercase" do
-      before { Evva.filter_platforms!(bundle, "android") }
+    context "when filter_by_platforms is nil" do
+      before { Evva.filter_platforms!(bundle, nil) }
 
-      it "filters all the same" do
-        expect(event_names).to eq(["everywhere", "android_only"])
+      it "does not filter anything" do
+        expect(event_names).to eq(["unrestricted", "ios_only", "android_only"])
+      end
+    end
+
+    context "when filter_by_platforms is empty" do
+      before { Evva.filter_platforms!(bundle, []) }
+
+      it "does not filter anything" do
+        expect(event_names).to eq(["unrestricted", "ios_only", "android_only"])
       end
     end
 
     it "accounts for every event it was given" do
       events_in = bundle[:events].size
-      Evva.filter_platforms!(bundle, "iOS")
+      Evva.filter_platforms!(bundle, ["ios"])
       events_out = bundle[:events].size
       events_filtered = events.count { |e| !e.supports_platform?("ios") }
 
@@ -148,46 +156,38 @@ describe Evva do
     end
 
     context "when no event is filtered out" do
-      let(:events) { [everywhere] }
+      let(:events) { [unrestricted] }
 
       it "leaves the events untouched" do
-        expect { Evva.filter_platforms!(bundle, "iOS") }.not_to change { bundle[:events] }
+        expect { Evva.filter_platforms!(bundle, ["ios"]) }.not_to change { bundle[:events] }
       end
 
       it "leaves the enums untouched, orphans included" do
-        expect { Evva.filter_platforms!(bundle, "iOS") }.not_to change { enum_names }
+        expect { Evva.filter_platforms!(bundle, ["ios"]) }.not_to change { enum_names }
       end
 
       it "logs nothing" do
         expect {
-          Evva.filter_platforms!(bundle, "iOS")
+          Evva.filter_platforms!(bundle, ["ios"])
         }.to not_change { Evva::Logger.summary[:info] }
-      end
-    end
-
-    context "when the platform is not one we generate for" do
-      before { Evva.filter_platforms!(bundle, "web") }
-
-      it "filters nothing" do
-        expect(event_names).to eq(["everywhere", "ios_only", "android_only"])
       end
     end
 
     describe "enum pruning" do
       it "prunes an enum whose only event was filtered out" do
-        Evva.filter_platforms!(bundle, "ios")
+        Evva.filter_platforms!(bundle, ["ios"])
 
         expect(enum_names).not_to include("AndroidOnlyEnum")
       end
 
       it "keeps an enum still referenced by a surviving event" do
-        Evva.filter_platforms!(bundle, "ios")
+        Evva.filter_platforms!(bundle, ["ios"])
 
         expect(enum_names).to include("IosOnlyEnum")
       end
 
       it "keeps an enum that was already unreferenced before filtering" do
-        Evva.filter_platforms!(bundle, "ios")
+        Evva.filter_platforms!(bundle, ["ios"])
 
         expect(enum_names).to include("NeverReferenced")
       end
@@ -198,7 +198,7 @@ describe Evva do
         end
 
         it "keeps the enum" do
-          Evva.filter_platforms!(bundle, "ios")
+          Evva.filter_platforms!(bundle, ["ios"])
 
           expect(enum_names).to include("AndroidOnlyEnum")
         end
@@ -209,13 +209,13 @@ describe Evva do
         let(:ios_only) { event("ios_only", ["ios"], { from_screen: "IosOnlyEnum?" }) }
 
         it "prunes the filtered platform's enum" do
-          Evva.filter_platforms!(bundle, "ios")
+          Evva.filter_platforms!(bundle, ["ios"])
 
           expect(enum_names).not_to include("AndroidOnlyEnum")
         end
 
         it "keeps the surviving platform's enum" do
-          Evva.filter_platforms!(bundle, "ios")
+          Evva.filter_platforms!(bundle, ["ios"])
 
           expect(enum_names).to include("IosOnlyEnum")
         end
@@ -226,7 +226,7 @@ describe Evva do
       subject(:messages) do
         logged = []
         allow(Evva::Logger).to receive(:info) { |msg| logged << msg }
-        Evva.filter_platforms!(bundle, "ios")
+        Evva.filter_platforms!(bundle, ["ios"])
         logged
       end
 

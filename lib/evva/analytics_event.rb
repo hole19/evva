@@ -1,11 +1,8 @@
 module Evva
   class AnalyticsEvent
-    # Concrete platforms an event can be generated for, in canonical order.
-    PLATFORMS = %w[android ios].freeze
-
     attr_reader :event_name, :properties, :destinations, :platforms
 
-    def initialize(event_name, properties, destinations, platforms = PLATFORMS)
+    def initialize(event_name, properties, destinations, platforms = nil)
       @event_name = event_name
       @properties = properties
       @destinations = destinations
@@ -13,6 +10,8 @@ module Evva
     end
 
     def supports_platform?(platform)
+      return true if platforms.nil?
+
       platforms.include?(platform.to_s.downcase)
     end
 

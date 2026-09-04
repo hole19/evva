@@ -26,7 +26,7 @@ module Evva
     config = Evva::Config.new(hash: YAML.safe_load(config_file))
     bundle = analytics_data(config: config.data_source)
     filter_destinations!(bundle, config.exclude_destinations)
-    filter_platforms!(bundle, config.type)
+    filter_platforms!(bundle, config.filter_by_platforms)
     case config.type.downcase
     when "android"
       generator = Evva::KotlinGenerator.new(config.package_name)
@@ -103,15 +103,18 @@ module Evva
     bundle[:people].each { |p| p.destinations.reject! { |d| excluded.include?(d) } }
   end
 
-  def filter_platforms!(bundle, platform)
-    platform = platform.to_s.downcase
-    return unless Evva::AnalyticsEvent::PLATFORMS.include?(platform)
+  def filter_platforms!(bundle, platforms)
+    return if platforms.nil? || platforms.empty?
 
-    kept, filtered = bundle[:events].partition { |event| event.supports_platform?(platform) }
+    normalized = platforms.map { |p| p.to_s.downcase }
+
+    kept, filtered = bundle[:events].partition { |event|
+      normalized.any? { |p| event.supports_platform?(p) }
+    }
     return if filtered.empty?
 
     bundle[:events] = kept
-    Logger.info("filtered #{filtered.size} events (#{filtered.map(&:event_name).join(', ')})")
+    Logger.info("Filtered #{filtered.size} events (#{filtered.map(&:event_name).join(', ')})")
 
     # Only what the dropped events were keeping alive. An enum that had no
     # reference before this run keeps its place on purpose: pruning those would
@@ -121,7 +124,7 @@ module Evva
     return if pruned.empty?
 
     bundle[:enums] = remaining
-    Logger.info("pruned #{pruned.size} enums (#{pruned.map(&:enum_name).join(', ')})")
+    Logger.info("Pruned #{pruned.size} enums (#{pruned.map(&:enum_name).join(', ')})")
   end
 
   # Every property type these events and people properties name, with the

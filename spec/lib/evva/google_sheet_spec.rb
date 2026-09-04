@@ -23,17 +23,17 @@ describe Evva::GoogleSheet do
 
     it "returns an array with the corresponding events" do
       expected = [
-        Evva::AnalyticsEvent.new("cp_page_view", { course_id: "Long", course_name: "String" }, ["firebase", "custom destination"]),
-        Evva::AnalyticsEvent.new("nav_feed_tap", {}, []),
-        Evva::AnalyticsEvent.new("cp_view_scorecard", { course_id: "Long", course_name: "String" }, ["custom destination"]),
-        Evva::AnalyticsEvent.new("side_game_delete", { fromScreen: "SideGameFromScreen", round_group_creation_token: "String" }, ["firebase"]),
+        Evva::AnalyticsEvent.new("cp_page_view", { course_id: "Long", course_name: "String" }, ["firebase", "custom destination"], nil),
+        Evva::AnalyticsEvent.new("nav_feed_tap", {}, [], nil),
+        Evva::AnalyticsEvent.new("cp_view_scorecard", { course_id: "Long", course_name: "String" }, ["custom destination"], nil),
+        Evva::AnalyticsEvent.new("side_game_delete", { fromScreen: "SideGameFromScreen", round_group_creation_token: "String" }, ["firebase"], nil),
       ]
       expect(events).to eq(expected)
     end
 
     context "when the sheet has no Platform column" do
-      it "includes every event on both platforms" do
-        expect(events.map(&:platforms)).to all(eq(Evva::AnalyticsEvent::PLATFORMS))
+      it "leaves platforms as nil (unrestricted)" do
+        expect(events.map(&:platforms)).to all(be_nil)
       end
     end
 
@@ -53,15 +53,15 @@ describe Evva::GoogleSheet do
           cp_page_view
           ios_only_event
           android_only_event
-          both_listed_event
+          multi_platform_event
           mixed_case_event
-          both_keyword_event
+          all_keyword_event
           wear_sync_event
         ])
       end
 
-      it "treats an empty cell as every platform" do
-        expect(platforms_for("cp_page_view")).to eq(Evva::AnalyticsEvent::PLATFORMS)
+      it "treats an empty cell as unrestricted" do
+        expect(platforms_for("cp_page_view")).to be_nil
       end
 
       it "reads a single platform" do
@@ -70,15 +70,15 @@ describe Evva::GoogleSheet do
       end
 
       it "reads a comma separated list of platforms" do
-        expect(platforms_for("both_listed_event")).to eq(Evva::AnalyticsEvent::PLATFORMS)
+        expect(platforms_for("multi_platform_event")).to eq(["ios", "android"])
       end
 
       it "normalises casing" do
         expect(platforms_for("mixed_case_event")).to eq(["ios"])
       end
 
-      it "expands the both keyword" do
-        expect(platforms_for("both_keyword_event")).to eq(Evva::AnalyticsEvent::PLATFORMS)
+      it "treats the all keyword as unrestricted" do
+        expect(platforms_for("all_keyword_event")).to be_nil
       end
     end
 
@@ -129,40 +129,24 @@ describe Evva::GoogleSheet do
     context "when a platform cell uses the all keyword" do
       let(:events_file) { "Event Name,Platform\nsome_event,ALL\n" }
 
-      it "expands to every platform" do
-        expect(events.first.platforms).to eq(Evva::AnalyticsEvent::PLATFORMS)
+      it "treats it as unrestricted" do
+        expect(events.first.platforms).to be_nil
       end
     end
 
     context "when a platform cell repeats a platform" do
-      let(:events_file) { "Event Name,Platform\nsome_event,\"ios,iOS,both\"\n" }
+      let(:events_file) { "Event Name,Platform\nsome_event,\"ios,iOS\"\n" }
 
       it "does not duplicate it" do
-        expect(events.first.platforms).to eq(Evva::AnalyticsEvent::PLATFORMS)
+        expect(events.first.platforms).to eq(["ios"])
       end
     end
 
-    context "when a platform is not recognised" do
-      let(:events_file) { "Event Name,Platform\nnav_feed_tap,iOS\nround_dexterity_change,Windows\n" }
+    context "when a platform cell has an unknown token" do
+      let(:events_file) { "Event Name,Platform\nsome_event,Windows\n" }
 
-      it "raises naming the offending event" do
-        expect { events }.to raise_error(/round_dexterity_change/)
-      end
-
-      it "raises naming the offending value" do
-        expect { events }.to raise_error(/Windows/)
-      end
-
-      it "raises listing the accepted values" do
-        expect { events }.to raise_error(/android, ios, both, all/)
-      end
-    end
-
-    context "when only some platform tokens are recognised" do
-      let(:events_file) { "Event Name,Platform\nsome_event,\"iOS, Blackberry\"\n" }
-
-      it "still raises" do
-        expect { events }.to raise_error(/Blackberry/)
+      it "stores it as-is (lowercased)" do
+        expect(events.first.platforms).to eq(["windows"])
       end
     end
 
