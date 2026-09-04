@@ -19,6 +19,6 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 3.2.0"
 
   s.add_runtime_dependency "colorize", "~> 1.0"
-  s.add_runtime_dependency "csv", ">= 3.0"
+  s.add_runtime_dependency "csv", "~> 3.0"
   s.add_runtime_dependency "safe_yaml", "~> 1.0"
 end

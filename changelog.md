@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-04
+
 - Add `Platform` column support in the events sheet and `filter_by_platforms` configuration to filter generated events by platform
 
 ## [0.8.5] - 2026-08-21
