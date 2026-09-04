@@ -36,4 +36,43 @@ Evva automatically generates code for triggering events based on a Google Sheets
  destinations_file_name: /file/with/destinations
  special_enum_file_name: /file/with/special/enum/properties/
  swift_public: false  # optional; when true (iOS), generated Swift uses the public access modifier for generated extensions
+ filter_by_platforms:  # optional; array of platforms to keep (e.g. [ios])
+   - ios
  ```
+
+## The events sheet
+
+ The events sheet is read by column header, so column order does not matter and
+ unknown columns are ignored.
+
+ | Column | Required | Meaning |
+ | --- | --- | --- |
+ | `Event Name` | yes | The event name |
+ | `Event Properties` | no | Comma separated `name:Type` pairs |
+ | `Event Destination` | no | Comma separated destinations |
+ | `Platform` | no | Which platforms track the event |
+
+### Platform
+
+ `Platform` tags an event with the platforms it belongs to. Filtering is driven
+ by the `filter_by_platforms` key in `evva_config.yml`: only events matching one
+ of the listed platforms (or unrestricted events) are generated. When the key is
+ absent, every event is generated.
+
+ Any value is accepted as a platform name (case insensitive, comma separated).
+ An empty cell means the event is unrestricted and will never be filtered out.
+
+ The header is matched ignoring case and surrounding whitespace, so `platform` and
+ `Platform ` are both found.
+
+ When no `Platform` column is found the run says so, because "every event was
+ generated" is otherwise indistinguishable from a header that failed to match:
+
+ ```
+ [INFO] No Platform column in the events sheet, every event will be generated for every platform
+ ```
+
+ Enums whose only referencing events were filtered out are pruned, unless a
+ people property also references them.
+
+ People properties have no `Platform` column and are never filtered.

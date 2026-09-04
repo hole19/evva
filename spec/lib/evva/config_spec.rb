@@ -65,6 +65,24 @@ describe Evva::Config do
     end
   end
 
+  describe "#filter_by_platforms" do
+    context "when not set" do
+      its(:filter_by_platforms) { should be_nil }
+    end
+
+    context "when set to an array" do
+      before { hash[:filter_by_platforms] = ["ios"] }
+
+      its(:filter_by_platforms) { should eq(["ios"]) }
+    end
+
+    context "when not an array" do
+      before { hash[:filter_by_platforms] = "ios" }
+
+      it { expect { config }.to raise_error(ArgumentError, /Expected Array, got String/) }
+    end
+  end
+
   describe "#swift_public?" do
     context "when swift_public is true" do
       before { hash[:swift_public] = true }

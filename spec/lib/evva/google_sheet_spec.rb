@@ -23,12 +23,118 @@ describe Evva::GoogleSheet do
 
     it "returns an array with the corresponding events" do
       expected = [
-        Evva::AnalyticsEvent.new("cp_page_view", { course_id: "Long", course_name: "String" }, ["firebase", "custom destination"]),
-        Evva::AnalyticsEvent.new("nav_feed_tap", {}, []),
-        Evva::AnalyticsEvent.new("cp_view_scorecard", { course_id: "Long", course_name: "String" }, ["custom destination"]),
-        Evva::AnalyticsEvent.new("side_game_delete", { fromScreen: "SideGameFromScreen", round_group_creation_token: "String" }, ["firebase"]),
+        Evva::AnalyticsEvent.new("cp_page_view", { course_id: "Long", course_name: "String" }, ["firebase", "custom destination"], nil),
+        Evva::AnalyticsEvent.new("nav_feed_tap", {}, [], nil),
+        Evva::AnalyticsEvent.new("cp_view_scorecard", { course_id: "Long", course_name: "String" }, ["custom destination"], nil),
+        Evva::AnalyticsEvent.new("side_game_delete", { fromScreen: "SideGameFromScreen", round_group_creation_token: "String" }, ["firebase"], nil),
       ]
       expect(events).to eq(expected)
+    end
+
+    context "when the sheet has no Platform column" do
+      it "leaves platforms as nil (unrestricted)" do
+        expect(events.map(&:platforms)).to all(be_nil)
+      end
+    end
+
+    context "when the sheet has a Platform column" do
+      let(:events_file) { File.read("spec/fixtures/sample_public_events_with_platform.csv") }
+
+      def platforms_for(event_name)
+        events.find { |event| event.event_name == event_name }.platforms
+      end
+
+      it do
+        expect { events }.not_to raise_error
+      end
+
+      it "reads the column by header name, whatever its position" do
+        expect(events.map(&:event_name)).to eq(%w[
+          cp_page_view
+          ios_only_event
+          android_only_event
+          multi_platform_event
+          mixed_case_event
+          wear_sync_event
+        ])
+      end
+
+      it "treats an empty cell as unrestricted" do
+        expect(platforms_for("cp_page_view")).to be_nil
+      end
+
+      it "reads a single platform" do
+        expect(platforms_for("ios_only_event")).to eq(["ios"])
+        expect(platforms_for("android_only_event")).to eq(["android"])
+      end
+
+      it "reads a comma separated list of platforms" do
+        expect(platforms_for("multi_platform_event")).to eq(["ios", "android"])
+      end
+
+      it "normalises casing" do
+        expect(platforms_for("mixed_case_event")).to eq(["ios"])
+      end
+    end
+
+    ["platform", "Platform ", " Platform", "PLATFORM", "pLaTfOrM"].each do |header|
+      context "when the Platform header is written as #{header.inspect}" do
+        let(:events_file) { %(Event Name,"#{header}"\nsome_event,Android\n) }
+
+        it "still finds the column" do
+          expect(events.first.platforms).to eq(["android"])
+        end
+      end
+    end
+
+    context "when there is no Platform column" do
+      let(:events_file) { "Event Name,Event Destination\nsome_event,firebase\n" }
+
+      it "says so, so that a mistyped header is not mistaken for a filter that ran" do
+        logged = []
+        allow(Evva::Logger).to receive(:info) { |msg| logged << msg }
+
+        events
+
+        expect(logged).to include(/No Platform column/)
+      end
+    end
+
+    context "when the Platform column is present" do
+      let(:events_file) { "Event Name,Platform\nsome_event,iOS\n" }
+
+      it "does not report a missing column" do
+        logged = []
+        allow(Evva::Logger).to receive(:info) { |msg| logged << msg }
+
+        events
+
+        expect(logged).not_to include(/No Platform column/)
+      end
+    end
+
+    context "when a platform cell is written in another casing" do
+      let(:events_file) { "Event Name,Platform\nsome_event,  AnDrOiD  \n" }
+
+      it "normalises it" do
+        expect(events.first.platforms).to eq(["android"])
+      end
+    end
+
+    context "when a platform cell repeats a platform" do
+      let(:events_file) { "Event Name,Platform\nsome_event,\"ios,iOS\"\n" }
+
+      it "does not duplicate it" do
+        expect(events.first.platforms).to eq(["ios"])
+      end
+    end
+
+    context "when a platform cell has an unknown token" do
+      let(:events_file) { "Event Name,Platform\nsome_event,Windows\n" }
+
+      it "stores it as-is (lowercased)" do
+        expect(events.first.platforms).to eq(["windows"])
+      end
     end
 
     context "when given an inexistent sheet" do

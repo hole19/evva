@@ -26,6 +26,7 @@ module Evva
     config = Evva::Config.new(hash: YAML.safe_load(config_file))
     bundle = analytics_data(config: config.data_source)
     filter_destinations!(bundle, config.exclude_destinations)
+    filter_platforms!(bundle, config.filter_by_platforms)
     case config.type.downcase
     when "android"
       generator = Evva::KotlinGenerator.new(config.package_name)
@@ -100,6 +101,40 @@ module Evva
     bundle[:destinations].reject! { |d| excluded.include?(d) }
     bundle[:events].each { |e| e.destinations.reject! { |d| excluded.include?(d) } }
     bundle[:people].each { |p| p.destinations.reject! { |d| excluded.include?(d) } }
+  end
+
+  def filter_platforms!(bundle, platforms)
+    return if platforms.nil? || platforms.empty?
+
+    normalized = platforms.map { |p| p.to_s.downcase }
+
+    kept, filtered = bundle[:events].partition { |event|
+      normalized.any? { |p| event.supports_platform?(p) }
+    }
+    return if filtered.empty?
+
+    bundle[:events] = kept
+    Logger.info("Filtered #{filtered.size} events (#{filtered.map(&:event_name).join(', ')})")
+
+    # Only what the dropped events were keeping alive. An enum that had no
+    # reference before this run keeps its place on purpose: pruning those would
+    # change the output of sheets that have no Platform column at all.
+    orphaned = types_referenced_by(filtered) - types_referenced_by(kept, bundle[:people])
+    pruned, remaining = bundle[:enums].partition { |enum| orphaned.include?(enum.enum_name) }
+    return if pruned.empty?
+
+    bundle[:enums] = remaining
+    Logger.info("Pruned #{pruned.size} enums (#{pruned.map(&:enum_name).join(', ')})")
+  end
+
+  # Every property type these events and people properties name, with the
+  # optional marker stripped. The caller compares against real enum names, so
+  # this never has to decide whether a type is an enum. People properties are
+  # never platform filtered but still hold references, so an enum kept alive only
+  # by one must survive.
+  def types_referenced_by(events, people = [])
+    types = events.flat_map { |event| event.properties.values } + people.map(&:type)
+    types.map { |type| type.to_s.chomp("?") }
   end
 
   def write_to_file(path, data)

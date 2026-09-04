@@ -6,6 +6,7 @@ module Evva
     EVENT_NAME = "Event Name"
     EVENT_PROPERTIES = "Event Properties"
     EVENT_DESTINATION = "Event Destination"
+    EVENT_PLATFORM = "Platform"
 
     PROPERTY_NAME = "Property Name"
     PROPERTY_TYPE = "Property Type"
@@ -26,11 +27,17 @@ module Evva
         get_csv(@events_url)
       end
 
-      @events ||= @events_csv.map do |row|
-        event_name = row[EVENT_NAME]
-        properties = hash_parser(row[EVENT_PROPERTIES])
-        destinations = row[EVENT_DESTINATION]&.split(",")
-        Evva::AnalyticsEvent.new(event_name, properties, destinations || [])
+      @events ||= begin
+        platform_header = header_matching(@events_csv, EVENT_PLATFORM)
+        Logger.info("No #{EVENT_PLATFORM} column in the events sheet, every event will be generated for every platform") if platform_header.nil?
+
+        @events_csv.map do |row|
+          event_name = row[EVENT_NAME]
+          properties = hash_parser(row[EVENT_PROPERTIES])
+          destinations = row[EVENT_DESTINATION]&.split(",")
+          platforms = platform_parser(platform_header && row[platform_header])
+          Evva::AnalyticsEvent.new(event_name, properties, destinations || [], platforms)
+        end
       end
     end
 
@@ -94,6 +101,21 @@ module Evva
       raise "Http Error #{response.body}" if response.code.to_i >= 400
 
       response.body
+    end
+
+    # Matched ignoring case and surrounding whitespace, because a header of
+    # "platform" or "Platform " means what it plainly means.
+    def header_matching(csv, name)
+      csv.headers.compact.find { |header| header.to_s.strip.casecmp?(name) }
+    end
+
+    # nil (no Platform column or empty cell) means unrestricted (never filtered out).
+    # Concrete platform tokens are stored lowercased and deduplicated.
+    def platform_parser(platform_list)
+      tokens = platform_list.to_s.split(",").map(&:strip).reject(&:empty?)
+      return nil if tokens.empty?
+
+      tokens.map(&:downcase).uniq
     end
 
     def hash_parser(property_array)

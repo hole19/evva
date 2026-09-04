@@ -68,6 +68,10 @@ module Evva
       @hash[:exclude_destinations] || []
     end
 
+    def filter_by_platforms
+      @hash[:filter_by_platforms]
+    end
+
     CONFIG_STRUCT = {
       type: Hash,
       elements: {
@@ -83,7 +87,8 @@ module Evva
         destinations_file_name: { type: String },
         package_name: { type: String },
         swift_public: { type: Object, optional: true },
-        exclude_destinations: { type: Array, optional: true }
+        exclude_destinations: { type: Array, optional: true },
+        filter_by_platforms: { type: Array, optional: true }
       }
     }.freeze
 
