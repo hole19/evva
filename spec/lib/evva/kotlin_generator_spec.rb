@@ -158,7 +158,7 @@ Kotlin
     let(:people_bundle) { [
       Evva::AnalyticsProperty.new("rounds_with_wear", "String?", []),
       Evva::AnalyticsProperty.new("last_active_at", "Date", []),
-      Evva::AnalyticsProperty.new("previous_wear_platform", "WearableAppPlatform", []),
+      Evva::AnalyticsProperty.new("upgrade_source", "PremiumFrom", []),
       Evva::AnalyticsProperty.new("wear_platform", "WearableAppPlatform?", ["firebase", "custom destination"]),
     ] }
     let(:expected) {
@@ -190,10 +190,10 @@ sealed class AnalyticsProperty(
         innerValue = value,
     )
 
-    data class PreviousWearPlatform(
-        val value: WearableAppPlatform,
+    data class UpgradeSource(
+        val value: PremiumFrom,
     ) : AnalyticsProperty(
-        property = AnalyticsProperties.PREVIOUS_WEAR_PLATFORM,
+        property = AnalyticsProperties.UPGRADE_SOURCE,
         innerValue = value.key,
     )
 
