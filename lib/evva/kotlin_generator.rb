@@ -84,11 +84,21 @@ module Evva
 
         properties = people_bundle.map do |property|
           type = native_type(property.type)
+          value_fetcher = "value"
+
+          if special_property?(type)
+            if type.end_with?("?")
+              # optional value, we need ? to access a parameter
+              value_fetcher += "?"
+            end
+            value_fetcher += ".key"
+          end
+
           {
             class_name: camelize(property.property_name),
             property_name: constantize(property.property_name),
             type: type,
-            is_special_property: special_property?(property.type),
+            value_fetcher: value_fetcher,
             destinations: property.destinations.map { |p| constantize(p) },
           }
         end

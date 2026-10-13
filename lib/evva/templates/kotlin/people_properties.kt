@@ -1,6 +1,6 @@
 sealed class <%= class_name %>(
 	property: <%= enums_class_name %>,
-	val innerValue: Any,
+	val innerValue: Any?,
 	val destinations: Array<<%= destinations_class_name %>> = emptyArray(),
 ) {
 	val name = property.key
@@ -10,7 +10,7 @@ sealed class <%= class_name %>(
 		val value: <%= property[:type] %>,
 	) : <%= class_name %>(
 		property = <%= enums_class_name %>.<%= property[:property_name] %>,
-		innerValue = value<% if property[:is_special_property] %>.key<% end %>,
+		innerValue = <%= property[:value_fetcher] %>,
 		<%- if property[:destinations].count > 0 -%>
 		destinations = arrayOf(
 			<%- property[:destinations].each_with_index do |d, index| -%>

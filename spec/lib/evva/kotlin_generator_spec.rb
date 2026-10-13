@@ -156,9 +156,10 @@ Kotlin
   describe "#people_properties" do
     subject { generator.people_properties(people_bundle, "AnalyticsProperty", "AnalyticsProperties", "AnalyticsDestinations") }
     let(:people_bundle) { [
-      Evva::AnalyticsProperty.new("rounds_with_wear", "String", []),
+      Evva::AnalyticsProperty.new("rounds_with_wear", "String?", []),
       Evva::AnalyticsProperty.new("last_active_at", "Date", []),
-      Evva::AnalyticsProperty.new("wear_platform", "WearableAppPlatform", ["firebase", "custom destination"]),
+      Evva::AnalyticsProperty.new("upgrade_source", "PremiumFrom", []),
+      Evva::AnalyticsProperty.new("wear_platform", "WearableAppPlatform?", ["firebase", "custom destination"]),
     ] }
     let(:expected) {
 <<-Kotlin
@@ -170,13 +171,13 @@ package com.hole19golf.hole19.analytics
 
 sealed class AnalyticsProperty(
     property: AnalyticsProperties,
-    val innerValue: Any,
+    val innerValue: Any?,
     val destinations: Array<AnalyticsDestinations> = emptyArray(),
 ) {
     val name = property.key
 
     data class RoundsWithWear(
-        val value: String,
+        val value: String?,
     ) : AnalyticsProperty(
         property = AnalyticsProperties.ROUNDS_WITH_WEAR,
         innerValue = value,
@@ -189,11 +190,18 @@ sealed class AnalyticsProperty(
         innerValue = value,
     )
 
+    data class UpgradeSource(
+        val value: PremiumFrom,
+    ) : AnalyticsProperty(
+        property = AnalyticsProperties.UPGRADE_SOURCE,
+        innerValue = value.key,
+    )
+
     data class WearPlatform(
-        val value: WearableAppPlatform,
+        val value: WearableAppPlatform?,
     ) : AnalyticsProperty(
         property = AnalyticsProperties.WEAR_PLATFORM,
-        innerValue = value.key,
+        innerValue = value?.key,
         destinations = arrayOf(
             AnalyticsDestinations.FIREBASE,
             AnalyticsDestinations.CUSTOM_DESTINATION,
