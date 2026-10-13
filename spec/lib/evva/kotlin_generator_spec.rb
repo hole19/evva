@@ -156,8 +156,9 @@ Kotlin
   describe "#people_properties" do
     subject { generator.people_properties(people_bundle, "AnalyticsProperty", "AnalyticsProperties", "AnalyticsDestinations") }
     let(:people_bundle) { [
-      Evva::AnalyticsProperty.new("rounds_with_wear", "String", []),
+      Evva::AnalyticsProperty.new("rounds_with_wear", "String?", []),
       Evva::AnalyticsProperty.new("last_active_at", "Date", []),
+      Evva::AnalyticsProperty.new("previous_wear_platform", "WearableAppPlatform", []),
       Evva::AnalyticsProperty.new("wear_platform", "WearableAppPlatform?", ["firebase", "custom destination"]),
     ] }
     let(:expected) {
@@ -176,7 +177,7 @@ sealed class AnalyticsProperty(
     val name = property.key
 
     data class RoundsWithWear(
-        val value: String,
+        val value: String?,
     ) : AnalyticsProperty(
         property = AnalyticsProperties.ROUNDS_WITH_WEAR,
         innerValue = value,
@@ -187,6 +188,13 @@ sealed class AnalyticsProperty(
     ) : AnalyticsProperty(
         property = AnalyticsProperties.LAST_ACTIVE_AT,
         innerValue = value,
+    )
+
+    data class PreviousWearPlatform(
+        val value: WearableAppPlatform,
+    ) : AnalyticsProperty(
+        property = AnalyticsProperties.PREVIOUS_WEAR_PLATFORM,
+        innerValue = value.key,
     )
 
     data class WearPlatform(
