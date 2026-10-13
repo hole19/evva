@@ -159,6 +159,8 @@ Kotlin
       Evva::AnalyticsProperty.new("rounds_with_wear", "String", []),
       Evva::AnalyticsProperty.new("last_active_at", "Date", []),
       Evva::AnalyticsProperty.new("wear_platform", "WearableAppPlatform", ["firebase", "custom destination"]),
+      Evva::AnalyticsProperty.new("last_round_id", "Long?", []),
+      Evva::AnalyticsProperty.new("previous_wear_platform", "WearableAppPlatform?", []),
     ] }
     let(:expected) {
 <<-Kotlin
@@ -170,7 +172,7 @@ package com.hole19golf.hole19.analytics
 
 sealed class AnalyticsProperty(
     property: AnalyticsProperties,
-    val innerValue: Any,
+    val innerValue: Any?,
     val destinations: Array<AnalyticsDestinations> = emptyArray(),
 ) {
     val name = property.key
@@ -198,6 +200,20 @@ sealed class AnalyticsProperty(
             AnalyticsDestinations.FIREBASE,
             AnalyticsDestinations.CUSTOM_DESTINATION,
         ),
+    )
+
+    data class LastRoundId(
+        val value: Long?,
+    ) : AnalyticsProperty(
+        property = AnalyticsProperties.LAST_ROUND_ID,
+        innerValue = value,
+    )
+
+    data class PreviousWearPlatform(
+        val value: WearableAppPlatform?,
+    ) : AnalyticsProperty(
+        property = AnalyticsProperties.PREVIOUS_WEAR_PLATFORM,
+        innerValue = value?.key,
     )
 }
 Kotlin
