@@ -2,8 +2,6 @@
 
 ## [Unreleased]
 
-## [0.10.0] - 2026-10-13
-
 - Support optional people properties in Kotlin: `innerValue` is now `Any?` and optional special properties use `value?.key`
 
 ## [0.9.0] - 2026-09-04
