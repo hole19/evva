@@ -158,9 +158,7 @@ Kotlin
     let(:people_bundle) { [
       Evva::AnalyticsProperty.new("rounds_with_wear", "String", []),
       Evva::AnalyticsProperty.new("last_active_at", "Date", []),
-      Evva::AnalyticsProperty.new("wear_platform", "WearableAppPlatform", ["firebase", "custom destination"]),
-      Evva::AnalyticsProperty.new("last_round_id", "Long?", []),
-      Evva::AnalyticsProperty.new("previous_wear_platform", "WearableAppPlatform?", []),
+      Evva::AnalyticsProperty.new("wear_platform", "WearableAppPlatform?", ["firebase", "custom destination"]),
     ] }
     let(:expected) {
 <<-Kotlin
@@ -192,28 +190,14 @@ sealed class AnalyticsProperty(
     )
 
     data class WearPlatform(
-        val value: WearableAppPlatform,
+        val value: WearableAppPlatform?,
     ) : AnalyticsProperty(
         property = AnalyticsProperties.WEAR_PLATFORM,
-        innerValue = value.key,
+        innerValue = value?.key,
         destinations = arrayOf(
             AnalyticsDestinations.FIREBASE,
             AnalyticsDestinations.CUSTOM_DESTINATION,
         ),
-    )
-
-    data class LastRoundId(
-        val value: Long?,
-    ) : AnalyticsProperty(
-        property = AnalyticsProperties.LAST_ROUND_ID,
-        innerValue = value,
-    )
-
-    data class PreviousWearPlatform(
-        val value: WearableAppPlatform?,
-    ) : AnalyticsProperty(
-        property = AnalyticsProperties.PREVIOUS_WEAR_PLATFORM,
-        innerValue = value?.key,
     )
 }
 Kotlin
