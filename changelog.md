@@ -3,7 +3,6 @@
 ## [Unreleased]
 
 - **Breaking:** Kotlin enum constants (events, people properties, special property enums and destinations) are now generated in PascalCase, e.g. `RoundStarted` instead of `ROUND_STARTED`. The `key` values are unchanged
-- Kotlin enum constants that would not start with a letter are prefixed with `_` (`9 holes` -> `_9Holes`), and non-ASCII letters are kept
 
 ## [0.10.0] - 2026-10-13
 
