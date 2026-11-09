@@ -182,7 +182,8 @@ module Evva
     end
 
     def pascalize(string)
-      string.to_s.split(/[^A-Za-z0-9]+/).reject(&:empty?).map(&:capitalize).join
+      name = string.to_s.split(/[^\p{Alnum}]+/).map(&:capitalize).join
+      name.match?(/\A\p{L}/) ? name : "_#{name}"
     end
 
     def native_type(type)

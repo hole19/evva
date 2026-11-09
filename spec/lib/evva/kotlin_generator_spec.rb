@@ -130,6 +130,24 @@ enum class PremiumFrom(val key: String) {
 Kotlin
      }
     it { should eq expected }
+
+    context "when values do not start with a letter or use non-ASCII letters" do
+      let(:enums) { [
+        Evva::AnalyticsEnum.new("HoleCount", ["9 holes", "_2fa", "日本語"]),
+      ] }
+
+      let(:expected_enum) {
+<<-Kotlin
+enum class HoleCount(val key: String) {
+    _9Holes("9 holes"),
+    _2fa("_2fa"),
+    日本語("日本語"),
+}
+Kotlin
+      }
+
+      it { should include expected_enum }
+    end
   end
 
   describe "#event_enum" do
