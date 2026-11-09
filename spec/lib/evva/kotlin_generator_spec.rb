@@ -29,13 +29,13 @@ sealed class AnalyticsEvent(
     val name = event.key
 
     data object CpPageView : AnalyticsEvent(
-        event = AnalyticsEvents.CP_PAGE_VIEW,
+        event = AnalyticsEvents.CpPageView,
     )
 
     data object CpPageView2 : AnalyticsEvent(
-        event = AnalyticsEvents.CP_PAGE_VIEW_2,
+        event = AnalyticsEvents.CpPageView2,
         destinations = arrayOf(
-            AnalyticsDestinations.FIREBASE,
+            AnalyticsDestinations.Firebase,
         ),
     )
 
@@ -43,14 +43,14 @@ sealed class AnalyticsEvent(
         val courseId: Long,
         val courseName: String,
     ) : AnalyticsEvent(
-        event = AnalyticsEvents.CP_PAGE_VIEW_A,
+        event = AnalyticsEvents.CpPageViewA,
         properties = mapOf(
             "course_id" to courseId,
             "course_name" to courseName,
         ),
         destinations = arrayOf(
-            AnalyticsDestinations.FIREBASE,
-            AnalyticsDestinations.CUSTOM_DESTINATION,
+            AnalyticsDestinations.Firebase,
+            AnalyticsDestinations.CustomDestination,
         ),
     )
 
@@ -59,14 +59,14 @@ sealed class AnalyticsEvent(
         val courseName: String,
         val fromScreen: CourseProfileSource,
     ) : AnalyticsEvent(
-        event = AnalyticsEvents.CP_PAGE_VIEW_B,
+        event = AnalyticsEvents.CpPageViewB,
         properties = mapOf(
             "course_id" to courseId,
             "course_name" to courseName,
             "from_screen" to fromScreen.key,
         ),
         destinations = arrayOf(
-            AnalyticsDestinations.FIREBASE,
+            AnalyticsDestinations.Firebase,
         ),
     )
 
@@ -75,7 +75,7 @@ sealed class AnalyticsEvent(
         val courseName: String,
         val fromScreen: CourseProfileSource?,
     ) : AnalyticsEvent(
-        event = AnalyticsEvents.CP_PAGE_VIEW_C,
+        event = AnalyticsEvents.CpPageViewC,
         properties = mapOf(
             "course_id" to courseId,
             "course_name" to courseName,
@@ -88,7 +88,7 @@ sealed class AnalyticsEvent(
         val courseName: String,
         val viewedAt: String,
     ) : AnalyticsEvent(
-        event = AnalyticsEvents.CP_PAGE_VIEW_D,
+        event = AnalyticsEvents.CpPageViewD,
         properties = mapOf(
             "course_id" to courseId,
             "course_name" to courseName,
@@ -106,7 +106,7 @@ Kotlin
     subject { generator.special_property_enums(enums) }
     let(:enums) { [
       Evva::AnalyticsEnum.new("CourseProfileSource", ["course_discovery", "synced_courses"]),
-      Evva::AnalyticsEnum.new("PremiumFrom", ["Course Profile", "Round Setup"]),
+      Evva::AnalyticsEnum.new("PremiumFrom", ["Course Profile", "Round Setup", "PAYWALL", "push-notification v2"]),
     ] }
     let(:expected) {
 <<-Kotlin
@@ -117,13 +117,15 @@ package com.hole19golf.hole19.analytics
  */
 
 enum class CourseProfileSource(val key: String) {
-    COURSE_DISCOVERY("course_discovery"),
-    SYNCED_COURSES("synced_courses"),
+    CourseDiscovery("course_discovery"),
+    SyncedCourses("synced_courses"),
 }
 
 enum class PremiumFrom(val key: String) {
-    COURSE_PROFILE("Course Profile"),
-    ROUND_SETUP("Round Setup"),
+    CourseProfile("Course Profile"),
+    RoundSetup("Round Setup"),
+    Paywall("PAYWALL"),
+    PushNotificationV2("push-notification v2"),
 }
 Kotlin
      }
@@ -145,8 +147,8 @@ package com.hole19golf.hole19.analytics
  */
 
 enum class AnalyticsEvents(val key: String) {
-    NAV_FEED_TAP("nav_feed_tap"),
-    NAV_PERFORMANCE_TAP("nav_performance_tap"),
+    NavFeedTap("nav_feed_tap"),
+    NavPerformanceTap("nav_performance_tap"),
 }
 Kotlin
      }
@@ -179,32 +181,32 @@ sealed class AnalyticsProperty(
     data class RoundsWithWear(
         val value: String?,
     ) : AnalyticsProperty(
-        property = AnalyticsProperties.ROUNDS_WITH_WEAR,
+        property = AnalyticsProperties.RoundsWithWear,
         innerValue = value,
     )
 
     data class LastActiveAt(
         val value: String,
     ) : AnalyticsProperty(
-        property = AnalyticsProperties.LAST_ACTIVE_AT,
+        property = AnalyticsProperties.LastActiveAt,
         innerValue = value,
     )
 
     data class UpgradeSource(
         val value: PremiumFrom,
     ) : AnalyticsProperty(
-        property = AnalyticsProperties.UPGRADE_SOURCE,
+        property = AnalyticsProperties.UpgradeSource,
         innerValue = value.key,
     )
 
     data class WearPlatform(
         val value: WearableAppPlatform?,
     ) : AnalyticsProperty(
-        property = AnalyticsProperties.WEAR_PLATFORM,
+        property = AnalyticsProperties.WearPlatform,
         innerValue = value?.key,
         destinations = arrayOf(
-            AnalyticsDestinations.FIREBASE,
-            AnalyticsDestinations.CUSTOM_DESTINATION,
+            AnalyticsDestinations.Firebase,
+            AnalyticsDestinations.CustomDestination,
         ),
     )
 }
@@ -229,8 +231,8 @@ package com.hole19golf.hole19.analytics
  */
 
 enum class AnalyticsProperties(val key: String) {
-    ROUNDS_WITH_WEAR("rounds_with_wear"),
-    WEAR_PLATFORM("wear_platform"),
+    RoundsWithWear("rounds_with_wear"),
+    WearPlatform("wear_platform"),
 }
 Kotlin
     }
@@ -252,8 +254,8 @@ package com.hole19golf.hole19.analytics
  */
 
 enum class AnalyticsDestinations {
-    FIREBASE,
-    WHATEVER_YOU_WANT_REALLY,
+    Firebase,
+    WhateverYouWantReally,
 }
 Kotlin
     }

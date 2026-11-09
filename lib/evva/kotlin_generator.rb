@@ -47,11 +47,11 @@ module Evva
             }
           end
 
-          destinations = event.destinations.map { |p| constantize(p) }
+          destinations = event.destinations.map { |p| pascalize(p) }
 
           {
             class_name: camelize(event.event_name),
-            event_name: constantize(event.event_name),
+            event_name: pascalize(event.event_name),
             properties: properties,
             destinations: destinations
           }
@@ -67,7 +67,7 @@ module Evva
 
         events = bundle.map(&:event_name).map do |event_name|
           {
-            name: constantize(event_name),
+            name: pascalize(event_name),
             value: event_name,
           }
         end
@@ -96,10 +96,10 @@ module Evva
 
           {
             class_name: camelize(property.property_name),
-            property_name: constantize(property.property_name),
+            property_name: pascalize(property.property_name),
             type: type,
             value_fetcher: value_fetcher,
-            destinations: property.destinations.map { |p| constantize(p) },
+            destinations: property.destinations.map { |p| pascalize(p) },
           }
         end
 
@@ -113,7 +113,7 @@ module Evva
 
         properties = people_bundle.map(&:property_name).map do |property_name|
           {
-            name: constantize(property_name),
+            name: pascalize(property_name),
             value: property_name,
           }
         end
@@ -127,7 +127,7 @@ module Evva
         enums = enums_bundle.map do |enum|
           values = enum.values.map do |value|
             {
-              name: constantize(value),
+              name: pascalize(value),
               value: value,
             }
           end
@@ -146,7 +146,7 @@ module Evva
       header_footer_wrapper do
         class_name = file_name
 
-        destinations = bundle.map { |d| constantize(d) }
+        destinations = bundle.map { |d| pascalize(d) }
 
         template_from(DESTINATIONS_TEMPLATE).result(binding)
       end
@@ -181,8 +181,8 @@ module Evva
       string.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub("/", "::")
     end
 
-    def constantize(string)
-      string.tr(" ", "_").upcase
+    def pascalize(string)
+      string.to_s.split(/[^A-Za-z0-9]+/).reject(&:empty?).map(&:capitalize).join
     end
 
     def native_type(type)
