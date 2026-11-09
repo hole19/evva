@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- **Breaking:** Kotlin enum constants (events, people properties, special property enums and destinations) are now generated in PascalCase, e.g. `RoundStarted` instead of `ROUND_STARTED`. The `key` values are unchanged
+
 ## [0.10.0] - 2026-10-13
 
 - Support optional people properties in Kotlin: `innerValue` is now `Any?` and optional special properties use `value?.key`
