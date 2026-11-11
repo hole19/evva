@@ -48,9 +48,33 @@ Evva automatically generates code for triggering events based on a Google Sheets
  | Column | Required | Meaning |
  | --- | --- | --- |
  | `Event Name` | yes | The event name |
- | `Event Properties` | no | Comma separated `name:Type` pairs |
+ | `Event Properties` | no | `name:Type` pairs, comma separated or one per line |
  | `Event Destination` | no | Comma separated destinations |
  | `Platform` | no | Which platforms track the event |
+
+### Event Properties
+
+ Properties can be separated by commas, by line breaks inside the cell, or both,
+ so a long list can be kept readable with one property per line (Option+Enter
+ on Mac, Alt+Enter on Windows):
+
+ ```
+ handicap:Double?
+ playing_handicap:Int?
+ number_of_played_holes:Int
+ ```
+
+ Blank lines, trailing commas and spaces around items or around `:` are ignored.
+
+ Multi-line cells need evva 0.12.0 or newer. Older versions read the whole cell as
+ a single broken property, so only convert rows once every app generating from
+ the sheet has been updated.
+
+### Destinations
+
+ `Event Destination` (and `Property Destination` in the people properties sheet)
+ accepts the same separators, and spaces around each destination are ignored, so
+ the cell can be a multi-select dropdown, which writes values as `mixpanel, braze`.
 
 ### Platform
 

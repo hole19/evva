@@ -31,6 +31,69 @@ describe Evva::GoogleSheet do
       expect(events).to eq(expected)
     end
 
+    context "when list cells use line breaks, as exported by Google Sheets" do
+      let(:events_file) { File.read("spec/fixtures/sample_public_events_multiline.csv") }
+
+      it "reads each multi-line cell as one field and parses it like the comma separated sheet" do
+        comma_separated = Evva::GoogleSheet.new(events_sheet, people_sheet, enum_sheet)
+        stub_request(:get, events_sheet).to_return(status: 200, body: File.read("spec/fixtures/sample_public_events.csv"))
+        expected = comma_separated.events
+
+        stub_request(:get, events_sheet).to_return(status: 200, body: events_file)
+        expect(events).to eq(expected)
+      end
+    end
+
+    describe "list cells" do
+      let(:events_file) { %(Event Name,Event Properties,Event Destination\nsome_event,"#{properties}","#{destinations}"\n) }
+      let(:properties) { "a:Int,b:String?" }
+      let(:destinations) { "mixpanel,braze" }
+
+      {
+        "comma separated" => "a:Int,b:String?",
+        "one per line" => "a:Int\nb:String?",
+        "one per line with CRLF" => "a:Int\r\nb:String?",
+        "one per line with CR" => "a:Int\rb:String?",
+        "mixed commas and line breaks" => "a:Int,\nb:String?",
+        "a trailing comma" => "a:Int,b:String?,",
+        "a trailing line break" => "a:Int\nb:String?\n",
+        "blank lines between items" => "a:Int\n\n\nb:String?",
+        "spaces around separators and colons" => " a : Int ,\n  b: String? ",
+      }.each do |description, cell|
+        context "with event properties written with #{description}" do
+          let(:properties) { cell }
+
+          it "parses the same properties" do
+            expect(events.first.properties).to eq(a: "Int", b: "String?")
+          end
+        end
+      end
+
+      {
+        "comma separated" => "mixpanel,braze",
+        "as a multi-select dropdown (comma and space)" => "mixpanel, braze",
+        "one per line" => "mixpanel\nbraze",
+        "a trailing comma" => "mixpanel,braze,",
+      }.each do |description, cell|
+        context "with event destinations written #{description}" do
+          let(:destinations) { cell }
+
+          it "parses the same destinations" do
+            expect(events.first.destinations).to eq(["mixpanel", "braze"])
+          end
+        end
+      end
+
+      context "with empty cells" do
+        let(:events_file) { "Event Name,Event Properties,Event Destination\nsome_event,,\n" }
+
+        it "has no properties and no destinations" do
+          expect(events.first.properties).to eq({})
+          expect(events.first.destinations).to eq([])
+        end
+      end
+    end
+
     context "when the sheet has no Platform column" do
       it "leaves platforms as nil (unrestricted)" do
         expect(events.map(&:platforms)).to all(be_nil)
@@ -167,6 +230,14 @@ describe Evva::GoogleSheet do
         Evva::AnalyticsProperty.new("total_friends", "Int", []),
         Evva::AnalyticsProperty.new("wearable_platform", "WearableAppPlatform", ["firebase"]),
       ]
+    end
+  end
+
+  describe "#people_properties with a multi-select destination dropdown" do
+    let(:people_file) { File.read("spec/fixtures/sample_public_people_properties_multiselect.csv") }
+
+    it "trims the space the dropdown puts after each comma" do
+      expect(sheet.people_properties.first.destinations).to eq(["firebase", "custom destination"])
     end
   end
 
