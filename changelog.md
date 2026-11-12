@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-11
+
+- `Event Properties` can be written one property per line (and mixed with commas); `Event Destination` and `Property Destination` trim spaces around each destination, so a multi-select dropdown (`mixpanel, braze`) works
+
 ## [0.11.0] - 2026-11-09
 
 - **Breaking:** Kotlin enum constants (events, people properties, special property enums and destinations) are now generated in PascalCase, e.g. `RoundStarted` instead of `ROUND_STARTED`. The `key` values are unchanged

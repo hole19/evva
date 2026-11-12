@@ -34,9 +34,9 @@ module Evva
         @events_csv.map do |row|
           event_name = row[EVENT_NAME]
           properties = hash_parser(row[EVENT_PROPERTIES])
-          destinations = row[EVENT_DESTINATION]&.split(",")
+          destinations = list_parser(row[EVENT_DESTINATION])
           platforms = platform_parser(platform_header && row[platform_header])
-          Evva::AnalyticsEvent.new(event_name, properties, destinations || [], platforms)
+          Evva::AnalyticsEvent.new(event_name, properties, destinations, platforms)
         end
       end
     end
@@ -50,8 +50,8 @@ module Evva
       @people_properties ||= @people_properties_csv.map do |row|
         property_name = row[PROPERTY_NAME]
         property_type = row[PROPERTY_TYPE]
-        destinations = row[PROPERTY_DESTINATION]&.split(",")
-        Evva::AnalyticsProperty.new(property_name, property_type, destinations || [])
+        destinations = list_parser(row[PROPERTY_DESTINATION])
+        Evva::AnalyticsProperty.new(property_name, property_type, destinations)
       end
     end
 
@@ -118,15 +118,20 @@ module Evva
       tokens.map(&:downcase).uniq
     end
 
+    # Items may be separated by commas, line breaks, or both, so a long list can
+    # be written one item per line in the cell. A multi-select dropdown joins its
+    # values with ", ", hence the strip.
+    def list_parser(list)
+      list.to_s.split(/,|\r\n|\r|\n/).map(&:strip).reject(&:empty?)
+    end
+
     def hash_parser(property_array)
       h = {}
-      unless property_array.nil? || property_array.empty?
-        property_array.split(",").each do |prop|
-          split_prop = prop.split(":")
-          prop_name = split_prop[0].strip.to_sym
-          prop_type = split_prop[1].to_s.strip
-          h[prop_name] = prop_type
-        end
+      list_parser(property_array).each do |prop|
+        split_prop = prop.split(":")
+        prop_name = split_prop[0].strip.to_sym
+        prop_type = split_prop[1].to_s.strip
+        h[prop_name] = prop_type
       end
       h
     end
