@@ -71,7 +71,7 @@ describe Evva::GoogleSheet do
 
       {
         "comma separated" => "mixpanel,braze",
-        "as a multi-select dropdown (comma and space)" => "mixpanel, braze",
+        "with a space after each comma" => "mixpanel, braze",
         "one per line" => "mixpanel\nbraze",
         "a trailing comma" => "mixpanel,braze,",
       }.each do |description, cell|
@@ -233,10 +233,10 @@ describe Evva::GoogleSheet do
     end
   end
 
-  describe "#people_properties with a multi-select destination dropdown" do
-    let(:people_file) { File.read("spec/fixtures/sample_public_people_properties_multiselect.csv") }
+  describe "#people_properties with spaces in the destination cell" do
+    let(:people_file) { File.read("spec/fixtures/sample_public_people_properties_spaced.csv") }
 
-    it "trims the space the dropdown puts after each comma" do
+    it "trims the space after each comma" do
       expect(sheet.people_properties.first.destinations).to eq(["firebase", "custom destination"])
     end
   end

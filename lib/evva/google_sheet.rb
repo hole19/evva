@@ -119,8 +119,7 @@ module Evva
     end
 
     # Items may be separated by commas, line breaks, or both, so a long list can
-    # be written one item per line in the cell. A multi-select dropdown joins its
-    # values with ", ", hence the strip.
+    # be written one item per line in the cell.
     def list_parser(list)
       list.to_s.split(/,|\r\n|\r|\n/).map(&:strip).reject(&:empty?)
     end
