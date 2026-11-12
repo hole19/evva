@@ -4,7 +4,7 @@
 
 ## [0.12.0] - 2026-11-11
 
-- `Event Properties` can be written one property per line (and mixed with commas); `Event Destination` and `Property Destination` trim spaces around each destination, so a multi-select dropdown (`mixpanel, braze`) works
+- `Event Properties` can be written one property per line (and mixed with commas); `Event Destination` and `Property Destination` accept the same separators and trim spaces around each destination
 
 ## [0.11.0] - 2026-11-09
 

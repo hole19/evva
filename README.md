@@ -73,8 +73,9 @@ Evva automatically generates code for triggering events based on a Google Sheets
 ### Destinations
 
  `Event Destination` (and `Property Destination` in the people properties sheet)
- accepts the same separators, and spaces around each destination are ignored, so
- the cell can be a multi-select dropdown, which writes values as `mixpanel, braze`.
+ accepts the same separators, and spaces around each destination are ignored.
+ A multi-select dropdown works too: Google's CSV export joins its values with a
+ plain comma (`mixpanel,braze`), so it reads the same in older evva versions.
 
 ### Platform
 
