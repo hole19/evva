@@ -254,6 +254,58 @@ describe Evva::GoogleSheet do
         Evva::AnalyticsEnum.new("PremiumClickBuy", ["notes","hi_res_maps","whatever"])
       ]
     end
+
+    context "when values are written one per line, as exported by Google Sheets" do
+      let(:enum_file) { File.read("spec/fixtures/sample_public_enums_multiline.csv") }
+
+      it "parses the same values as the comma separated sheet" do
+        expect(enum_classes.map(&:values)).to eq [
+          ["course_discovery", "synced_courses", "nearby", "deal"],
+          ["notes", "hi_res_maps", "whatever"],
+        ]
+      end
+    end
+
+    describe "a Possible Values cell" do
+      let(:enum_file) { %(Enum Name,Possible Values\nSomeEnum,"#{values}"\n) }
+
+      {
+        "comma separated" => "a,b",
+        "one per line" => "a\nb",
+        "one per line with CRLF" => "a\r\nb",
+        "mixed commas and line breaks" => "a,\nb",
+        "a trailing comma" => "a,b,",
+        "a trailing line break" => "a\nb\n",
+        "blank lines between values" => "a\n\nb",
+        "spaces around separators" => " a ,\n b ",
+      }.each do |description, cell|
+        context "written #{description}" do
+          let(:values) { cell }
+
+          it "parses the same values" do
+            expect(enum_classes.first.values).to eq(["a", "b"])
+          end
+        end
+      end
+
+      context "with spaces inside a value" do
+        let(:values) { "main app,No Scoring" }
+
+        it "keeps them" do
+          expect(enum_classes.first.values).to eq(["main app", "No Scoring"])
+        end
+      end
+
+      ["", ",", "\n\n", " , "].each do |cell|
+        context "with no values (#{cell.inspect})" do
+          let(:values) { cell }
+
+          it "stops with an error naming the enum, instead of generating an enum Swift cannot compile" do
+            expect { enum_classes }.to raise_error("Enum SomeEnum has no Possible Values")
+          end
+        end
+      end
+    end
   end
 
   describe "#destinations" do
