@@ -63,7 +63,7 @@ module Evva
 
       @enum_classes ||= @enum_classes_csv.map do |row|
         enum_name = row[ENUM_NAME]
-        values = row[ENUM_VALUES].split(",")
+        values = list_parser(row[ENUM_VALUES])
         Evva::AnalyticsEnum.new(enum_name, values)
       end
     end

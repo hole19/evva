@@ -77,6 +77,15 @@ Evva automatically generates code for triggering events based on a Google Sheets
  A multi-select dropdown works too: Google's CSV export joins its values with a
  plain comma (`mixpanel,braze`), so it reads the same in older evva versions.
 
+### Enum values
+
+ `Possible Values` in the enum classes sheet accepts the same separators: commas,
+ one value per line, or both. Spaces around each value are ignored, spaces inside a
+ value (`main app`) are kept. Each value is the exact string sent to analytics.
+
+ One value per line needs evva 0.12.1 or newer. Older versions read the whole cell
+ as a single value, so only convert rows once every app has been updated.
+
 ### Platform
 
  `Platform` tags an event with the platforms it belongs to. Filtering is driven
