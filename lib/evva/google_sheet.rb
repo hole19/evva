@@ -64,6 +64,9 @@ module Evva
       @enum_classes ||= @enum_classes_csv.map do |row|
         enum_name = row[ENUM_NAME]
         values = list_parser(row[ENUM_VALUES])
+        # An enum with no cases is not valid Swift with a String raw type.
+        raise "Enum #{enum_name} has no #{ENUM_VALUES}" if values.empty?
+
         Evva::AnalyticsEnum.new(enum_name, values)
       end
     end

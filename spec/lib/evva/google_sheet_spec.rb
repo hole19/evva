@@ -296,11 +296,13 @@ describe Evva::GoogleSheet do
         end
       end
 
-      context "when empty" do
-        let(:enum_file) { "Enum Name,Possible Values\nSomeEnum,\n" }
+      ["", ",", "\n\n", " , "].each do |cell|
+        context "with no values (#{cell.inspect})" do
+          let(:values) { cell }
 
-        it "has no values" do
-          expect(enum_classes.first.values).to eq([])
+          it "stops with an error naming the enum, instead of generating an enum Swift cannot compile" do
+            expect { enum_classes }.to raise_error("Enum SomeEnum has no Possible Values")
+          end
         end
       end
     end
