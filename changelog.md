@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - `data_source.type` is now `csv`, the format both Google Sheets and Evva Hub exports produce. `google_sheet` is still accepted, and `Evva::GoogleSheet` remains as an alias of the renamed `Evva::CsvSource`
+- Tested on Ruby 4.0 in CI. The development lockfile moves `unicode-emoji` to 4.3.0, since 4.1.0 doesn't install on Ruby 4
 
 ## [0.12.1] - 2026-11-17
 
