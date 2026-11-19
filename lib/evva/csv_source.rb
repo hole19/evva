@@ -2,7 +2,9 @@ require "net/https"
 require "csv"
 
 module Evva
-  class GoogleSheet
+  # Reads the analytics dictionary from CSV files fetched over HTTP. Both the
+  # Google Sheets CSV export and the Evva Hub export produce this format.
+  class CsvSource
     EVENT_NAME = "Event Name"
     EVENT_PROPERTIES = "Event Properties"
     EVENT_DESTINATION = "Event Destination"
@@ -23,7 +25,7 @@ module Evva
 
     def events
       @events_csv ||= begin
-        Logger.info("Downloading data from Google Sheet at #{@events_url}")
+        Logger.info("Downloading CSV from #{@events_url}")
         get_csv(@events_url)
       end
 
@@ -43,7 +45,7 @@ module Evva
 
     def people_properties
       @people_properties_csv ||= begin
-        Logger.info("Downloading data from Google Sheet at #{@people_properties_url}")
+        Logger.info("Downloading CSV from #{@people_properties_url}")
         get_csv(@people_properties_url)
       end
 
@@ -57,7 +59,7 @@ module Evva
 
     def enum_classes
       @enum_classes_csv ||= begin
-        Logger.info("Downloading data from Google Sheet at #{@enum_classes_url}")
+        Logger.info("Downloading CSV from #{@enum_classes_url}")
         get_csv(@enum_classes_url)
       end
 
@@ -135,4 +137,7 @@ module Evva
       h
     end
   end
+
+  # Kept so code that referenced the old name still loads.
+  GoogleSheet = CsvSource
 end

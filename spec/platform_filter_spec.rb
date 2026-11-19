@@ -18,7 +18,7 @@ describe "filtering by platform end to end" do
 
   def unfiltered_bundle
     source = {
-      type: "google_sheet",
+      type: "csv",
       events_url: events_url,
       people_properties_url: people_url,
       enum_classes_url: enum_url

@@ -43,7 +43,7 @@ Layout/DotPosition:
 # Configuration parameters: AllowForAlignment, AllowBeforeTrailingComments, ForceEqualSignAlignment.
 Layout/ExtraSpacing:
   Exclude:
-    - 'spec/lib/evva/google_sheet_spec.rb'
+    - 'spec/lib/evva/csv_source_spec.rb'
 
 # Offense count: 1
 # This cop supports safe autocorrection (--autocorrect).
@@ -98,7 +98,7 @@ Layout/SpaceAfterComma:
   Exclude:
     - 'lib/evva/kotlin_generator.rb'
     - 'lib/evva/swift_generator.rb'
-    - 'spec/lib/evva/google_sheet_spec.rb'
+    - 'spec/lib/evva/csv_source_spec.rb'
 
 # Offense count: 94
 # This cop supports safe autocorrection (--autocorrect).
@@ -111,7 +111,7 @@ Layout/SpaceInsideHashLiteralBraces:
     - 'lib/evva/logger.rb'
     - 'spec/evva_spec.rb'
     - 'spec/lib/evva/config_spec.rb'
-    - 'spec/lib/evva/google_sheet_spec.rb'
+    - 'spec/lib/evva/csv_source_spec.rb'
     - 'spec/lib/evva/kotlin_generator_spec.rb'
     - 'spec/lib/evva/object_extension_spec.rb'
     - 'spec/lib/evva/swift_generator_spec.rb'
@@ -128,7 +128,7 @@ Lint/AmbiguousBlockAssociation:
 Lint/AmbiguousRegexpLiteral:
   Exclude:
     - 'spec/lib/evva/config_spec.rb'
-    - 'spec/lib/evva/google_sheet_spec.rb'
+    - 'spec/lib/evva/csv_source_spec.rb'
     - 'spec/lib/evva/object_extension_spec.rb'
 
 # Offense count: 3
@@ -257,12 +257,12 @@ Style/HashSyntax:
     - 'spec/evva_spec.rb'
     - 'spec/platform_filter_spec.rb'
     - 'lib/evva/config.rb'
-    - 'lib/evva/google_sheet.rb'
+    - 'lib/evva/csv_source.rb'
     - 'lib/evva/kotlin_generator.rb'
     - 'lib/evva/logger.rb'
     - 'lib/evva/swift_generator.rb'
     - 'spec/lib/evva/config_spec.rb'
-    - 'spec/lib/evva/google_sheet_spec.rb'
+    - 'spec/lib/evva/csv_source_spec.rb'
     - 'spec/lib/evva/kotlin_generator_spec.rb'
     - 'spec/lib/evva/object_extension_spec.rb'
     - 'spec/lib/evva/swift_generator_spec.rb'
@@ -288,7 +288,7 @@ Style/ModuleFunction:
 # SupportedStyles: literals, strict
 Style/MutableConstant:
   Exclude:
-    - 'lib/evva/google_sheet.rb'
+    - 'lib/evva/csv_source.rb'
     - 'lib/evva/kotlin_generator.rb'
     - 'lib/evva/swift_generator.rb'
 
@@ -363,7 +363,7 @@ Style/SymbolProc:
 Style/TrailingCommaInArrayLiteral:
   Exclude:
     - 'spec/evva_spec.rb'
-    - 'spec/lib/evva/google_sheet_spec.rb'
+    - 'spec/lib/evva/csv_source_spec.rb'
     - 'spec/lib/evva/kotlin_generator_spec.rb'
     - 'spec/lib/evva/swift_generator_spec.rb'
 

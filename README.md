@@ -4,7 +4,7 @@ Evva
 [![Status](https://travis-ci.org/hole19/evva.svg?branch=master)](https://travis-ci.org/hole19/evva?branch=master)
 [![Gem](https://img.shields.io/gem/v/evva.svg?style=flat)](http://rubygems.org/gems/evva "View this project in Rubygems")
 
-Evva automatically generates code for triggering events based on a Google Sheets specification. It generates code for both Swift (iOS) and Kotlin (Android).
+Evva automatically generates code for triggering events based on a CSV specification, such as a Google Sheets CSV export or an Evva Hub export. It generates code for both Swift (iOS) and Kotlin (Android).
 
 # Instalation
 
@@ -23,10 +23,10 @@ Evva automatically generates code for triggering events based on a Google Sheets
  type: Android|iOS
 
  data_source:
-  type: google_sheet
-  events_url: <GOOGLE-DRIVE-EVENTS-SHEET-URL>
-  people_properties_url: <GOOGLE-DRIVE-PEOPLE-PROPERTIES-SHEET-URL>
-  enum_classes_url: <GOOGLE-DRIVE-ENUM-CLASSES-SHEET-URL>
+  type: csv
+  events_url: <EVENTS-CSV-URL>
+  people_properties_url: <PEOPLE-PROPERTIES-CSV-URL>
+  enum_classes_url: <ENUM-CLASSES-CSV-URL>
 
  out_path: /folder/where/analytics/classes/are
  event_file_name: /file/with/tracking/functions
@@ -39,6 +39,10 @@ Evva automatically generates code for triggering events based on a Google Sheets
  filter_by_platforms:  # optional; array of platforms to keep (e.g. [ios])
    - ios
  ```
+
+ `data_source.type: csv` reads each URL as a CSV with a header row. Google Sheets
+ (File → Share → Publish to web → CSV) and Evva Hub exports both produce it.
+ `google_sheet` is the former name of `csv` and is still accepted.
 
 ## The events sheet
 

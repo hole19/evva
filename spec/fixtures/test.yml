@@ -1,7 +1,7 @@
 type: Android
 
 data_source:
-  type: google_sheet
+  type: csv
   events_url: https://path-to-csv
   people_properties_url: https://path-to-csv
   enum_classes_url: https://path-to-csv
