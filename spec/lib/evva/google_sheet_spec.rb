@@ -29,7 +29,7 @@ describe Evva::GoogleSheet do
       sheet.people_properties
       sheet.enum_classes
 
-      expect(logged).to include("Downloading sheet from https://example.com/export/events.csv")
+      expect(logged).to include("Downloading events sheet from https://example.com/export/events.csv")
       expect(logged.join("\n")).not_to match(/evv_secret|token=/)
     end
 
