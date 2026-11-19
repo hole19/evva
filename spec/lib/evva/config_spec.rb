@@ -5,7 +5,7 @@ describe Evva::Config do
     {
       type: "EvvaOS",
       data_source: {
-        type: "google_sheet",
+        type: "csv",
         events_url: "https://events.csv",
         people_properties_url: "https://people_properties.csv",
         enum_classes_url: "https://enum_classes.csv",
@@ -39,7 +39,12 @@ describe Evva::Config do
   describe "#data_source" do
     subject(:data_source) { config.data_source }
 
-    it { should eq(type: "google_sheet", events_url: "https://events.csv", people_properties_url: "https://people_properties.csv", enum_classes_url: "https://enum_classes.csv") }
+    it { should eq(type: "csv", events_url: "https://events.csv", people_properties_url: "https://people_properties.csv", enum_classes_url: "https://enum_classes.csv") }
+
+    context "when given the legacy google_sheet type" do
+      before { hash[:data_source][:type] = "google_sheet" }
+      it { should include(type: "google_sheet", events_url: "https://events.csv") }
+    end
 
     context "when given an unknown type data source" do
       before { hash[:data_source] = { type: "i_dunno" } }

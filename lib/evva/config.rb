@@ -92,7 +92,7 @@ module Evva
       }
     }.freeze
 
-    GOOGLE_SHEET_STRUCT = {
+    CSV_STRUCT = {
       type: Hash,
       elements: {
         type: { type: String },
@@ -103,7 +103,9 @@ module Evva
     }.freeze
 
     DICTIONARY_STRUCT = {
-      "google_sheet" => GOOGLE_SHEET_STRUCT
+      "csv" => CSV_STRUCT,
+      # Former name of "csv", still accepted so existing configs keep working.
+      "google_sheet" => CSV_STRUCT
     }.freeze
   end
 end

@@ -1,5 +1,7 @@
-describe Evva::GoogleSheet do
-  let(:sheet) { Evva::GoogleSheet.new(events_sheet, people_sheet, enum_sheet) }
+require "open3"
+
+describe Evva::CsvSource do
+  let(:sheet) { Evva::CsvSource.new(events_sheet, people_sheet, enum_sheet) }
 
   let(:events_sheet) { "https://wtvr1" }
   let(:people_sheet) { "https://wtvr2" }
@@ -66,7 +68,7 @@ describe Evva::GoogleSheet do
       let(:events_file) { File.read("spec/fixtures/sample_public_events_multiline.csv") }
 
       it "reads each multi-line cell as one field and parses it like the comma separated sheet" do
-        comma_separated = Evva::GoogleSheet.new(events_sheet, people_sheet, enum_sheet)
+        comma_separated = Evva::CsvSource.new(events_sheet, people_sheet, enum_sheet)
         stub_request(:get, events_sheet).to_return(status: 200, body: File.read("spec/fixtures/sample_public_events.csv"))
         expected = comma_separated.events
 
@@ -352,5 +354,34 @@ describe Evva::GoogleSheet do
         "custom destination",
       ]
     end
+  end
+end
+
+describe "CSV data source compatibility" do
+  let(:urls) { { events_url: "https://wtvr1", people_properties_url: "https://wtvr2", enum_classes_url: "https://wtvr3" } }
+
+  before do
+    stub_request(:get, urls[:events_url]).to_return(status: 200, body: File.read("spec/fixtures/sample_public_events.csv"))
+    stub_request(:get, urls[:people_properties_url]).to_return(status: 200, body: File.read("spec/fixtures/sample_public_people_properties.csv"))
+    stub_request(:get, urls[:enum_classes_url]).to_return(status: 200, body: File.read("spec/fixtures/sample_public_enums.csv"))
+  end
+
+  it "keeps Evva::GoogleSheet as an alias of Evva::CsvSource" do
+    expect(Evva::GoogleSheet).to equal(Evva::CsvSource)
+  end
+
+  # Run in a fresh process so nothing the suite already loaded can hide a
+  # missing file.
+  it "still loads through the former require path" do
+    script = 'require "evva/google_sheet"; exit(Evva::GoogleSheet.equal?(Evva::CsvSource) ? 0 : 1)'
+    output, status = Open3.capture2e(RbConfig.ruby, "-Ilib", "-e", script)
+    expect(status).to be_success, output
+  end
+
+  it "reads the same data for the legacy 'google_sheet' type as for 'csv'" do
+    csv = Evva.analytics_data(config: urls.merge(type: "csv"))
+    legacy = Evva.analytics_data(config: urls.merge(type: "google_sheet"))
+    expect(legacy[:events]).to eq(csv[:events])
+    expect(csv[:events]).not_to be_empty
   end
 end

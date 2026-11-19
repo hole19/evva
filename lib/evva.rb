@@ -2,7 +2,7 @@ require "optparse"
 require "yaml"
 
 require "evva/logger"
-require "evva/google_sheet"
+require "evva/csv_source"
 require "evva/config"
 require "evva/file_reader"
 require "evva/analytics_event"
@@ -65,8 +65,8 @@ module Evva
   def analytics_data(config:)
     source =
       case config[:type]
-      when "google_sheet"
-        Evva::GoogleSheet.new(config[:events_url], config[:people_properties_url], config[:enum_classes_url])
+      when "csv", "google_sheet"
+        Evva::CsvSource.new(config[:events_url], config[:people_properties_url], config[:enum_classes_url])
       end
     events_bundle = {}
     events_bundle[:events] = source.events

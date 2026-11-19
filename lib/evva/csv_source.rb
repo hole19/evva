@@ -1,0 +1,155 @@
+require "net/https"
+require "csv"
+
+module Evva
+  # Reads the analytics dictionary from CSV files fetched over HTTP. Both the
+  # Google Sheets CSV export and the Evva Hub export produce this format.
+  class CsvSource
+    EVENT_NAME = "Event Name"
+    EVENT_PROPERTIES = "Event Properties"
+    EVENT_DESTINATION = "Event Destination"
+    EVENT_PLATFORM = "Platform"
+
+    PROPERTY_NAME = "Property Name"
+    PROPERTY_TYPE = "Property Type"
+    PROPERTY_DESTINATION = "Property Destination"
+
+    ENUM_NAME = "Enum Name"
+    ENUM_VALUES = "Possible Values"
+
+    def initialize(events_url, people_properties_url, enum_classes_url)
+      @events_url = events_url
+      @people_properties_url = people_properties_url
+      @enum_classes_url = enum_classes_url
+    end
+
+    def events
+      @events_csv ||= begin
+        Logger.info("Downloading events sheet from #{redact(@events_url)}")
+        get_csv(@events_url)
+      end
+
+      @events ||= begin
+        platform_header = header_matching(@events_csv, EVENT_PLATFORM)
+        Logger.info("No #{EVENT_PLATFORM} column in the events sheet, every event will be generated for every platform") if platform_header.nil?
+
+        @events_csv.map do |row|
+          event_name = row[EVENT_NAME]
+          properties = hash_parser(row[EVENT_PROPERTIES])
+          destinations = list_parser(row[EVENT_DESTINATION])
+          platforms = platform_parser(platform_header && row[platform_header])
+          Evva::AnalyticsEvent.new(event_name, properties, destinations, platforms)
+        end
+      end
+    end
+
+    def people_properties
+      @people_properties_csv ||= begin
+        Logger.info("Downloading people properties sheet from #{redact(@people_properties_url)}")
+        get_csv(@people_properties_url)
+      end
+
+      @people_properties ||= @people_properties_csv.map do |row|
+        property_name = row[PROPERTY_NAME]
+        property_type = row[PROPERTY_TYPE]
+        destinations = list_parser(row[PROPERTY_DESTINATION])
+        Evva::AnalyticsProperty.new(property_name, property_type, destinations)
+      end
+    end
+
+    def enum_classes
+      @enum_classes_csv ||= begin
+        Logger.info("Downloading enums sheet from #{redact(@enum_classes_url)}")
+        get_csv(@enum_classes_url)
+      end
+
+      @enum_classes ||= @enum_classes_csv.map do |row|
+        enum_name = row[ENUM_NAME]
+        values = list_parser(row[ENUM_VALUES])
+        # An enum with no cases is not valid Swift with a String raw type.
+        raise "Enum #{enum_name} has no #{ENUM_VALUES}" if values.empty?
+
+        Evva::AnalyticsEnum.new(enum_name, values)
+      end
+    end
+
+    def destinations
+      @destinations ||= events.map(&:destinations).flatten.uniq
+    end
+
+  private
+
+    # Sheet URLs can carry an auth token in the query string or userinfo, so
+    # only scheme, host and path are ever printed.
+    def redact(url)
+      uri = URI(url.to_s)
+      "#{uri.scheme}://#{uri.host}#{uri.path}"
+    rescue URI::InvalidURIError
+      "<invalid url>"
+    end
+
+    def get_csv(url)
+      data = get(url)
+
+      begin
+        CSV.parse(data, headers: true)
+      rescue StandardError => e
+        raise "Cannot parse. Expected CSV at #{redact(url)}: #{e}"
+      end
+    end
+
+    def get(url, max_redirects = 1)
+      raise "Too may redirects" if max_redirects == -1
+
+      uri = URI(url)
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+      request = Net::HTTP::Get.new(uri.request_uri)
+      response = http.request(request)
+
+      return get(response["location"], max_redirects - 1) if response.is_a? Net::HTTPRedirection
+
+      raise "Http Error #{response.body}" if response.code.to_i >= 400
+
+      response.body
+    end
+
+    # Matched ignoring case and surrounding whitespace, because a header of
+    # "platform" or "Platform " means what it plainly means.
+    def header_matching(csv, name)
+      csv.headers.compact.find { |header| header.to_s.strip.casecmp?(name) }
+    end
+
+    # nil (no Platform column or empty cell) means unrestricted (never filtered out).
+    # Concrete platform tokens are stored lowercased and deduplicated.
+    def platform_parser(platform_list)
+      tokens = platform_list.to_s.split(",").map(&:strip).reject(&:empty?)
+      return nil if tokens.empty?
+
+      tokens.map(&:downcase).uniq
+    end
+
+    # Items may be separated by commas, line breaks, or both, so a long list can
+    # be written one item per line in the cell.
+    def list_parser(list)
+      list.to_s.split(/,|\r\n|\r|\n/).map(&:strip).reject(&:empty?)
+    end
+
+    def hash_parser(property_array)
+      h = {}
+      list_parser(property_array).each do |prop|
+        split_prop = prop.split(":")
+        prop_name = split_prop[0].strip.to_sym
+        prop_type = split_prop[1].to_s.strip
+        h[prop_name] = prop_type
+      end
+      h
+    end
+  end
+
+  # Kept so code that referenced the old name still loads.
+  GoogleSheet = CsvSource
+end
