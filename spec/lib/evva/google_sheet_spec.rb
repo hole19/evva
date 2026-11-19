@@ -14,6 +14,37 @@ describe Evva::GoogleSheet do
     stub_request(:get, enum_sheet).to_return(status: 200, body: enum_file, headers: {})
   end
 
+  describe "auth token in sheet URLs" do
+    let(:events_sheet) { "https://example.com/export/events.csv?token=evv_secret" }
+    let(:people_sheet) { "https://example.com/export/people.csv?token=evv_secret" }
+    let(:enum_sheet) { "https://example.com/export/enums.csv?token=evv_secret" }
+    let(:logged) { [] }
+
+    before do
+      allow(Evva::Logger).to receive(:info) { |msg| logged << msg }
+    end
+
+    it "does not log the token or credentials when downloading" do
+      sheet.events
+      sheet.people_properties
+      sheet.enum_classes
+
+      expect(logged).to include("Downloading data from Google Sheet at https://example.com/export/events.csv")
+      expect(logged.join("\n")).not_to match(/evv_secret|token=/)
+    end
+
+    context "when the response is not valid CSV" do
+      let(:events_file) { "\"unterminated" }
+
+      it "does not include the token in the error" do
+        expect { sheet.events }.to raise_error(RuntimeError) { |e|
+          expect(e.message).to include("https://example.com/export/events.csv")
+          expect(e.message).not_to match(/evv_secret|token=/)
+        }
+      end
+    end
+  end
+
   describe "#events" do
     subject(:events) { sheet.events }
 
