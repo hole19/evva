@@ -23,7 +23,7 @@ module Evva
 
     def events
       @events_csv ||= begin
-        Logger.info("Downloading data from Google Sheet at #{@events_url}")
+        Logger.info("Downloading events sheet from #{redact(@events_url)}")
         get_csv(@events_url)
       end
 
@@ -43,7 +43,7 @@ module Evva
 
     def people_properties
       @people_properties_csv ||= begin
-        Logger.info("Downloading data from Google Sheet at #{@people_properties_url}")
+        Logger.info("Downloading people properties sheet from #{redact(@people_properties_url)}")
         get_csv(@people_properties_url)
       end
 
@@ -57,7 +57,7 @@ module Evva
 
     def enum_classes
       @enum_classes_csv ||= begin
-        Logger.info("Downloading data from Google Sheet at #{@enum_classes_url}")
+        Logger.info("Downloading enums sheet from #{redact(@enum_classes_url)}")
         get_csv(@enum_classes_url)
       end
 
@@ -77,13 +77,22 @@ module Evva
 
   private
 
+    # Sheet URLs can carry an auth token in the query string or userinfo, so
+    # only scheme, host and path are ever printed.
+    def redact(url)
+      uri = URI(url.to_s)
+      "#{uri.scheme}://#{uri.host}#{uri.path}"
+    rescue URI::InvalidURIError
+      "<invalid url>"
+    end
+
     def get_csv(url)
       data = get(url)
 
       begin
         CSV.parse(data, headers: true)
       rescue StandardError => e
-        raise "Cannot parse. Expected CSV at #{url}: #{e}"
+        raise "Cannot parse. Expected CSV at #{redact(url)}: #{e}"
       end
     end
 
