@@ -1,3 +1,5 @@
+require "open3"
+
 describe Evva::CsvSource do
   let(:sheet) { Evva::CsvSource.new(events_sheet, people_sheet, enum_sheet) }
 
@@ -366,6 +368,14 @@ describe "CSV data source compatibility" do
 
   it "keeps Evva::GoogleSheet as an alias of Evva::CsvSource" do
     expect(Evva::GoogleSheet).to equal(Evva::CsvSource)
+  end
+
+  # Run in a fresh process so nothing the suite already loaded can hide a
+  # missing file.
+  it "still loads through the former require path" do
+    script = 'require "evva/google_sheet"; exit(Evva::GoogleSheet.equal?(Evva::CsvSource) ? 0 : 1)'
+    output, status = Open3.capture2e(RbConfig.ruby, "-Ilib", "-e", script)
+    expect(status).to be_success, output
   end
 
   it "reads the same data for the legacy 'google_sheet' type as for 'csv'" do
