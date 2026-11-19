@@ -4,6 +4,10 @@
 
 - `data_source.type` is now `csv`, the format both Google Sheets and Evva Hub exports produce. `google_sheet` is still accepted, and `Evva::GoogleSheet` remains as an alias of the renamed `Evva::CsvSource`
 
+## [0.12.1] - 2026-11-17
+
+- Enum `Possible Values` accept the same separators as `Event Properties` (commas and/or one value per line) and trim spaces around each value; an enum with no values stops the run with an error naming it
+
 ## [0.12.0] - 2026-11-11
 
 - `Event Properties` can be written one property per line (and mixed with commas); `Event Destination` and `Property Destination` accept the same separators and trim spaces around each destination

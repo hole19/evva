@@ -25,7 +25,7 @@ module Evva
 
     def events
       @events_csv ||= begin
-        Logger.info("Downloading CSV from #{@events_url}")
+        Logger.info("Downloading events sheet from #{redact(@events_url)}")
         get_csv(@events_url)
       end
 
@@ -45,7 +45,7 @@ module Evva
 
     def people_properties
       @people_properties_csv ||= begin
-        Logger.info("Downloading CSV from #{@people_properties_url}")
+        Logger.info("Downloading people properties sheet from #{redact(@people_properties_url)}")
         get_csv(@people_properties_url)
       end
 
@@ -59,13 +59,16 @@ module Evva
 
     def enum_classes
       @enum_classes_csv ||= begin
-        Logger.info("Downloading CSV from #{@enum_classes_url}")
+        Logger.info("Downloading enums sheet from #{redact(@enum_classes_url)}")
         get_csv(@enum_classes_url)
       end
 
       @enum_classes ||= @enum_classes_csv.map do |row|
         enum_name = row[ENUM_NAME]
-        values = row[ENUM_VALUES].split(",")
+        values = list_parser(row[ENUM_VALUES])
+        # An enum with no cases is not valid Swift with a String raw type.
+        raise "Enum #{enum_name} has no #{ENUM_VALUES}" if values.empty?
+
         Evva::AnalyticsEnum.new(enum_name, values)
       end
     end
@@ -76,13 +79,22 @@ module Evva
 
   private
 
+    # Sheet URLs can carry an auth token in the query string or userinfo, so
+    # only scheme, host and path are ever printed.
+    def redact(url)
+      uri = URI(url.to_s)
+      "#{uri.scheme}://#{uri.host}#{uri.path}"
+    rescue URI::InvalidURIError
+      "<invalid url>"
+    end
+
     def get_csv(url)
       data = get(url)
 
       begin
         CSV.parse(data, headers: true)
       rescue StandardError => e
-        raise "Cannot parse. Expected CSV at #{url}: #{e}"
+        raise "Cannot parse. Expected CSV at #{redact(url)}: #{e}"
       end
     end
 
