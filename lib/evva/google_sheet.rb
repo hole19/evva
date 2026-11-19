@@ -23,7 +23,7 @@ module Evva
 
     def events
       @events_csv ||= begin
-        Logger.info("Downloading data from Google Sheet at #{redact(@events_url)}")
+        Logger.info("Downloading sheet from #{redact(@events_url)}")
         get_csv(@events_url)
       end
 
@@ -43,7 +43,7 @@ module Evva
 
     def people_properties
       @people_properties_csv ||= begin
-        Logger.info("Downloading data from Google Sheet at #{redact(@people_properties_url)}")
+        Logger.info("Downloading sheet from #{redact(@people_properties_url)}")
         get_csv(@people_properties_url)
       end
 
@@ -57,7 +57,7 @@ module Evva
 
     def enum_classes
       @enum_classes_csv ||= begin
-        Logger.info("Downloading data from Google Sheet at #{redact(@enum_classes_url)}")
+        Logger.info("Downloading sheet from #{redact(@enum_classes_url)}")
         get_csv(@enum_classes_url)
       end
 
